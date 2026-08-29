@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { StepKicker } from "@/components/game-bar";
 import { TeamReel } from "@/components/team-reel";
 import { LUCKS, luckLine, type Luck } from "@/lib/luck";
 import { ERAS, FRANCHISES, hashSeed, mulberry32, pickIndex, type Era, type Franchise } from "@/lib/nba";
@@ -76,8 +77,7 @@ export function RoomSpin({
 
   return (
     <section>
-      <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">01 · Pull</p>
-      <p className="mb-4 text-sm text-muted">{kicker}</p>
+      <StepKicker n={1} label="Pull" hint={kicker} className="mb-4" />
       <div className="grid grid-cols-3 gap-2">
         <div>
           <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">Franchise</p>

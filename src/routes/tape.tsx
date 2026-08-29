@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { NamePlate } from "@/components/name-plate";
 import { PageIntro } from "@/components/page-intro";
+import { Button } from "@/components/ui/button";
 import { useMounted } from "@/lib/hooks";
 import { downloadBlob, renderMarkCard, shareFile } from "@/lib/share-card";
 import { loadSave, todayKey, writeTapePins } from "@/lib/studio-save";
@@ -15,8 +16,8 @@ type Filter = (typeof FILTERS)[number];
 
 function TapePage() {
   const mounted = useMounted();
-  const stamp = mounted ? todayKey() : "";
-  const rows = useMemo(() => (stamp ? buildTape(stamp) : []), [stamp]);
+  const stamp = todayKey();
+  const rows = useMemo(() => buildTape(stamp), [stamp]);
   const [filter, setFilter] = useState<Filter>("ALL");
   const [pins, setPins] = useState<string[]>([]);
   const [sharing, setSharing] = useState<string | null>(null);
@@ -64,14 +65,6 @@ function TapePage() {
     }
   }
 
-  if (!mounted) {
-    return (
-      <div>
-        <PageIntro kicker="The Tape" title="Marks. Not a book." lead="The print is opening…" />
-      </div>
-    );
-  }
-
   return (
     <div>
       <PageIntro
@@ -106,33 +99,35 @@ function TapePage() {
           const pinned = pins.includes(row.player.id);
           return (
             <li key={row.player.id}>
-              <div className="flex flex-col gap-3 rounded-xl bg-paper px-4 py-4 shadow-border sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-3">
-                    <p className="font-display text-xl font-semibold">{row.player.name}</p>
-                    <p
-                      className={cn(
-                        "text-micro font-medium uppercase tracking-label",
-                        row.mark === "UP" && "text-good",
-                        row.mark === "DOWN" && "text-warn",
-                        row.mark === "FLAT" && "text-muted",
-                      )}
-                    >
-                      {row.mark}
-                      <span className="ml-2 text-subtle">{Array.from({ length: row.heat }, () => "·").join("")}</span>
+              <div className="flex flex-col gap-3 rounded-xl bg-paper p-3 shadow-border sm:flex-row sm:items-center sm:justify-between sm:p-4">
+                <div className="flex min-w-0 items-start gap-3">
+                  <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline gap-3">
+                      <p className="font-display text-xl font-semibold">{row.player.name}</p>
+                      <p
+                        className={cn(
+                          "text-micro font-medium uppercase tracking-label",
+                          row.mark === "UP" && "text-good",
+                          row.mark === "DOWN" && "text-warn",
+                          row.mark === "FLAT" && "text-muted",
+                        )}
+                      >
+                        {row.mark}
+                        <span className="ml-2 text-subtle">{Array.from({ length: row.heat }, () => "·").join("")}</span>
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-subtle">
+                      {row.player.pos} · {row.player.era}
                     </p>
+                    <p className="mt-1 text-sm text-muted">{row.note}</p>
                   </div>
-                  <p className="mt-1 text-sm text-muted">{row.note}</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 sm:shrink-0">
                   <Button variant="ghost" onClick={() => togglePin(row.player.id)}>
                     {pinned ? "Pinned" : "Pin"}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => shareRow(row)}
-                    disabled={sharing === row.player.id}
-                  >
+                  <Button variant="ghost" onClick={() => shareRow(row)} disabled={sharing === row.player.id}>
                     {sharing === row.player.id ? "Sharing…" : "Share mark"}
                   </Button>
                 </div>

@@ -6,6 +6,14 @@ export const Route = createFileRoute("/changelog")({ component: ChangelogPage })
 const ENTRIES = [
   {
     date: "August 29, 2026",
+    title: "The names",
+    items: [
+      "Tape, Slate, Keepers, and the Market Board wear plates. Initials on the still. Not a likeness.",
+      "Classic, Daily, All-time, Playoffs sit on one bar. STEP 1 pull. STEP 2 pick. Search the pack.",
+    ],
+  },
+  {
+    date: "August 29, 2026",
     title: "The desk",
     items: [
       "Home is a desk now. Games, Fantasy, Dynasty, In-Season, Lab. Photo cards. A live tape feed. Marks, not a book.",
@@ -127,7 +135,7 @@ function ChangelogPage() {
       />
       <ol className="space-y-12">
         {ENTRIES.map((entry) => (
-          <li key={entry.date}>
+          <li key={entry.title}>
             <p className="text-micro font-medium uppercase tracking-label text-subtle">{entry.date}</p>
             <h2 className="mt-2 text-3xl font-semibold">{entry.title}</h2>
             <ul className="mt-4 max-w-xl space-y-2 text-muted">

@@ -1,5 +1,5 @@
-import type { Recap } from "@/lib/recap";
-import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel } from "@/lib/nba";
+import type { Recap } from "./recap.ts";
+import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel } from "./nba.ts";
 
 const KEY = "fbs.v1";
 const VERSION = 2;
@@ -61,6 +61,14 @@ export function writeSave(next: StudioSave) {
   } catch {
     /* private mode */
   }
+}
+
+export function bestFrom(runs: SavedRun[], mode: SavedRun["mode"]) {
+  let best = 0;
+  for (const run of runs) {
+    if (run.mode === mode && run.wins > best) best = run.wins;
+  }
+  return best;
 }
 
 export function pad2(n: number) {

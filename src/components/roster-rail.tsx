@@ -1,4 +1,4 @@
-import { initials, plateFor } from "@/components/crest";
+import { NamePlate } from "@/components/name-plate";
 import type { Player } from "@/lib/nba";
 import { cn } from "@/lib/utils";
 
@@ -29,12 +29,7 @@ export function RosterRail({
           >
             {player ? (
               <>
-                <span className="relative size-9 shrink-0 overflow-hidden rounded-full bg-fg">
-                  <img src={plateFor(player.pos, player.era)} alt="" crossOrigin="anonymous" className="size-full object-cover" />
-                  <span className="absolute inset-0 grid place-items-center bg-fg/45 text-micro font-medium text-paper">
-                    {initials(player.name)}
-                  </span>
-                </span>
+                <NamePlate name={player.name} pos={player.pos} era={player.era} size="sm" />
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium">{player.name}</span>
                   <span className="text-micro uppercase tracking-label text-subtle">{player.pos}</span>
@@ -42,7 +37,7 @@ export function RosterRail({
               </>
             ) : (
               <>
-                <span className="size-9 shrink-0 rounded-full shadow-border" />
+                <NamePlate empty size="sm" />
                 <span className="text-sm text-muted">Open</span>
               </>
             )}

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { initials, plateFor } from "@/components/crest";
+import { NamePlate } from "@/components/name-plate";
 import { shortDate } from "@/lib/season";
 import { buildTape } from "@/lib/tape";
 import { cn } from "@/lib/utils";
@@ -26,17 +26,7 @@ export function StudioFeed({ dateKey }: { dateKey: string }) {
           {feed.map((row) => (
             <li key={row.player.id}>
               <Link to="/tape" className="flex gap-3">
-                <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-fg">
-                  <img
-                    src={plateFor(row.player.pos, row.player.era)}
-                    alt=""
-                    crossOrigin="anonymous"
-                    className="size-full object-cover"
-                  />
-                  <span className="absolute inset-0 grid place-items-center bg-fg/50 text-micro font-medium text-paper">
-                    {initials(row.player.name)}
-                  </span>
-                </span>
+                <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} />
                 <span className="min-w-0">
                   <span className="flex items-baseline justify-between gap-2">
                     <span className="truncate text-sm font-medium">{row.player.name}</span>
@@ -55,9 +45,7 @@ export function StudioFeed({ dateKey }: { dateKey: string }) {
                     {row.player.pos} · {row.player.era}
                   </span>
                   <span className="mt-1 block text-sm text-muted">{row.note}</span>
-                  <span className="mt-1 block text-micro text-subtle">
-                    The Tape · {stamp}
-                  </span>
+                  <span className="mt-1 block text-micro text-subtle">The Tape · {stamp}</span>
                 </span>
               </Link>
             </li>
@@ -75,17 +63,7 @@ export function StudioFeed({ dateKey }: { dateKey: string }) {
         <ul className="flex flex-col gap-3">
           {movers.map((row) => (
             <li key={row.player.id} className="flex items-center gap-3">
-              <span className="relative size-9 shrink-0 overflow-hidden rounded-full bg-fg">
-                <img
-                  src={plateFor(row.player.pos, row.player.era)}
-                  alt=""
-                  crossOrigin="anonymous"
-                  className="size-full object-cover"
-                />
-                <span className="absolute inset-0 grid place-items-center bg-fg/50 text-micro font-medium text-paper">
-                  {initials(row.player.name)}
-                </span>
-              </span>
+              <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} size="sm" />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">{row.player.name}</span>
                 <span className="text-micro uppercase tracking-label text-subtle">{row.player.pos}</span>

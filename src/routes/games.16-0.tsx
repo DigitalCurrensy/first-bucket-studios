@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { DraftFilters, GameBar, StepKicker } from "@/components/game-bar";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
@@ -9,6 +9,8 @@ import { RosterRail } from "@/components/roster-rail";
 import { SeasonRecap } from "@/components/season-recap";
 import { SeasonWalk } from "@/components/season-walk";
 import { ShareCardButton } from "@/components/share-card-button";
+import { Button } from "@/components/ui/button";
+import { filterPack, type PosFilter } from "@/lib/draft";
 import { luckLine, type Luck } from "@/lib/luck";
 import {
   PLAYERS,
@@ -43,6 +45,8 @@ function SixteenPage() {
   const [pack, setPack] = useState<Player[]>([]);
   const [picks, setPicks] = useState<string[]>([]);
   const [open, setOpen] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
+  const [pos, setPos] = useState<PosFilter>("ALL");
   const [wins, setWins] = useState(0);
   const [projected, setProjected] = useState(0);
   const [nights, setNights] = useState<Night[]>([]);
@@ -53,6 +57,7 @@ function SixteenPage() {
   const roster = picks
     .map((id) => pack.find((p) => p.id === id))
     .filter((p): p is Player => Boolean(p));
+  const shown = filterPack(pack, query, pos);
 
   const startDraft = useCallback((nextTeam: Franchise, nextEra: Era, nextLuck: Luck) => {
     setTeam(nextTeam);
@@ -61,6 +66,8 @@ function SixteenPage() {
     setPack(dealPack(`${nextTeam}:${nextEra}:${nextLuck}:${Date.now()}`));
     setPicks([]);
     setOpen([]);
+    setQuery("");
+    setPos("ALL");
     setStep("draft");
   }, []);
 
@@ -118,6 +125,8 @@ function SixteenPage() {
     setPack([]);
     setPicks([]);
     setOpen([]);
+    setQuery("");
+    setPos("ALL");
     setNights([]);
     setCopied(false);
   }
@@ -140,19 +149,19 @@ function SixteenPage() {
         lead="One pull. Franchise, era, luck. Eight face-down. You turn five. Then the series play."
       />
 
+      <GameBar current="playoffs" onNew={reset} />
+
       {step === "spin" && <RoomSpin onReady={startDraft} />}
 
       {step === "draft" && (
         <section>
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-micro font-medium uppercase tracking-label text-subtle">
-                02 · Rip · {team} · {era} · {luck}
-              </p>
-              <p className="mt-1 text-sm text-muted">
-                {open.length} turned · {picks.length} of 5 locked in. {luckLine(luck)}
-              </p>
-            </div>
+            <StepKicker
+              n={2}
+              label="Pick"
+              hint={`${team} · ${era} · ${luck}. ${open.length} turned · ${picks.length} of 5. ${luckLine(luck)}`}
+              className="min-w-0 flex-1"
+            />
             <div className="flex flex-wrap gap-2">
               <Button variant="ghost" onClick={rip} disabled={open.length === pack.length}>
                 Turn them all
@@ -165,20 +174,25 @@ function SixteenPage() {
               </Button>
             </div>
           </div>
+          <DraftFilters query={query} onQuery={setQuery} pos={pos} onPos={setPos} />
           <div className="grid gap-6 lg:grid-cols-dashboard">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {pack.map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  team={team}
-                  revealed={open.includes(player.id)}
-                  selected={picks.includes(player.id)}
-                  index={picks.indexOf(player.id)}
-                  onToggle={() => flip(player.id)}
-                />
-              ))}
-            </div>
+            {shown.length === 0 ? (
+              <p className="text-sm text-muted">Nothing in this pack matches. Clear the search.</p>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {shown.map((player) => (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    team={team}
+                    revealed={open.includes(player.id)}
+                    selected={picks.includes(player.id)}
+                    index={picks.indexOf(player.id)}
+                    onToggle={() => flip(player.id)}
+                  />
+                ))}
+              </div>
+            )}
             <RosterRail roster={roster} />
           </div>
         </section>

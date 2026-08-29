@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { NamePlate } from "@/components/name-plate";
 import { PageIntro } from "@/components/page-intro";
-import { useMounted } from "@/lib/hooks";
+import { Button } from "@/components/ui/button";
 import { buildSlate } from "@/lib/slate";
 import { todayKey } from "@/lib/studio-save";
 import type { Call } from "@/lib/week";
@@ -13,15 +13,12 @@ export const Route = createFileRoute("/slate")({ component: SlatePage });
 const CALLS: Array<Call | "ALL"> = ["ALL", "START", "SIT", "STREAM"];
 
 function SlatePage() {
-  const mounted = useMounted();
-  const key = mounted ? todayKey() : "";
-  const rows = useMemo(() => (key ? buildSlate(key) : []), [key]);
+  const key = todayKey();
+  const rows = useMemo(() => buildSlate(key), [key]);
   const [call, setCall] = useState<Call | "ALL">("ALL");
   const [copied, setCopied] = useState(false);
   const shown = rows.filter((row) => call === "ALL" || row.call === call);
-  const stamp = mounted
-    ? new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
-    : "";
+  const stamp = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
   async function copyLine() {
     const line = [
@@ -48,10 +45,8 @@ function SlatePage() {
       />
 
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">{mounted ? stamp : "Opening tonight…"}</p>
-        <Button onClick={copyLine} disabled={!mounted}>
-          {copied ? "Copied" : "Copy slate"}
-        </Button>
+        <p className="text-sm text-muted">{stamp}</p>
+        <Button onClick={copyLine}>{copied ? "Copied" : "Copy slate"}</Button>
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -72,18 +67,21 @@ function SlatePage() {
 
       <ul className="grid gap-3 sm:grid-cols-2">
         {shown.map((row) => (
-          <li key={row.player.id} className="rounded-xl bg-paper p-4 shadow-border sm:p-5">
+          <li key={row.player.id} className="rounded-xl bg-paper p-3 shadow-border sm:p-4">
             <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="font-display text-xl font-semibold">{row.player.name}</p>
-                <p className="text-xs text-subtle">
-                  {row.club} {row.home ? "vs" : "@"} {row.opp}
-                  {row.b2b ? " · B2B" : ""}
-                </p>
+              <div className="flex min-w-0 items-start gap-3">
+                <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} />
+                <div className="min-w-0">
+                  <p className="font-display text-xl font-semibold">{row.player.name}</p>
+                  <p className="text-xs text-subtle">
+                    {row.club} {row.home ? "vs" : "@"} {row.opp}
+                    {row.b2b ? " · B2B" : ""}
+                  </p>
+                </div>
               </div>
               <span
                 className={cn(
-                  "text-micro font-medium uppercase tracking-label",
+                  "shrink-0 text-micro font-medium uppercase tracking-label",
                   row.call === "START" && "text-good",
                   row.call === "SIT" && "text-warn",
                   row.call === "STREAM" && "text-subtle",

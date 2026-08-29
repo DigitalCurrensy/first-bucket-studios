@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { NamePlate } from "@/components/name-plate";
 import { PageIntro } from "@/components/page-intro";
 import {
   CATS,
@@ -81,17 +82,20 @@ function FantasyPage() {
 
           <div className="grid gap-3 md:hidden">
             {week.map((row) => (
-              <article key={row.name} className="rounded-xl bg-paper p-4 shadow-border">
+              <article key={row.name} className="rounded-xl bg-paper p-3 shadow-border sm:p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium">{row.name}</p>
-                    <p className="text-xs text-subtle">
-                      {row.team} · {row.pos} · {row.games}G{row.b2b ? " · B2B" : ""}
-                    </p>
+                  <div className="flex min-w-0 items-start gap-3">
+                    <NamePlate name={row.name} pos={row.pos} />
+                    <div className="min-w-0">
+                      <p className="font-medium">{row.name}</p>
+                      <p className="text-xs text-subtle">
+                        {row.team} · {row.pos} · {row.games}G{row.b2b ? " · B2B" : ""}
+                      </p>
+                    </div>
                   </div>
                   <span
                     className={cn(
-                      "text-micro font-medium uppercase tracking-label",
+                      "shrink-0 text-micro font-medium uppercase tracking-label",
                       row.call === "START" && "text-good",
                       row.call === "SIT" && "text-warn",
                       row.call === "STREAM" && "text-muted",
@@ -120,11 +124,16 @@ function FantasyPage() {
                 {week.map((row) => (
                   <tr key={row.name} className="border-b border-line last:border-0">
                     <td className="px-4 py-3">
-                      <p className="font-medium">{row.name}</p>
-                      <p className="text-xs text-subtle">
-                        {row.team}
-                        {row.b2b ? " · B2B" : ""}
-                      </p>
+                      <span className="flex items-center gap-3">
+                        <NamePlate name={row.name} pos={row.pos} size="sm" />
+                        <span className="min-w-0">
+                          <p className="font-medium">{row.name}</p>
+                          <p className="text-xs text-subtle">
+                            {row.team}
+                            {row.b2b ? " · B2B" : ""}
+                          </p>
+                        </span>
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-muted">{row.pos}</td>
                     <td className="px-4 py-3 tabular-nums">{row.games}</td>
@@ -187,12 +196,13 @@ function FantasyPage() {
                 <p className="mt-1 font-display text-xl font-semibold">{tier.blurb}</p>
                 <ol className="mt-4 space-y-3">
                   {tier.rows.map((row) => (
-                    <li key={row.player.id} className="flex items-baseline justify-between gap-3 text-sm">
-                      <span>
-                        <span className="mr-2 font-mono text-micro tabular-nums text-subtle">{row.rank}</span>
-                        {row.player.name}
+                    <li key={row.player.id} className="flex items-center justify-between gap-3 text-sm">
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="font-mono text-micro tabular-nums text-subtle">{row.rank}</span>
+                        <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} size="sm" />
+                        <span className="truncate">{row.player.name}</span>
                       </span>
-                      <span className="font-mono text-xs tabular-nums text-subtle">{row.score}</span>
+                      <span className="shrink-0 font-mono text-xs tabular-nums text-subtle">{row.score}</span>
                     </li>
                   ))}
                 </ol>
@@ -227,15 +237,18 @@ function FantasyPage() {
           ) : (
             <ul className="grid gap-3 sm:grid-cols-2">
               {streams.map((row) => (
-                <li key={row.name} className="rounded-xl bg-paper p-5 shadow-border">
+                <li key={row.name} className="rounded-xl bg-paper p-3 shadow-border sm:p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-display text-xl font-semibold">{row.name}</p>
-                      <p className="text-xs text-subtle">
-                        {row.team} · {row.pos} · {row.games}G{row.b2b ? " · B2B" : ""}
-                      </p>
+                    <div className="flex min-w-0 items-start gap-3">
+                      <NamePlate name={row.name} pos={row.pos} />
+                      <div className="min-w-0">
+                        <p className="font-display text-xl font-semibold">{row.name}</p>
+                        <p className="text-xs text-subtle">
+                          {row.team} · {row.pos} · {row.games}G{row.b2b ? " · B2B" : ""}
+                        </p>
+                      </div>
                     </div>
-                    <p className="font-mono text-micro tabular-nums text-subtle">{row.cats.join(" · ")}</p>
+                    <p className="shrink-0 font-mono text-micro tabular-nums text-subtle">{row.cats.join(" · ")}</p>
                   </div>
                   <p className="mt-3 text-sm text-muted">{row.why}</p>
                 </li>
@@ -252,12 +265,17 @@ function FantasyPage() {
           </p>
           <ul className="grid gap-3 sm:grid-cols-2">
             {CUTS.map((row) => (
-              <li key={row.name} className="rounded-xl bg-paper p-5 shadow-border">
-                <p className="font-display text-xl font-semibold">{row.name}</p>
-                <p className="text-xs text-subtle">
-                  {row.team} · {row.pos} · {row.games}G
-                </p>
-                <p className="mt-3 text-sm text-muted">{row.why}</p>
+              <li key={row.name} className="rounded-xl bg-paper p-3 shadow-border sm:p-4">
+                <div className="flex items-start gap-3">
+                  <NamePlate name={row.name} pos={row.pos} />
+                  <div className="min-w-0">
+                    <p className="font-display text-xl font-semibold">{row.name}</p>
+                    <p className="text-xs text-subtle">
+                      {row.team} · {row.pos} · {row.games}G
+                    </p>
+                    <p className="mt-3 text-sm text-muted">{row.why}</p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>

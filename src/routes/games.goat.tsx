@@ -1,21 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { DraftFilters, GameBar, StepKicker } from "@/components/game-bar";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
 import { RosterRail } from "@/components/roster-rail";
 import { ShareCardButton } from "@/components/share-card-button";
-import { PLAYERS, goatLabel, goatScore, type Player, type Pos } from "@/lib/nba";
+import { Button } from "@/components/ui/button";
+import { filterPack, type PosFilter } from "@/lib/draft";
+import { PLAYERS, goatLabel, goatScore, type Player } from "@/lib/nba";
 import { recordRun } from "@/lib/studio-save";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/games/goat")({ component: GoatPage });
 
-type Filter = "ALL" | Pos;
-
 function GoatPage() {
-  const [filter, setFilter] = useState<Filter>("ALL");
+  const [pos, setPos] = useState<PosFilter>("ALL");
+  const [query, setQuery] = useState("");
   const [picks, setPicks] = useState<string[]>([]);
   const [score, setScore] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
@@ -24,8 +24,8 @@ function GoatPage() {
     .map((id) => PLAYERS.find((p) => p.id === id))
     .filter((p): p is Player => Boolean(p));
   const shown = useMemo(
-    () => PLAYERS.filter((p) => (filter === "ALL" ? true : p.pos === filter)).sort((a, b) => b.peak - a.peak),
-    [filter],
+    () => filterPack(PLAYERS, query, pos).sort((a, b) => b.peak - a.peak),
+    [query, pos],
   );
   const live = goatScore(roster);
   const locked = score != null;
@@ -58,7 +58,8 @@ function GoatPage() {
     setPicks([]);
     setScore(null);
     setCopied(false);
-    setFilter("ALL");
+    setPos("ALL");
+    setQuery("");
   }
 
   async function copyLine() {
@@ -78,6 +79,8 @@ function GoatPage() {
         title="Five names. No franchise. No era."
         lead="The whole book is open. Balance still travels. A third guard is taxed. Lock the five and we score the circle."
       />
+
+      <GameBar current="alltime" onNew={reset} />
 
       {locked ? (
         <section className="grid gap-8 lg:grid-cols-2">
@@ -103,47 +106,37 @@ function GoatPage() {
       ) : (
         <section>
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-sm text-muted">
-                {picks.length} of 5
-                {roster.length > 0 && (
-                  <span className="ml-2 text-fg">
-                    Live {live} · {goatLabel(live)}
-                  </span>
-                )}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {(["ALL", "G", "F", "C"] as const).map((key) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setFilter(key)}
-                  className={cn(
-                    "min-h-11 rounded-full px-4 text-sm font-medium shadow-border",
-                    filter === key ? "bg-fg text-paper shadow-none" : "text-fg",
-                  )}
-                >
-                  {key === "ALL" ? "All" : key}
-                </button>
-              ))}
-              <Button onClick={lock} disabled={picks.length !== 5}>
-                Lock five
-              </Button>
-            </div>
+            <StepKicker
+              n={1}
+              label="Pick"
+              hint={
+                roster.length > 0
+                  ? `${picks.length} of 5. Live ${live} · ${goatLabel(live)}`
+                  : "Five names. Search the book. G, F, or C."
+              }
+              className="min-w-0 flex-1"
+            />
+            <Button onClick={lock} disabled={picks.length !== 5}>
+              Lock five
+            </Button>
           </div>
+          <DraftFilters query={query} onQuery={setQuery} pos={pos} onPos={setPos} placeholder="Search the book" />
           <div className="grid gap-6 lg:grid-cols-dashboard">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {shown.map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  selected={picks.includes(player.id)}
-                  index={picks.indexOf(player.id)}
-                  onToggle={() => toggle(player.id)}
-                />
-              ))}
-            </div>
+            {shown.length === 0 ? (
+              <p className="text-sm text-muted">No names match. Clear the search.</p>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {shown.map((player) => (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    selected={picks.includes(player.id)}
+                    index={picks.indexOf(player.id)}
+                    onToggle={() => toggle(player.id)}
+                  />
+                ))}
+              </div>
+            )}
             <RosterRail roster={roster} title="Your five" />
           </div>
         </section>

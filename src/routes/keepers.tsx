@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { NamePlate } from "@/components/name-plate";
 import { PageIntro } from "@/components/page-intro";
+import { Button } from "@/components/ui/button";
 import { KEEP_CALLS, KEEPER_ROWS, type KeepCall } from "@/lib/keepers";
 import { loadSave, writeKeepers } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
@@ -73,16 +74,19 @@ function KeepersPage() {
 
       <ul className="grid gap-3">
         {KEEPER_ROWS.map((row) => (
-          <li key={row.id} className="rounded-xl bg-paper p-4 shadow-border sm:p-5">
+          <li key={row.id} className="rounded-xl bg-paper p-3 shadow-border sm:p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="font-display text-xl font-semibold">{row.name}</p>
-                <p className="text-xs text-subtle">
-                  {row.team} · {row.pos}
-                </p>
-                <p className="mt-2 max-w-xl text-sm text-muted">{row.note}</p>
+              <div className="flex min-w-0 items-start gap-3">
+                <NamePlate name={row.name} pos={row.pos} />
+                <div className="min-w-0">
+                  <p className="font-display text-xl font-semibold">{row.name}</p>
+                  <p className="text-xs text-subtle">
+                    {row.team} · {row.pos}
+                  </p>
+                  <p className="mt-2 max-w-xl text-sm text-muted">{row.note}</p>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 sm:shrink-0">
                 {KEEP_CALLS.map((call) => (
                   <button
                     key={call}
@@ -90,9 +94,7 @@ function KeepersPage() {
                     onClick={() => mark(row.id, call)}
                     className={cn(
                       "min-h-11 rounded-full px-4 text-sm font-medium shadow-border",
-                      marks[row.id] === call && call === "KEEP" && "bg-fg text-paper shadow-none",
-                      marks[row.id] === call && call === "TRADE" && "bg-fg text-paper shadow-none",
-                      marks[row.id] === call && call === "CUT" && "bg-fg text-paper shadow-none",
+                      marks[row.id] === call && "bg-fg text-paper shadow-none",
                     )}
                   >
                     {call}
