@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageIntro } from "@/components/page-intro";
+import { Button } from "@/components/ui/button";
+import { downloadBlob, renderGymCard } from "@/lib/share-card";
 
 export const Route = createFileRoute("/gym")({ component: GymPage });
 
@@ -13,6 +15,13 @@ function GymPage() {
   const [clock, setClock] = useState("2:14");
   const [name, setName] = useState("Sabrina Ionescu");
   const [role, setRole] = useState("Guard · First Bucket");
+  const [saved, setSaved] = useState(false);
+
+  async function exportPng() {
+    const blob = await renderGymCard({ home, away, homeScore, awayScore, quarter, clock, name, role });
+    downloadBlob(blob, "first-bucket-gym.png");
+    setSaved(true);
+  }
 
   return (
     <div>
@@ -21,6 +30,10 @@ function GymPage() {
         title="Overlays you can actually use."
         lead="Scorebug and lower-third templates. They are not broadcasts, not highlight tapes, and they do not attach to live games."
       />
+
+      <div className="mb-8">
+        <Button onClick={exportPng}>{saved ? "Saved PNG" : "Export PNG"}</Button>
+      </div>
 
       <div className="grid gap-10 lg:grid-cols-2">
         <section>

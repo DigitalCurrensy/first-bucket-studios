@@ -32,6 +32,7 @@
   --min-width-board: 42rem;
   --grid-template-columns-shell: 14.5rem minmax(0, 1fr);
   --grid-template-columns-dashboard: minmax(0, 1fr) 22rem;
+  --grid-template-columns-dots: repeat(10, minmax(0, 1fr));
   --ease-studio: cubic-bezier(0.22, 1, 0.36, 1);
   --scale-press: 0.98;
   --height-reel-item: 5.75rem;

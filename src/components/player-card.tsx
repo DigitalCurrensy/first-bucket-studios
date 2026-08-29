@@ -1,4 +1,4 @@
-import { Crest, initials, plateFor } from "@/components/crest";
+import { Crest, initials, plateForPlayer } from "@/components/crest";
 import type { Player } from "@/lib/nba";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +24,7 @@ export function PlayerCard({
       <div className="card-face">
         <div className="relative aspect-plate overflow-hidden rounded-md bg-fg">
           <img
-            src={plateFor(player.pos, player.era)}
+            src={plateForPlayer(player.id)}
             alt=""
             crossOrigin="anonymous"
             className="size-full object-cover"

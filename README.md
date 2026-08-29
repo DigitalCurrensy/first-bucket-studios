@@ -4,29 +4,32 @@ Games + basketball tools. A Digital Currensy house.
 
 Editorial. Not a sportsbook. Not a recruiting desk. Not THE HUB, Proseasons, Sideline Stack, Brandular, or NIL MIXTAPE.
 
-Saves live on this device. No account.
+Saves live on this device. Export a studio file. No account.
 
 ## What ships
 
-**Games**
-- Build an 82-0 — spin a franchise, draft five, walk 82 nights
-- Daily Bucket — the room spins to the date. Then the season plays
-- GOAT Five — five names from the book. Score the circle
-- Build a 16-0 — four series. Lose one, the run is over
+**Play**
+- Build an 82-0 — spin a franchise, draft five, walk 82 nights. The card is a URL.
+- Daily Bucket — the date pulls the room. Same five for the house.
+- Four corners — start G/G/F/F/C. Then the season walks.
+- GOAT Five — five names from the book. Score the circle.
+- Build a 16-0 — four series, 2-2-1-1-1. Lose one, the run is over.
 
-**Fantasy**
-- Market Board — This Week, Tiers, Stream, Cut, Pace. Editorial, not a book
-- The Tape — UP / FLAT / DOWN. Marks, not a book
-- The Slate — tonight. One seeded board per day
-- Trade Desk — grade the deal, compare six cats. Not a book
-- Mock Lab — four-seat snake. You sit first. Need-first rooms
-- Keeper Desk — Keep / Trade / Cut. Not a league host
-- Brief Desk — weekly issue. Copy the brief. No signup
+**Tape**
+- The Tape — UP / FLAT / DOWN. The week is the print.
+- Brief Desk — weekly issue plus the house walk. No signup.
+- The Slate — this week’s board. Start / sit / stream.
 
-**Studio**
-- Card Shop — locked posters. Save the PNG.
-- The Board — fictional demo cards only. No clips, no NCAA claims
-- The Gym — scorebug and lower-third overlays, not highlight tapes
+**Cards**
+- Card Shop — locked posters. Save the PNG. Export the studio.
+- The Wall — walks on this device. Share the URL.
+- The Gym — scorebug and lower-third. Export the PNG.
+
+**Desk** (linked, not featured)
+- Market Board — density, not a total. Six counting cats.
+- Trade Desk — grade the deal. Keepers warn.
+- Mock Lab — four-seat snake. Current book. Need-first rooms.
+- Keeper Desk — Keep / Trade / Cut.
 
 ## Stack
 

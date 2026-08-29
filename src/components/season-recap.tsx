@@ -5,6 +5,8 @@ export function SeasonRecap({ recap }: { recap: Recap }) {
     ["Longest run", String(recap.streak)],
     ["Home", `${recap.homeW}–${recap.homeL}`],
     ["Away", `${recap.awayW}–${recap.awayL}`],
+    ["B2Bs", String(recap.b2b ?? 0)],
+    ["Sit nights", String(recap.sits ?? 0)],
     ["Best night", recap.bestLine],
     ["Worst night", recap.worstLine],
     ["Projected", String(recap.projected)],

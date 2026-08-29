@@ -1,4 +1,4 @@
-import { initials, plateFor } from "@/components/crest";
+import { initials, plateForPlayer } from "@/components/crest";
 import { PLAYERS } from "@/lib/nba";
 import { cn } from "@/lib/utils";
 
@@ -18,12 +18,14 @@ export function NamePlate({
   name,
   pos,
   era,
+  id,
   size = "md",
   empty = false,
 }: {
   name?: string;
   pos?: string;
   era?: string;
+  id?: string;
   size?: keyof typeof SIZES;
   empty?: boolean;
 }) {
@@ -31,8 +33,10 @@ export function NamePlate({
     return <span className={cn(SIZES[size], "block shrink-0 rounded-full shadow-border")} aria-hidden="true" />;
   }
 
-  const hit = PLAYERS.find((p) => p.name === name || p.id === name);
-  const src = plateFor(pos ?? hit?.pos ?? "F", era ?? hit?.era ?? "Positionless");
+  const hit = PLAYERS.find((p) => p.id === id || p.name === name || p.id === name);
+  const src = plateForPlayer(hit?.id ?? id ?? name);
+  void pos;
+  void era;
 
   return (
     <span className={cn("relative block shrink-0 overflow-hidden rounded-full bg-fg", SIZES[size])}>

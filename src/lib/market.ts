@@ -1,4 +1,7 @@
-import { PLAYERS, type Player } from "./nba.ts";
+import { currentBook, PLAYERS_BY_ID, type Player } from "./nba.ts";
+import { weekDensity } from "./schedule.ts";
+import { weekKey } from "./studio-save.ts";
+import { weekRows } from "./week.ts";
 
 export const CATS = ["PTS", "3s", "REB", "AST", "STL", "BLK"] as const;
 export type Cat = (typeof CATS)[number];
@@ -39,24 +42,24 @@ export function catValue(player: Player, cat: Cat) {
 
 export type TierRow = { player: Player; score: number; rank: number };
 
-export function rankPlayers(players: Player[] = PLAYERS): TierRow[] {
+export function rankPlayers(players: Player[] = currentBook()): TierRow[] {
   return [...players]
     .map((player) => ({ player, score: sixScore(player) }))
     .sort((a, b) => b.score - a.score)
     .map((row, i) => ({ ...row, rank: i + 1 }));
 }
 
-export function buildTiers(players: Player[] = PLAYERS) {
-  const current = players.filter((p) => p.era === "Positionless");
-  const ranked = rankPlayers(current);
+export function buildTiers(players: Player[] = currentBook()) {
+  const ranked = rankPlayers(players);
   return [
     { id: 1, label: "T1", blurb: "Week-winning floor.", rows: ranked.slice(0, 4) },
     { id: 2, label: "T2", blurb: "Every week, no debate.", rows: ranked.slice(4, 9) },
-    { id: 3, label: "T3", blurb: "The cut line lives here.", rows: ranked.slice(9) },
+    { id: 3, label: "T3", blurb: "The cut line lives here.", rows: ranked.slice(9, 24) },
   ];
 }
 
 export type StreamRow = {
+  id: string;
   name: string;
   team: string;
   pos: string;
@@ -66,21 +69,58 @@ export type StreamRow = {
   why: string;
 };
 
-export const STREAMS: StreamRow[] = [
-  { name: "Jalen Williams", team: "OKC", pos: "F", games: 4, b2b: false, cats: ["PTS", "STL", "REB"], why: "Four games, secondary creation, soft interiors." },
-  { name: "Naz Reid", team: "MIN", pos: "C", games: 4, b2b: false, cats: ["REB", "BLK", "3s"], why: "Frontcourt run if the starter sits a half." },
-  { name: "Payton Pritchard", team: "BOS", pos: "G", games: 4, b2b: false, cats: ["3s", "PTS"], why: "Threes and minutes if the offense stalls." },
-  { name: "Bench big vs pace-up", team: "ATL", pos: "C", games: 4, b2b: false, cats: ["REB", "BLK"], why: "Four games, live-ball pace, cheap boards." },
-  { name: "Cade Cunningham", team: "DET", pos: "G", games: 4, b2b: true, cats: ["PTS", "AST", "STL"], why: "Volume holds. Stream only if you are thin at guard." },
-  { name: "Sabrina Ionescu", team: "NYL", pos: "G", games: 3, b2b: false, cats: ["3s", "AST"], why: "Threes travel. Three games is still a stream in 3s." },
-];
+function catsOf(player: Player): Cat[] {
+  const scored = CATS.map((cat) => ({ cat, n: catValue(player, cat) })).sort((a, b) => b.n - a.n);
+  return scored.slice(0, 3).map((row) => row.cat);
+}
 
-export const CUTS = [
-  { name: "Star wing on a B2B", team: "LAL", pos: "F", games: 2, why: "Two games plus rest risk. The cut is the back half." },
-  { name: "Empty-stat big", team: "CHI", pos: "C", games: 3, why: "Boards without blocks or a counting cat you are losing." },
-  { name: "Road-only guard", team: "UTA", pos: "G", games: 2, why: "Thin slate, no threes, no steals. Dead roster spot." },
-  { name: "Jayson Tatum", team: "BOS", pos: "F", games: 3, why: "Not a cut in most rooms — sit the B2B, do not drop." },
-];
+export function streamRows(week = weekKey()): StreamRow[] {
+  return weekRows(week)
+    .filter((row) => row.call === "STREAM")
+    .map((row) => {
+      const player = PLAYERS_BY_ID[row.id];
+      return {
+        id: row.id,
+        name: row.name,
+        team: row.team,
+        pos: row.pos,
+        games: row.games,
+        b2b: row.b2b,
+        cats: player ? catsOf(player) : ["PTS"],
+        why: row.why,
+      };
+    });
+}
+
+export const STREAMS = streamRows("2026-W35");
+
+export type CutRow = {
+  id: string;
+  name: string;
+  team: string;
+  pos: string;
+  games: number;
+  why: string;
+};
+
+export function cutRows(week = weekKey()): CutRow[] {
+  const fromWeek = weekRows(week)
+    .filter((row) => row.call === "SIT" || ["vuc", "claxton", "keyonte", "tatum"].includes(row.id))
+    .map((row) => ({
+      id: row.id,
+      name: row.name,
+      team: row.team,
+      pos: row.pos,
+      games: row.games,
+      why:
+        row.id === "tatum"
+          ? "Not a cut in most rooms — sit the B2B, do not drop."
+          : row.why,
+    }));
+  return fromWeek.slice(0, 6);
+}
+
+export const CUTS = cutRows("2026-W35");
 
 export const LEAN = [
   { cat: "3s" as Cat, tilt: "Up", note: "Four-game wings. Live-ball nights." },
@@ -89,7 +129,12 @@ export const LEAN = [
   { cat: "AST" as Cat, tilt: "Down", note: "Thin at the point. Do not stream empty assists." },
 ];
 
-export function streamsFor(cat: Cat | "ALL") {
-  if (cat === "ALL") return STREAMS;
-  return STREAMS.filter((row) => row.cats.includes(cat));
+export function streamsFor(cat: Cat | "ALL", week = weekKey()) {
+  const rows = streamRows(week);
+  if (cat === "ALL") return rows;
+  return rows.filter((row) => row.cats.includes(cat));
+}
+
+export function paceBoard(week = weekKey()) {
+  return weekDensity(week);
 }

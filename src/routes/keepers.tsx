@@ -77,7 +77,7 @@ function KeepersPage() {
           <li key={row.id} className="rounded-xl bg-paper p-3 shadow-border sm:p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 items-start gap-3">
-                <NamePlate name={row.name} pos={row.pos} />
+                <NamePlate name={row.name} pos={row.pos} id={row.id} />
                 <div className="min-w-0">
                   <p className="font-display text-xl font-semibold">{row.name}</p>
                   <p className="text-xs text-subtle">

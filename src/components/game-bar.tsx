@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 export const GAME_MODES = [
   { id: "classic", label: "Classic", href: "/games/82-0", mode: "82-0" },
   { id: "daily", label: "Daily", href: "/games/daily", mode: "daily" },
+  { id: "corners", label: "Corners", href: "/games/corners", mode: "corners" },
   { id: "alltime", label: "All-time", href: "/games/goat", mode: "goat" },
   { id: "playoffs", label: "Playoffs", href: "/games/16-0", mode: "16-0" },
 ] as const;

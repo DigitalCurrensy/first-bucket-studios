@@ -8,6 +8,7 @@ import {
   shareFile,
   type CardKind,
 } from "@/lib/share-card";
+import { encodeWalk } from "@/lib/walk";
 import type { Player } from "@/lib/nba";
 
 export function ShareCardButton({
@@ -17,6 +18,7 @@ export function ShareCardButton({
   roster,
   kind = "season",
   luck,
+  nights,
 }: {
   team: string;
   era: string;
@@ -24,6 +26,7 @@ export function ShareCardButton({
   roster: Player[];
   kind?: CardKind;
   luck?: string;
+  nights?: { win: boolean }[];
 }) {
   const [state, setState] = useState<"idle" | "busy" | "shared" | "saved" | "fail">("idle");
 
@@ -31,9 +34,13 @@ export function ShareCardButton({
     if (state === "busy" || roster.length === 0) return;
     setState("busy");
     try {
-      const blob = await renderShareCard({ team, era, wins, roster, kind, luck });
+      const blob = await renderShareCard({ team, era, wins, roster, kind, luck, nights });
       const name = cardFileName(team, wins);
-      const text = cardCaption({ team, era, wins, roster, kind });
+      const walk =
+        kind !== "goat" && kind !== "playoff" && luck
+          ? encodeWalk({ team, era, luck, wins, ids: roster.map((p) => p.id) })
+          : undefined;
+      const text = cardCaption({ team, era, wins, roster, kind, luck, walk });
       if (mode === "save") {
         downloadBlob(blob, name);
         setState("saved");

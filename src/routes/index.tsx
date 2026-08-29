@@ -7,29 +7,31 @@ import { PRODUCTS, TABS, type Tab } from "@/lib/catalog";
 import { useMounted } from "@/lib/hooks";
 import { PLAYERS_BY_ID } from "@/lib/nba";
 import { seasonLine } from "@/lib/season";
-import { formatRun, loadSave, todayKey } from "@/lib/studio-save";
+import { formatRun, loadSave, weekKey } from "@/lib/studio-save";
+import { decodeWalk } from "@/lib/walk";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
   const mounted = useMounted();
-  const [tab, setTab] = useState<Tab>("Games");
+  const [tab, setTab] = useState<Tab>("Play");
   const save = mounted ? loadSave() : null;
   const latest = save?.runs[0];
   const latestNames = latest?.roster.map((id) => PLAYERS_BY_ID[id]?.name).filter(Boolean) ?? [];
-  const stamp = todayKey();
   const shown = PRODUCTS.filter((p) => p.tab === tab);
   const clock = seasonLine();
+  const week = weekKey();
+  const wall = (save?.walks ?? []).slice(0, 4).map((id) => ({ id, payload: decodeWalk(id) }));
 
   return (
     <div>
       <p className="text-micro font-medium uppercase tracking-label text-subtle">First Bucket Studio</p>
-      <h1 className="mt-3 max-w-3xl text-4xl font-semibold sm:text-5xl">We build games + basketball tools.</h1>
-      <p className="mt-3 max-w-xl text-muted">Thoughtfully crafted. Used on purpose. Not a sportsbook, not a recruiting desk.</p>
+      <h1 className="mt-3 max-w-3xl text-4xl font-semibold sm:text-5xl">Play 82-0. Rip the pack. Send the card.</h1>
+      <p className="mt-3 max-w-xl text-muted">A basketball house with a machine at the center. Editorial desks. Not a sportsbook.</p>
       <p className="mt-3 flex items-center gap-2 text-sm text-muted">
         <Check className="size-4 text-good" aria-hidden="true" />
-        Editorial marks. Plates, not likenesses. House crests, not league marks.
+        The walk is a URL. Tuesday is Tape + Brief + Daily.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
@@ -39,10 +41,10 @@ function Home() {
           Build an 82-0
         </Link>
         <Link
-          to="/games/goat"
+          to="/tape"
           className="inline-flex min-h-11 items-center rounded-full px-5 text-sm font-medium shadow-border"
         >
-          GOAT Five
+          The Tape
         </Link>
       </div>
 
@@ -51,7 +53,31 @@ function Home() {
           Last run: {latest.team} · {formatRun(latest)}
           {latestNames.length ? ` · ${latestNames.slice(0, 3).join(", ")}` : ""}
           {save && save.bestWins > 0 && <span className="ml-2 text-fg">Best {save.bestWins}</span>}
+          {latest.walk && (
+            <Link to="/walk/$id" params={{ id: latest.walk }} className="ml-2 text-fg">
+              Open the walk
+            </Link>
+          )}
         </p>
+      )}
+
+      {wall.length > 0 && (
+        <div className="mt-6">
+          <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">The wall</p>
+          <ul className="flex flex-wrap gap-2">
+            {wall.map((item) => (
+              <li key={item.id}>
+                <Link
+                  to="/walk/$id"
+                  params={{ id: item.id }}
+                  className="inline-flex min-h-11 items-center rounded-full bg-paper px-4 text-sm shadow-border"
+                >
+                  {item.payload ? `${item.payload.team} ${item.payload.wins}` : "Walk"}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <div className="mt-8 flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
@@ -84,7 +110,7 @@ function Home() {
           </div>
         </section>
         <div className="lg:sticky lg:top-8 lg:self-start">
-          <StudioFeed dateKey={stamp} />
+          <StudioFeed dateKey={week} />
         </div>
       </div>
     </div>

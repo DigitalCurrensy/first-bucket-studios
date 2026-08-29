@@ -5,7 +5,7 @@ import { PageIntro } from "@/components/page-intro";
 import { Button } from "@/components/ui/button";
 import { useMounted } from "@/lib/hooks";
 import { downloadBlob, renderMarkCard, shareFile } from "@/lib/share-card";
-import { loadSave, todayKey, writeTapePins } from "@/lib/studio-save";
+import { loadSave, weekKey, writeTapePins } from "@/lib/studio-save";
 import { buildTape, markLine, type TapeRow } from "@/lib/tape";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +16,7 @@ type Filter = (typeof FILTERS)[number];
 
 function TapePage() {
   const mounted = useMounted();
-  const stamp = todayKey();
+  const stamp = weekKey();
   const rows = useMemo(() => buildTape(stamp), [stamp]);
   const [filter, setFilter] = useState<Filter>("ALL");
   const [pins, setPins] = useState<string[]>([]);
@@ -101,7 +101,7 @@ function TapePage() {
             <li key={row.player.id}>
               <div className="flex flex-col gap-3 rounded-xl bg-paper p-3 shadow-border sm:flex-row sm:items-center sm:justify-between sm:p-4">
                 <div className="flex min-w-0 items-start gap-3">
-                  <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} />
+                  <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} id={row.player.id} />
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-baseline gap-3">
                       <p className="font-display text-xl font-semibold">{row.player.name}</p>

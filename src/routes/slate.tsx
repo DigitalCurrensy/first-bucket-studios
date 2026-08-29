@@ -4,7 +4,7 @@ import { NamePlate } from "@/components/name-plate";
 import { PageIntro } from "@/components/page-intro";
 import { Button } from "@/components/ui/button";
 import { buildSlate } from "@/lib/slate";
-import { todayKey } from "@/lib/studio-save";
+import { weekKey } from "@/lib/studio-save";
 import type { Call } from "@/lib/week";
 import { cn } from "@/lib/utils";
 
@@ -13,12 +13,12 @@ export const Route = createFileRoute("/slate")({ component: SlatePage });
 const CALLS: Array<Call | "ALL"> = ["ALL", "START", "SIT", "STREAM"];
 
 function SlatePage() {
-  const key = todayKey();
+  const key = weekKey();
   const rows = useMemo(() => buildSlate(key), [key]);
   const [call, setCall] = useState<Call | "ALL">("ALL");
   const [copied, setCopied] = useState(false);
   const shown = rows.filter((row) => call === "ALL" || row.call === call);
-  const stamp = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const stamp = key;
 
   async function copyLine() {
     const line = [
@@ -40,8 +40,8 @@ function SlatePage() {
     <div>
       <PageIntro
         kicker="The Slate"
-        title="Tonight. Not the week."
-        lead="One seeded board per day. Start, sit, or stream the names on it. Editorial. Not a book. No second seed."
+        title="This week. Not a line."
+        lead="One seeded board per week. Start, sit, or stream the names on it. Editorial. Not a book."
       />
 
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
@@ -70,7 +70,7 @@ function SlatePage() {
           <li key={row.player.id} className="rounded-xl bg-paper p-3 shadow-border sm:p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
-                <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} />
+                <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} id={row.player.id} />
                 <div className="min-w-0">
                   <p className="font-display text-xl font-semibold">{row.player.name}</p>
                   <p className="text-xs text-subtle">

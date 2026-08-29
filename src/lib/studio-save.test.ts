@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { bestFrom, type SavedRun } from "./studio-save.ts";
+import { bestFrom, weekKey, type SavedRun } from "./studio-save.ts";
 
 const runs: SavedRun[] = [
   { id: "1", at: 1, mode: "82-0", team: "Lakers", era: "Showtime", wins: 61, roster: [] },
@@ -18,4 +18,8 @@ test("bestFrom takes the high walk for that mode", () => {
 
 test("bestFrom on an empty book is zero", () => {
   assert.equal(bestFrom([], "82-0"), 0);
+});
+
+test("week key is an ISO week", () => {
+  assert.match(weekKey(), /^\d{4}-W\d{2}$/);
 });

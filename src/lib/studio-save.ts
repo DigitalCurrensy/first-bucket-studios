@@ -2,16 +2,18 @@ import type { Recap } from "./recap.ts";
 import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel } from "./nba.ts";
 
 const KEY = "fbs.v1";
-const VERSION = 2;
+const VERSION = 3;
 
 export type SavedRun = {
   id: string;
   at: number;
-  mode: "82-0" | "daily" | "goat" | "16-0";
+  mode: "82-0" | "daily" | "goat" | "16-0" | "corners";
   team: string;
   era: string;
   wins: number;
   roster: string[];
+  luck?: string;
+  walk?: string;
   recap?: Recap;
 };
 
@@ -22,6 +24,7 @@ export type StudioSave = {
   lastDaily: string | null;
   bestWins: number;
   runs: SavedRun[];
+  walks: string[];
   boardTiers: Record<string, 1 | 2 | 3>;
   keepers: Record<string, "KEEP" | "TRADE" | "CUT">;
   tapePins: string[];
@@ -34,6 +37,7 @@ export const emptySave = (): StudioSave => ({
   lastDaily: null,
   bestWins: 0,
   runs: [],
+  walks: [],
   boardTiers: {},
   keepers: {},
   tapePins: [],
@@ -42,6 +46,7 @@ export const emptySave = (): StudioSave => ({
 function migrate(raw: StudioSave): StudioSave {
   const next = { ...emptySave(), ...raw, version: VERSION };
   if ((raw.version ?? 0) < 2) next.theme = "night";
+  if (!Array.isArray(next.walks)) next.walks = [];
   return next;
 }
 
@@ -85,10 +90,20 @@ export function yesterdayKey(d = new Date()) {
   return todayKey(y);
 }
 
+/** ISO week, UTC. Tape / Slate / Brief share this. Daily stays on todayKey. */
+export function weekKey(d = new Date()) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
+  return `${date.getUTCFullYear()}-W${pad2(week)}`;
+}
+
 export function recordRun(run: SavedRun, dailyStamp?: string) {
   const save = loadSave();
   const runs = [run, ...save.runs].slice(0, 24);
-  const season = run.mode === "82-0" || run.mode === "daily";
+  const season = run.mode === "82-0" || run.mode === "daily" || run.mode === "corners";
   const bestWins = season ? Math.max(save.bestWins, run.wins) : save.bestWins;
   let streak = save.streak;
   let lastDaily = save.lastDaily;
@@ -96,7 +111,16 @@ export function recordRun(run: SavedRun, dailyStamp?: string) {
     streak = lastDaily === yesterdayKey() ? streak + 1 : 1;
     lastDaily = dailyStamp;
   }
-  const next = { ...save, runs, bestWins, streak, lastDaily };
+  const walks = run.walk ? [run.walk, ...save.walks.filter((id) => id !== run.walk)].slice(0, 48) : save.walks;
+  const next = { ...save, runs, bestWins, streak, lastDaily, walks };
+  writeSave(next);
+  return next;
+}
+
+export function rememberWalk(id: string) {
+  const save = loadSave();
+  const walks = [id, ...save.walks.filter((item) => item !== id)].slice(0, 48);
+  const next = { ...save, walks };
   writeSave(next);
   return next;
 }
@@ -111,6 +135,18 @@ export function writeKeepers(keepers: StudioSave["keepers"]) {
 export function writeTapePins(tapePins: string[]) {
   const save = loadSave();
   const next = { ...save, tapePins };
+  writeSave(next);
+  return next;
+}
+
+export function exportStudio() {
+  return JSON.stringify({ ...loadSave(), exportedAt: Date.now() }, null, 2);
+}
+
+export function importStudio(raw: string) {
+  const parsed = JSON.parse(raw) as StudioSave;
+  if (!parsed || typeof parsed !== "object") throw new Error("Not a studio file");
+  const next = migrate(parsed);
   writeSave(next);
   return next;
 }

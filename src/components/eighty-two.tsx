@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
-import { DraftFilters, GameBar, StepKicker } from "@/components/game-bar";
+import { DraftFilters, GameBar, StepKicker, type GameMode } from "@/components/game-bar";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
@@ -11,15 +11,12 @@ import { SeasonWalk } from "@/components/season-walk";
 import { ShareCardButton } from "@/components/share-card-button";
 import { Button } from "@/components/ui/button";
 import { filterPack, type PosFilter } from "@/lib/draft";
-import { useMounted } from "@/lib/hooks";
-import { LUCKS, luckLine, type Luck } from "@/lib/luck";
+import { luckLine, type Luck } from "@/lib/luck";
 import {
+  cornersOk,
   dealFrom,
-  ERAS,
-  FRANCHISES,
   hashSeed,
   mulberry32,
-  pickIndex,
   PLAYERS,
   recordLine,
   winLabel,
@@ -31,14 +28,16 @@ import { recapOf, type Recap } from "@/lib/recap";
 import { seasonWalk, type Night } from "@/lib/sim";
 import { loadSave, recordRun, todayKey } from "@/lib/studio-save";
 import { tick } from "@/lib/tick";
+import { dailyRoom, encodeWalk } from "@/lib/walk";
 import { cn } from "@/lib/utils";
 
-type Mode = "82-0" | "daily";
+type Mode = "82-0" | "daily" | "corners";
 type Step = "spin" | "draft" | "season" | "result";
 
 export type Challenge = {
   team?: Franchise;
   era?: Era;
+  luck?: Luck;
   beat?: number;
 };
 
@@ -47,31 +46,37 @@ function dealPack(seed: string) {
   return dealFrom(PLAYERS, rng, 10);
 }
 
+function barFor(mode: Mode): GameMode {
+  if (mode === "daily") return "daily";
+  if (mode === "corners") return "corners";
+  return "classic";
+}
+
 export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challenge }) {
-  const mounted = useMounted();
   const daily = mode === "daily";
-  const stamp = mounted ? todayKey() : "";
+  const corners = mode === "corners";
+  const stamp = todayKey();
+  const house = useMemo(() => (daily ? dailyRoom(stamp) : null), [daily, stamp]);
 
   const locked = useMemo(() => {
-    if (daily && stamp) {
-      const rng = mulberry32(hashSeed(`daily:${stamp}`));
-      return {
-        team: pickIndex(rng, FRANCHISES),
-        era: pickIndex(rng, ERAS),
-        luck: pickIndex(rng, LUCKS),
-        pack: dealFrom(PLAYERS, rng, 10),
-      };
+    if (daily && house) {
+      return { team: house.team, era: house.era, luck: house.luck, pack: house.pack };
     }
     if (challenge?.team && challenge.era) {
-      return { team: challenge.team, era: challenge.era, luck: undefined as Luck | undefined, pack: [] as Player[] };
+      return {
+        team: challenge.team,
+        era: challenge.era,
+        luck: challenge.luck,
+        pack: [] as Player[],
+      };
     }
     return null;
-  }, [daily, stamp, challenge]);
+  }, [daily, house, challenge]);
 
   const [step, setStep] = useState<Step>("spin");
   const [team, setTeam] = useState<Franchise | "">("");
   const [era, setEra] = useState<Era | "">("");
-  const [luck, setLuck] = useState<Luck>("Even");
+  const [luck, setLuck] = useState<Luck>(challenge?.luck ?? "Even");
   const [pack, setPack] = useState<Player[]>([]);
   const [picks, setPicks] = useState<string[]>([]);
   const [open, setOpen] = useState<string[]>([]);
@@ -82,18 +87,22 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
   const [nights, setNights] = useState<Night[]>([]);
   const [recap, setRecap] = useState<Recap | null>(null);
   const [club, setClub] = useState("FBS");
+  const [walkId, setWalkId] = useState("");
   const [copied, setCopied] = useState(false);
   const [challengeCopied, setChallengeCopied] = useState(false);
+  const [walkCopied, setWalkCopied] = useState(false);
   const [already, setAlready] = useState(false);
   const [streak, setStreak] = useState(0);
 
   const activeTeam = daily ? (locked?.team ?? team) : team;
   const activeEra = daily ? (locked?.era ?? era) : era;
+  const activeLuck = daily ? (locked?.luck ?? luck) : luck;
   const activePack = daily && step !== "spin" ? (locked?.pack ?? pack) : pack;
   const roster = picks
     .map((id) => activePack.find((p) => p.id === id))
     .filter((p): p is Player => Boolean(p));
   const shown = filterPack(activePack, query, pos);
+  const lined = corners ? cornersOk(roster) : roster.length === 5;
 
   const startDraft = useCallback(
     (nextTeam: Franchise, nextEra: Era, nextLuck: Luck) => {
@@ -134,14 +143,22 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
   }
 
   function lock() {
-    if (roster.length !== 5 || !activeEra || !activeTeam) return;
-    const walk = seasonWalk(activeTeam, activeEra, roster, luck);
+    if (!lined || !activeEra || !activeTeam) return;
+    const walk = seasonWalk(activeTeam, activeEra, roster, activeLuck);
     const summary = recapOf(walk.nights, walk.projected);
+    const id = encodeWalk({
+      team: activeTeam,
+      era: activeEra,
+      luck: activeLuck,
+      wins: walk.wins,
+      ids: roster.map((p) => p.id),
+    });
     setWins(walk.wins);
     setProjected(walk.projected);
     setNights(walk.nights);
     setRecap(summary);
     setClub(walk.us);
+    setWalkId(id);
     setStep("season");
     const before = loadSave();
     const wasToday = Boolean(daily && before.lastDaily === stamp);
@@ -154,6 +171,8 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
         era: activeEra,
         wins: walk.wins,
         roster: roster.map((p) => p.id),
+        luck: activeLuck,
+        walk: id,
         recap: summary,
       },
       daily ? stamp : undefined,
@@ -169,7 +188,9 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
     setPos("ALL");
     setCopied(false);
     setChallengeCopied(false);
+    setWalkCopied(false);
     setNights([]);
+    setWalkId("");
     setStep("spin");
     if (!daily) {
       setTeam("");
@@ -179,7 +200,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
   }
 
   async function copyLine() {
-    const line = `Walked a ${recordLine(wins)} ${activeEra} ${activeTeam} (${luck}) at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}.`;
+    const line = `Walked a ${recordLine(wins)} ${activeEra} ${activeTeam} (${activeLuck}) at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}. /walk/${walkId}`;
     try {
       await navigator.clipboard.writeText(line);
       setCopied(true);
@@ -189,7 +210,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
   }
 
   async function copyChallenge() {
-    const url = `${window.location.origin}/games/82-0?team=${encodeURIComponent(activeTeam)}&era=${encodeURIComponent(activeEra)}&beat=${wins}`;
+    const url = `${window.location.origin}/games/82-0?team=${encodeURIComponent(activeTeam)}&era=${encodeURIComponent(activeEra)}&luck=${encodeURIComponent(activeLuck)}&beat=${wins}`;
     try {
       await navigator.clipboard.writeText(url);
       setChallengeCopied(true);
@@ -198,42 +219,47 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
     }
   }
 
-  if (daily && !mounted) {
-    return (
-      <div>
-        <PageIntro kicker="Daily Bucket" title="One deal. One day." lead="The machine is about to pull…" />
-      </div>
-    );
+  async function copyWalk() {
+    const url = `${window.location.origin}/walk/${encodeURIComponent(walkId)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setWalkCopied(true);
+    } catch {
+      setWalkCopied(false);
+    }
   }
 
-  const save = mounted ? loadSave() : null;
+  const save = loadSave();
   const eraFits = roster.filter((p) => p.era === activeEra).length;
   const beat = challenge?.beat;
+  const title = daily ? "One deal. One day." : corners ? "Start the corners." : "Pull the room. Rip the pack.";
+  const lead = daily
+    ? "The date pulls the room. Same five for the house. Rip ten. Turn five. Then 82 nights play."
+    : corners
+      ? "G, G, F, F, C. The corners have to hold. Then the season walks."
+      : "One pull. Franchise, era, luck. Ten face-down. You turn five. The nights wander.";
 
   return (
     <div>
       <PageIntro
-        kicker={daily ? "Daily Bucket" : "Build an 82-0"}
-        title={daily ? "One deal. One day." : "Pull the room. Rip the pack."}
-        lead={
-          daily
-            ? "Three strips land on the date. Rip ten. Turn five. Then 82 nights play."
-            : "One pull. Franchise, era, luck. Ten face-down. You turn five. The nights wander."
-        }
+        kicker={daily ? "Daily Bucket" : corners ? "Four corners" : "Build an 82-0"}
+        title={title}
+        lead={lead}
       />
 
-      <GameBar current={daily ? "daily" : "classic"} onNew={reset} />
+      <GameBar current={barFor(mode)} onNew={daily ? undefined : reset} />
 
       {beat != null && Number.isFinite(beat) && (
         <p className="mb-6 rounded-xl bg-paper px-4 py-3 text-sm shadow-border">
           Beat {recordLine(beat)}. Same room. New pack. {challenge?.team} · {challenge?.era}
+          {challenge?.luck ? ` · ${challenge.luck}` : ""}
         </p>
       )}
 
-      {daily && locked && step !== "spin" && (
+      {daily && house && (
         <p className="mb-8 text-sm text-muted">
-          {stamp} · {locked.team} · {locked.era}
-          {save && save.streak > 0 && <span className="ml-3 text-fg">Streak {save.streak}</span>}
+          {stamp} · {house.team} · {house.era} · {house.luck}
+          {save.streak > 0 && <span className="ml-3 text-fg">Streak {save.streak}</span>}
         </p>
       )}
 
@@ -243,7 +269,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
             daily && locked
               ? { team: locked.team, era: locked.era, luck: locked.luck }
               : challenge?.team && challenge.era
-                ? { team: challenge.team, era: challenge.era }
+                ? { team: challenge.team, era: challenge.era, luck: challenge.luck }
                 : undefined
           }
           auto={daily}
@@ -257,18 +283,21 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
             <StepKicker
               n={2}
               label="Pick"
-              hint={`${activeTeam} · ${activeEra} · ${luck}. ${open.length} turned · ${picks.length} of 5. ${luckLine(luck)}`}
+              hint={`${activeTeam} · ${activeEra} · ${activeLuck}. ${open.length} turned · ${picks.length} of 5. ${luckLine(activeLuck)}${corners ? " Start G/G/F/F/C." : ""}`}
               className="min-w-0 flex-1"
             />
             <div className="flex flex-wrap gap-2">
               <Button variant="ghost" onClick={rip} disabled={open.length === activePack.length}>
                 Turn them all
               </Button>
-              <Button onClick={lock} disabled={picks.length !== 5}>
+              <Button onClick={lock} disabled={!lined}>
                 Lock five
               </Button>
             </div>
           </div>
+          {corners && roster.length === 5 && !lined && (
+            <p className="mb-4 text-sm text-warn">The corners have to hold. Two guards, two wings, one center.</p>
+          )}
           <DraftFilters query={query} onQuery={setQuery} pos={pos} onPos={setPos} />
           <div className="grid gap-6 lg:grid-cols-dashboard">
             {shown.length === 0 ? (
@@ -306,11 +335,17 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
 
       {step === "result" && (
         <section className="grid gap-8 lg:grid-cols-2">
-          <ResultPoster team={activeTeam} era={`${activeEra} · ${luck}`} wins={wins} roster={roster} />
+          <ResultPoster
+            team={activeTeam}
+            era={`${activeEra} · ${activeLuck}`}
+            wins={wins}
+            roster={roster}
+            nights={nights}
+          />
           <div>
             <p className="font-display text-2xl font-semibold">{winLabel(wins)}</p>
             <p className="mt-2 text-muted">
-              {recordLine(wins)} walked. Projected {projected}. {luckLine(luck)}
+              {recordLine(wins)} walked. Projected {projected}. {luckLine(activeLuck)}
               {eraFits ? ` ${eraFits} era fits in the five.` : " No era fits — the walk paid for that."}
             </p>
             {beat != null && Number.isFinite(beat) && (
@@ -326,16 +361,28 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
             {daily && already && <p className="mt-3 text-sm text-subtle">Replay logged. Streak already counted today.</p>}
             {daily && !already && streak > 0 && <p className="mt-3 text-sm text-fg">Streak {streak}.</p>}
             <div className="mt-6 flex flex-wrap gap-2">
-              <ShareCardButton team={activeTeam} era={activeEra} wins={wins} roster={roster} luck={luck} />
+              <ShareCardButton
+                team={activeTeam}
+                era={activeEra}
+                wins={wins}
+                roster={roster}
+                luck={activeLuck}
+                nights={nights}
+              />
+              <Button variant="ghost" onClick={copyWalk}>
+                {walkCopied ? "Walk copied" : "Copy walk"}
+              </Button>
               <Button variant="ghost" onClick={copyLine}>
                 {copied ? "Copied" : "Copy line"}
               </Button>
               <Button variant="ghost" onClick={copyChallenge}>
-                {challengeCopied ? "Challenge copied" : "Copy challenge"}
+                {challengeCopied ? "Challenge copied" : "Beat it"}
               </Button>
-              <Button variant="ghost" onClick={reset}>
-                {daily ? "Watch it pull" : "Pull again"}
-              </Button>
+              {!daily && (
+                <Button variant="ghost" onClick={reset}>
+                  Pull again
+                </Button>
+              )}
               {mode === "82-0" ? (
                 <Link to="/games/daily" className={cn("inline-flex min-h-11 items-center px-4 text-sm text-muted")}>
                   Daily Bucket

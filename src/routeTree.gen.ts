@@ -22,10 +22,13 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SlateRouteImport } from './routes/slate'
 import { Route as TapeRouteImport } from './routes/tape'
 import { Route as TradeRouteImport } from './routes/trade'
+import { Route as WallRouteImport } from './routes/wall'
 import { Route as Games160RouteImport } from './routes/games.16-0'
 import { Route as Games820RouteImport } from './routes/games.82-0'
+import { Route as GamesCornersRouteImport } from './routes/games.corners'
 import { Route as GamesDailyRouteImport } from './routes/games.daily'
 import { Route as GamesGoatRouteImport } from './routes/games.goat'
+import { Route as WalkIdRouteImport } from './routes/walk.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -92,6 +95,11 @@ const TradeRoute = TradeRouteImport.update({
   path: '/trade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WallRoute = WallRouteImport.update({
+  id: '/wall',
+  path: '/wall',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Games160Route = Games160RouteImport.update({
   id: '/games/16-0',
   path: '/games/16-0',
@@ -102,6 +110,11 @@ const Games820Route = Games820RouteImport.update({
   path: '/games/82-0',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesCornersRoute = GamesCornersRouteImport.update({
+  id: '/games/corners',
+  path: '/games/corners',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GamesDailyRoute = GamesDailyRouteImport.update({
   id: '/games/daily',
   path: '/games/daily',
@@ -110,6 +123,11 @@ const GamesDailyRoute = GamesDailyRouteImport.update({
 const GamesGoatRoute = GamesGoatRouteImport.update({
   id: '/games/goat',
   path: '/games/goat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalkIdRoute = WalkIdRouteImport.update({
+  id: '/walk/$id',
+  path: '/walk/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -127,10 +145,13 @@ export interface FileRoutesByFullPath {
   '/slate': typeof SlateRoute
   '/tape': typeof TapeRoute
   '/trade': typeof TradeRoute
+  '/wall': typeof WallRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
+  '/games/corners': typeof GamesCornersRoute
   '/games/daily': typeof GamesDailyRoute
   '/games/goat': typeof GamesGoatRoute
+  '/walk/$id': typeof WalkIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -146,10 +167,13 @@ export interface FileRoutesByTo {
   '/slate': typeof SlateRoute
   '/tape': typeof TapeRoute
   '/trade': typeof TradeRoute
+  '/wall': typeof WallRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
+  '/games/corners': typeof GamesCornersRoute
   '/games/daily': typeof GamesDailyRoute
   '/games/goat': typeof GamesGoatRoute
+  '/walk/$id': typeof WalkIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -166,10 +190,13 @@ export interface FileRoutesById {
   '/slate': typeof SlateRoute
   '/tape': typeof TapeRoute
   '/trade': typeof TradeRoute
+  '/wall': typeof WallRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
+  '/games/corners': typeof GamesCornersRoute
   '/games/daily': typeof GamesDailyRoute
   '/games/goat': typeof GamesGoatRoute
+  '/walk/$id': typeof WalkIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,10 +214,13 @@ export interface FileRouteTypes {
     | '/slate'
     | '/tape'
     | '/trade'
+    | '/wall'
     | '/games/16-0'
     | '/games/82-0'
+    | '/games/corners'
     | '/games/daily'
     | '/games/goat'
+    | '/walk/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -206,10 +236,13 @@ export interface FileRouteTypes {
     | '/slate'
     | '/tape'
     | '/trade'
+    | '/wall'
     | '/games/16-0'
     | '/games/82-0'
+    | '/games/corners'
     | '/games/daily'
     | '/games/goat'
+    | '/walk/$id'
   id:
     | '__root__'
     | '/'
@@ -225,10 +258,13 @@ export interface FileRouteTypes {
     | '/slate'
     | '/tape'
     | '/trade'
+    | '/wall'
     | '/games/16-0'
     | '/games/82-0'
+    | '/games/corners'
     | '/games/daily'
     | '/games/goat'
+    | '/walk/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -245,10 +281,13 @@ export interface RootRouteChildren {
   SlateRoute: typeof SlateRoute
   TapeRoute: typeof TapeRoute
   TradeRoute: typeof TradeRoute
+  WallRoute: typeof WallRoute
   Games160Route: typeof Games160Route
   Games820Route: typeof Games820Route
+  GamesCornersRoute: typeof GamesCornersRoute
   GamesDailyRoute: typeof GamesDailyRoute
   GamesGoatRoute: typeof GamesGoatRoute
+  WalkIdRoute: typeof WalkIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -344,6 +383,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TradeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wall': {
+      id: '/wall'
+      path: '/wall'
+      fullPath: '/wall'
+      preLoaderRoute: typeof WallRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games/16-0': {
       id: '/games/16-0'
       path: '/games/16-0'
@@ -358,6 +404,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Games820RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/corners': {
+      id: '/games/corners'
+      path: '/games/corners'
+      fullPath: '/games/corners'
+      preLoaderRoute: typeof GamesCornersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games/daily': {
       id: '/games/daily'
       path: '/games/daily'
@@ -370,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/games/goat'
       fullPath: '/games/goat'
       preLoaderRoute: typeof GamesGoatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/walk/$id': {
+      id: '/walk/$id'
+      path: '/walk/$id'
+      fullPath: '/walk/$id'
+      preLoaderRoute: typeof WalkIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -389,10 +449,13 @@ const rootRouteChildren: RootRouteChildren = {
   SlateRoute: SlateRoute,
   TapeRoute: TapeRoute,
   TradeRoute: TradeRoute,
+  WallRoute: WallRoute,
   Games160Route: Games160Route,
   Games820Route: Games820Route,
+  GamesCornersRoute: GamesCornersRoute,
   GamesDailyRoute: GamesDailyRoute,
   GamesGoatRoute: GamesGoatRoute,
+  WalkIdRoute: WalkIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

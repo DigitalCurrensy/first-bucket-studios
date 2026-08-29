@@ -1,5 +1,6 @@
 import { hashSeed, mulberry32, type Player } from "./nba.ts";
 import { currentPlayers } from "./slate.ts";
+import { weekKey } from "./studio-save.ts";
 
 export type Mark = "UP" | "FLAT" | "DOWN";
 
@@ -44,8 +45,8 @@ function pickMark(rng: () => number): Mark {
   return "DOWN";
 }
 
-export function buildTape(dateKey: string, pool: Player[] = currentPlayers()): TapeRow[] {
-  const rng = mulberry32(hashSeed(`tape:${dateKey}`));
+export function buildTape(key = weekKey(), pool: Player[] = currentPlayers()): TapeRow[] {
+  const rng = mulberry32(hashSeed(`tape:${key}`));
   const copy = [...pool];
   const rows: TapeRow[] = [];
   const n = Math.min(12, copy.length);

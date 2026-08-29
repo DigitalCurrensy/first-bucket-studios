@@ -26,46 +26,49 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   {
-    group: "Games",
+    group: "Play",
     items: [
       { href: "/games/82-0" as const, label: "Build an 82-0", icon: Circle },
       { href: "/games/daily" as const, label: "Daily Bucket", icon: Sun },
+      { href: "/games/corners" as const, label: "Four corners", icon: Trophy },
       { href: "/games/goat" as const, label: "GOAT Five", icon: Award },
       { href: "/games/16-0" as const, label: "Build a 16-0", icon: Trophy },
     ],
   },
   {
-    group: "Fantasy",
+    group: "Tape",
     items: [
-      { href: "/fantasy" as const, label: "Market Board", icon: LineChart },
-      { href: "/slate" as const, label: "The Slate", icon: CalendarDays },
-      { href: "/trade" as const, label: "Trade Desk", icon: ArrowLeftRight },
+      { href: "/tape" as const, label: "The Tape", icon: Newspaper },
       { href: "/brief" as const, label: "Brief Desk", icon: FileText },
+      { href: "/slate" as const, label: "The Slate", icon: CalendarDays },
     ],
   },
   {
-    group: "Dynasty",
+    group: "Cards",
     items: [
+      { href: "/shop" as const, label: "Card Shop", icon: Image },
+      { href: "/wall" as const, label: "The Wall", icon: Layers },
+      { href: "/gym" as const, label: "The Gym", icon: LayoutTemplate },
+    ],
+  },
+  {
+    group: "Desk",
+    items: [
+      { href: "/fantasy" as const, label: "Market Board", icon: LineChart },
+      { href: "/trade" as const, label: "Trade Desk", icon: ArrowLeftRight },
       { href: "/keepers" as const, label: "Keeper Desk", icon: Bookmark },
       { href: "/mock" as const, label: "Mock Lab", icon: ListOrdered },
     ],
   },
   {
-    group: "In-Season",
-    items: [{ href: "/tape" as const, label: "The Tape", icon: Newspaper }],
-  },
-  {
     group: "Lab",
     items: [
-      { href: "/gym" as const, label: "The Gym", icon: LayoutTemplate },
       { href: "/board" as const, label: "The Board", icon: Layers },
-      { href: "/shop" as const, label: "Card Shop", icon: Image },
       { href: "/changelog" as const, label: "Changelog", icon: History },
       { href: "/about" as const, label: "About", icon: Info },
     ],
   },
 ];
-
 export function StudioShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);

@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { CATS, catValue, sixScore } from "@/lib/market";
-import { PLAYERS_BY_ID, type Player } from "@/lib/nba";
-import { currentPlayers } from "@/lib/slate";
+import { currentBook, PLAYERS_BY_ID, type Player } from "@/lib/nba";
+import { loadSave } from "@/lib/studio-save";
 import { gradeTrade } from "@/lib/trade";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ const TOOLS = [
 type ToolId = (typeof TOOLS)[number]["id"];
 type Side = "you" | "them";
 
-const POOL = currentPlayers();
+const POOL = currentBook();
 
 function namesOf(ids: string[]) {
   return ids.map((id) => PLAYERS_BY_ID[id]).filter((p): p is Player => Boolean(p));
@@ -37,6 +37,10 @@ function TradePage() {
   const send = useMemo(() => namesOf(you), [you]);
   const get = useMemo(() => namesOf(them), [them]);
   const grade = gradeTrade(send, get);
+  const keepers = loadSave().keepers;
+  const keeperHits = [...you, ...them]
+    .map((id) => PLAYERS_BY_ID[id])
+    .filter((p): p is Player => Boolean(p) && keepers[p.id] === "KEEP");
   const a = left ? PLAYERS_BY_ID[left] : undefined;
   const b = right ? PLAYERS_BY_ID[right] : undefined;
 
@@ -158,6 +162,11 @@ function TradePage() {
               <p className="mt-4 font-mono text-xs tabular-nums text-paper/50">
                 Send {grade.sendScore} · Get {grade.getScore} · {grade.delta > 0 ? "+" : ""}
                 {grade.delta}
+              </p>
+            )}
+            {keeperHits.length > 0 && (
+              <p className={cn("mt-4 text-sm", grade.pending ? "text-warn" : "text-paper/80")}>
+                Keeper warning: {keeperHits.map((p) => p.name).join(", ")} is marked KEEP on this device. Sitting a B2B is not a trade.
               </p>
             )}
           </article>

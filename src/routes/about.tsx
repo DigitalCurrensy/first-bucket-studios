@@ -28,8 +28,8 @@ function AboutPage() {
           The Tape is marks, not a book — not Top Shot, not Sorare, not a player-stock exchange. The Brief Desk is the
           weekly habit. The Slate is tonight. Trade Desk grades a deal. Keeper Desk is dynasty marks, not a league.
           16-0 is four playoff series, not a clamp. The formula is the center. The nights wander. Share the card. This
-          is not 2K and not a sportsbook. Copy the issue or come back. Saves live on this device. No account. If you
-          clear the browser, the streak goes with it.
+          is not 2K and not a sportsbook. Copy the issue or come back. Saves live on this device. Export a studio file.
+          No account. The walk is a URL. If you clear the browser, the streak goes with it.
         </p>
       </div>
     </div>

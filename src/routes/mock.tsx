@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
-import { PLAYERS, type Player, type Pos } from "@/lib/nba";
+import { currentBook, type Player, type Pos } from "@/lib/nba";
 import {
   NRULES,
   ROUNDS,
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/mock")({ component: MockPage });
 
 type Filter = "ALL" | Pos;
 
-const POOL = [...PLAYERS].sort((a, b) => b.peak - a.peak);
+const POOL = [...currentBook()].sort((a, b) => b.peak - a.peak);
 
 function MockPage() {
   const [youSlot, setYouSlot] = useState(0);

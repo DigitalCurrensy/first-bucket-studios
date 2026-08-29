@@ -12,7 +12,7 @@ import {
 import type { Player } from "./nba.ts";
 
 function p(id: string, pos: Player["pos"], peak: number): Player {
-  return { id, name: id, pos, era: "2000s", peak, pts: 20, reb: 5, ast: 5, stl: 1, blk: 1, threes: 1 };
+  return { id, name: id, pos, era: "2000s", peak, pts: 20, reb: 5, ast: 5, stl: 1, blk: 1, threes: 1, club: "LAL", shelf: "current" };
 }
 
 test("odd rounds run left, even rounds reverse", () => {

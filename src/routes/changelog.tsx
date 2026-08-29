@@ -6,6 +6,33 @@ export const Route = createFileRoute("/changelog")({ component: ChangelogPage })
 const ENTRIES = [
   {
     date: "August 29, 2026",
+    title: "The walk",
+    items: [
+      "The card is a URL. /walk/:id. Same five, same walk. Beat it is a new pack in the same room.",
+      "82 nights have a skeleton now. Home, road, B2Bs, sit nights. Skip to recap. A strip of dots on the poster.",
+      "Daily is the same room for everyone that calendar day. The house walk prints in the Brief.",
+    ],
+  },
+  {
+    date: "August 29, 2026",
+    title: "Tuesday",
+    items: [
+      "One book. Current NBA plus WNBA. Desks resolve by id. Dummy rows are gone.",
+      "Week key drives Tape, Slate, Brief. Daily stays on the date. Issue 002 and 003 live as files.",
+      "Market Board prints density — games, B2Bs, pace as talk. No implied totals. Keepers warn on Trade.",
+    ],
+  },
+  {
+    date: "August 29, 2026",
+    title: "The house",
+    items: [
+      "Export and import a studio file. Accounts wait. The wall is walks on this device.",
+      "Four corners: start G/G/F/F/C. Gym PNG export. Thirty house crests, SVG = PNG.",
+      "Nav is Play / Tape / Cards. Everything else stays linked.",
+    ],
+  },
+  {
+    date: "August 29, 2026",
     title: "The names",
     items: [
       "Tape, Slate, Keepers, and the Market Board wear plates. Initials on the still. Not a likeness.",

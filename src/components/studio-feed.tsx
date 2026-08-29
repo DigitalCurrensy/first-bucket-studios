@@ -26,7 +26,7 @@ export function StudioFeed({ dateKey }: { dateKey: string }) {
           {feed.map((row) => (
             <li key={row.player.id}>
               <Link to="/tape" className="flex gap-3">
-                <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} />
+                <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} id={row.player.id} />
                 <span className="min-w-0">
                   <span className="flex items-baseline justify-between gap-2">
                     <span className="truncate text-sm font-medium">{row.player.name}</span>
@@ -63,7 +63,7 @@ export function StudioFeed({ dateKey }: { dateKey: string }) {
         <ul className="flex flex-col gap-3">
           {movers.map((row) => (
             <li key={row.player.id} className="flex items-center gap-3">
-              <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} size="sm" />
+              <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} size="sm" id={row.player.id} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">{row.player.name}</span>
                 <span className="text-micro uppercase tracking-label text-subtle">{row.player.pos}</span>

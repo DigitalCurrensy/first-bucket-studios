@@ -1,24 +1,11 @@
-import { dealFrom, hashSeed, mulberry32, PLAYERS, type Player } from "./nba.ts";
+import { currentBook, dealFrom, hashSeed, mulberry32, type Player } from "./nba.ts";
+import { weekDensity } from "./schedule.ts";
+import { weekKey } from "./studio-save.ts";
 import type { Call } from "./week.ts";
 
-export const CLUB: Record<string, string> = {
-  lebron: "LAL",
-  jokic: "DEN",
-  curry: "GSW",
-  giannis: "MIL",
-  kd: "HOU",
-  sga: "OKC",
-  luka: "LAL",
-  wemby: "SAS",
-  kawhi: "LAC",
-  aja: "LVA",
-  sabrina: "NYL",
-  cade: "DET",
-  tatum: "BOS",
-  ant: "MIN",
-};
-
-const OPP = ["OKC", "DEN", "BOS", "DET", "ATL", "SAS", "MIN", "NYK", "MIA", "HOU", "MIL", "GSW", "LAC", "DAL"];
+export function currentPlayers(pool: Player[] = currentBook()) {
+  return pool.filter((p) => p.shelf === "current" || p.shelf === "wnba");
+}
 
 export type SlateRow = {
   player: Player;
@@ -30,20 +17,18 @@ export type SlateRow = {
   why: string;
 };
 
-export function currentPlayers(pool: Player[] = PLAYERS) {
-  return pool.filter((p) => p.era === "Positionless");
-}
-
-export function buildSlate(dateKey: string, pool: Player[] = PLAYERS): SlateRow[] {
-  const rng = mulberry32(hashSeed(`slate:${dateKey}`));
-  const dealt = dealFrom(currentPlayers(pool), rng, 8);
+export function buildSlate(key = weekKey(), pool: Player[] = currentBook()): SlateRow[] {
+  const rng = mulberry32(hashSeed(`slate:${key}`));
+  const dens = weekDensity(key);
+  const dealt = dealFrom(currentPlayers(pool), rng, 10);
   return dealt.map((player) => {
-    const club = CLUB[player.id] ?? "FA";
-    let opp = OPP[Math.floor(rng() * OPP.length)]!;
-    if (opp === club) opp = OPP[(OPP.indexOf(opp) + 3) % OPP.length]!;
-    const home = rng() > 0.45;
-    const b2b = rng() < 0.32;
-    const call: Call = b2b && player.peak < 93 ? "SIT" : player.peak >= 93 ? "START" : "STREAM";
+    const club = player.club;
+    const d = dens.find((row) => row.team === club);
+    const oppPool = dens.map((row) => row.team).filter((code) => code !== club);
+    const opp = oppPool[Math.floor(rng() * oppPool.length)] ?? "FA";
+    const home = d ? d.home >= Math.ceil(d.games / 2) : rng() > 0.45;
+    const b2b = d ? d.b2b > 0 : rng() < 0.32;
+    const call: Call = b2b && player.peak < 93 ? "SIT" : player.peak >= 90 ? "START" : "STREAM";
     const why =
       call === "SIT"
         ? "Second night. Minutes risk. Sit."

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { DotStrip } from "@/components/dot-strip";
 import { Button } from "@/components/ui/button";
 import type { Night } from "@/lib/sim";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,8 @@ export function SeasonWalk({
     <section>
       <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">
         {night.round ?? "The season"} · Game {night.n} / {of}
+        {night.b2b ? " · B2B" : ""}
+        {night.sit ? " · Sit" : ""}
       </p>
       <div className="overflow-hidden rounded-xl bg-fg p-4 text-paper sm:p-5">
         <div className="flex items-center justify-between gap-4 font-display text-2xl font-semibold tabular-nums sm:text-3xl">
@@ -72,6 +75,7 @@ export function SeasonWalk({
       <p className="mt-2 text-sm text-muted">
         {team}. Projected {projected}. The nights wander.
       </p>
+      <DotStrip nights={played} tone="ink" className="mt-6 max-w-xl" />
       <div className="mt-6 flex flex-wrap gap-2">
         <Button onClick={onDone} disabled={!done && nights.length > 0}>
           {done ? "The card" : "Walking…"}
@@ -83,7 +87,7 @@ export function SeasonWalk({
               setI(nights.length - 1);
             }}
           >
-            Skip the walk
+            Skip to recap
           </Button>
         )}
       </div>

@@ -10,6 +10,8 @@ export type Recap = {
   homeL: number;
   awayW: number;
   awayL: number;
+  b2b: number;
+  sits: number;
   bestLine: string;
   worstLine: string;
   exit?: string;
@@ -26,10 +28,14 @@ export function recapOf(nights: Night[], projected: number, exit?: string): Reca
   let homeL = 0;
   let awayW = 0;
   let awayL = 0;
+  let b2b = 0;
+  let sits = 0;
   let best: Night | null = null;
   let worst: Night | null = null;
 
   for (const n of nights) {
+    if (n.b2b) b2b += 1;
+    if (n.sit) sits += 1;
     if (n.win) {
       run += 1;
       if (run > streak) streak = run;
@@ -60,6 +66,8 @@ export function recapOf(nights: Night[], projected: number, exit?: string): Reca
     homeL,
     awayW,
     awayL,
+    b2b,
+    sits,
     bestLine: best ? line(best) : "—",
     worstLine: worst ? line(worst) : "—",
     exit,

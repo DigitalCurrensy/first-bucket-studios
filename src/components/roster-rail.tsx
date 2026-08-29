@@ -29,7 +29,7 @@ export function RosterRail({
           >
             {player ? (
               <>
-                <NamePlate name={player.name} pos={player.pos} era={player.era} size="sm" />
+                <NamePlate name={player.name} pos={player.pos} era={player.era} size="sm" id={player.id} />
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium">{player.name}</span>
                   <span className="text-micro uppercase tracking-label text-subtle">{player.pos}</span>

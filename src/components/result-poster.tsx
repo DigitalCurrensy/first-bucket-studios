@@ -1,4 +1,5 @@
 import { Crest } from "@/components/crest";
+import { DotStrip } from "@/components/dot-strip";
 import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel, type Player } from "@/lib/nba";
 
 export function ResultPoster({
@@ -7,12 +8,14 @@ export function ResultPoster({
   wins,
   roster,
   kind = "season",
+  nights,
 }: {
   team: string;
   era: string;
   wins: number;
   roster: Player[];
   kind?: "season" | "goat" | "playoff";
+  nights?: { win: boolean }[];
 }) {
   const line =
     kind === "goat" ? goatLabel(wins) : kind === "playoff" ? `${playoffLine(wins)} · ${playoffLabel(wins)}` : `${recordLine(wins)} · ${winLabel(wins)}`;
@@ -35,6 +38,7 @@ export function ResultPoster({
           </li>
         ))}
       </ul>
+      {nights && nights.length > 0 && <DotStrip nights={nights} className="mt-8" />}
     </article>
   );
 }
