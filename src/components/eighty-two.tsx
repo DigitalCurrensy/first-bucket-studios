@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
+import { RoomSpin } from "@/components/room-spin";
 import { useMounted } from "@/lib/hooks";
 import {
   dealFrom,
@@ -24,7 +25,7 @@ import { loadSave, recordRun, todayKey } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
 
 type Mode = "82-0" | "daily";
-type Step = "franchise" | "era" | "draft" | "result";
+type Step = "spin" | "draft" | "result";
 
 function dealPack(seed: string) {
   const rng = mulberry32(hashSeed(seed));
@@ -46,7 +47,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
     };
   }, [daily, stamp]);
 
-  const [step, setStep] = useState<Step>(daily ? "draft" : "franchise");
+  const [step, setStep] = useState<Step>("spin");
   const [team, setTeam] = useState<Franchise | "">("");
   const [era, setEra] = useState<Era | "">("");
   const [pack, setPack] = useState<Player[]>([]);
@@ -56,21 +57,23 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   const [already, setAlready] = useState(false);
   const [streak, setStreak] = useState(0);
 
-  const activeTeam = daily ? (locked?.team ?? "") : team;
-  const activeEra = daily ? (locked?.era ?? "") : era;
-  const activePack = daily ? (locked?.pack ?? []) : pack;
+  const activeTeam = daily ? (locked?.team ?? team) : team;
+  const activeEra = daily ? (locked?.era ?? era) : era;
+  const activePack = daily && step !== "spin" ? (locked?.pack ?? pack) : pack;
   const roster = picks
     .map((id) => activePack.find((p) => p.id === id))
     .filter((p): p is Player => Boolean(p));
 
-  function startDraft(nextTeam: Franchise, nextEra: Era) {
-    const seed = `${nextTeam}:${nextEra}:${Date.now()}`;
-    setTeam(nextTeam);
-    setEra(nextEra);
-    setPack(dealPack(seed));
-    setPicks([]);
-    setStep("draft");
-  }
+  const startDraft = useCallback(
+    (nextTeam: Franchise, nextEra: Era) => {
+      setTeam(nextTeam);
+      setEra(nextEra);
+      setPack(daily && locked ? locked.pack : dealPack(`${nextTeam}:${nextEra}:${Date.now()}`));
+      setPicks([]);
+      setStep("draft");
+    },
+    [daily, locked],
+  );
 
   function toggle(id: string) {
     setPicks((cur) => {
@@ -106,14 +109,12 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   function reset() {
     setPicks([]);
     setCopied(false);
-    if (daily) {
-      setStep("draft");
-      return;
+    setStep("spin");
+    if (!daily) {
+      setTeam("");
+      setEra("");
+      setPack([]);
     }
-    setStep("franchise");
-    setTeam("");
-    setEra("");
-    setPack([]);
   }
 
   async function copyLine() {
@@ -129,7 +130,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   if (daily && !mounted) {
     return (
       <div>
-        <PageIntro kicker="Daily Bucket" title="One deal. One day." lead="Dealing today’s pack…" />
+        <PageIntro kicker="Daily Bucket" title="One deal. One day." lead="The room is about to move…" />
       </div>
     );
   }
@@ -141,61 +142,27 @@ export function EightyTwo({ mode }: { mode: Mode }) {
     <div>
       <PageIntro
         kicker={daily ? "Daily Bucket" : "Build an 82-0"}
-        title={daily ? "One deal. One day." : "Stack five. Project the season."}
+        title={daily ? "One deal. One day." : "Spin the room. Stack five."}
         lead={
           daily
-            ? "Franchise and era are locked to the date. Draft five. A balanced five travels."
-            : "Pick a franchise, pick an era, draft five names. Balance and era-fit move the number."
+            ? "The franchise and era spin to the date. Then draft five. A balanced five travels."
+            : "The names move. Who lands is the room. Spin an era. Draft five. Balance travels."
         }
       />
 
-      {daily && locked && (
+      {daily && locked && step !== "spin" && (
         <p className="mb-8 text-sm text-muted">
           {stamp} · {locked.team} · {locked.era}
           {save && save.streak > 0 && <span className="ml-3 text-fg">Streak {save.streak}</span>}
         </p>
       )}
 
-      {step === "franchise" && (
-        <section>
-          <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">01 · Franchise</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {FRANCHISES.map((name) => (
-              <button
-                key={name}
-                type="button"
-                onClick={() => {
-                  setTeam(name);
-                  setStep("era");
-                }}
-                className="min-h-14 rounded-lg bg-paper px-3 text-left font-display text-lg font-semibold shadow-border transition-shadow duration-150 hover:shadow-border-hover"
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {step === "era" && (
-        <section>
-          <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">02 · Era · {team}</p>
-          <div className="flex flex-wrap gap-2">
-            {ERAS.map((name) => (
-              <button
-                key={name}
-                type="button"
-                onClick={() => startDraft(team as Franchise, name)}
-                className="min-h-11 rounded-full bg-paper px-4 text-sm shadow-border transition-shadow duration-150 hover:shadow-border-hover"
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-          <button type="button" onClick={() => setStep("franchise")} className="mt-6 min-h-11 text-sm text-muted">
-            Back to franchises
-          </button>
-        </section>
+      {step === "spin" && (
+        <RoomSpin
+          locked={daily && locked ? { team: locked.team, era: locked.era } : undefined}
+          auto={daily}
+          onReady={startDraft}
+        />
       )}
 
       {step === "draft" && (
@@ -203,7 +170,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-micro font-medium uppercase tracking-label text-subtle">
-                {daily ? "Today’s pack" : `03 · Draft five · ${team} · ${era}`}
+                {daily ? "Today’s pack" : `02 · Draft five · ${team} · ${era}`}
               </p>
               <p className="mt-1 text-sm text-muted">{picks.length} of 5 · A balanced five travels.</p>
             </div>
@@ -246,7 +213,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
             <div className="mt-6 flex flex-wrap gap-2">
               <Button onClick={copyLine}>{copied ? "Copied" : "Copy line"}</Button>
               <Button variant="ghost" onClick={reset}>
-                {daily ? "Draft again" : "Build another"}
+                {daily ? "Watch it spin" : "Spin another"}
               </Button>
               {mode === "82-0" ? (
                 <Link to="/games/daily" className={cn("inline-flex min-h-11 items-center px-4 text-sm text-muted")}>

@@ -9,8 +9,8 @@ Saves live on this device. No account.
 ## What ships
 
 **Games**
-- Build an 82-0 — franchise, era, five names, projected season
-- Daily Bucket — one seeded deal per day, streak on this device
+- Build an 82-0 — spin a franchise, spin an era, draft five, projected season
+- Daily Bucket — the room spins to the date. Keep the streak.
 - GOAT Five — five names from the book. Score the circle
 - Build a 16-0 — playoff draw. Eight names, five starters, sixteen-win banner
 

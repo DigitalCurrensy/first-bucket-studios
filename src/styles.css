@@ -39,6 +39,8 @@
   --grid-template-columns-shell: 13.75rem minmax(0, 1fr);
   --ease-studio: cubic-bezier(0.22, 1, 0.36, 1);
   --scale-press: 0.98;
+  --height-reel-item: 4.5rem;
+  --duration-spin: 1.8s;
 }
 
 html[data-theme="night"] {

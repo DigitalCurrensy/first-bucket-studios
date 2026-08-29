@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
+import { RoomSpin } from "@/components/room-spin";
 import {
-  ERAS,
-  FRANCHISES,
   PLAYERS,
   dealFrom,
   hashSeed,
@@ -23,14 +22,14 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/games/16-0")({ component: SixteenPage });
 
-type Step = "franchise" | "era" | "draft" | "result";
+type Step = "spin" | "draft" | "result";
 
 function dealPack(seed: string) {
   return dealFrom(PLAYERS, mulberry32(hashSeed(seed)), 8);
 }
 
 function SixteenPage() {
-  const [step, setStep] = useState<Step>("franchise");
+  const [step, setStep] = useState<Step>("spin");
   const [team, setTeam] = useState<Franchise | "">("");
   const [era, setEra] = useState<Era | "">("");
   const [pack, setPack] = useState<Player[]>([]);
@@ -42,13 +41,13 @@ function SixteenPage() {
     .map((id) => pack.find((p) => p.id === id))
     .filter((p): p is Player => Boolean(p));
 
-  function startDraft(nextTeam: Franchise, nextEra: Era) {
+  const startDraft = useCallback((nextTeam: Franchise, nextEra: Era) => {
     setTeam(nextTeam);
     setEra(nextEra);
     setPack(dealPack(`${nextTeam}:${nextEra}:${Date.now()}`));
     setPicks([]);
     setStep("draft");
-  }
+  }, []);
 
   function toggle(id: string) {
     setPicks((cur) => {
@@ -75,7 +74,7 @@ function SixteenPage() {
   }
 
   function reset() {
-    setStep("franchise");
+    setStep("spin");
     setTeam("");
     setEra("");
     setPack([]);
@@ -98,57 +97,17 @@ function SixteenPage() {
       <PageIntro
         kicker="Build a 16-0"
         title="Sixteen wins. One banner."
-        lead="Playoffs, not the regular season. Deal eight, start five. Two-way names travel. A third guard does not."
+        lead="Spin the room. Deal eight, start five. Two-way names travel. A third guard does not."
       />
 
-      {step === "franchise" && (
-        <section>
-          <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">01 · Franchise</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {FRANCHISES.map((name) => (
-              <button
-                key={name}
-                type="button"
-                onClick={() => {
-                  setTeam(name);
-                  setStep("era");
-                }}
-                className="min-h-14 rounded-lg bg-paper px-3 text-left font-display text-lg font-semibold shadow-border transition-shadow duration-150 hover:shadow-border-hover"
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {step === "era" && (
-        <section>
-          <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">02 · Era · {team}</p>
-          <div className="flex flex-wrap gap-2">
-            {ERAS.map((name) => (
-              <button
-                key={name}
-                type="button"
-                onClick={() => startDraft(team as Franchise, name)}
-                className="min-h-11 rounded-full bg-paper px-4 text-sm shadow-border transition-shadow duration-150 hover:shadow-border-hover"
-              >
-                {name}
-              </button>
-            ))}
-          </div>
-          <button type="button" onClick={() => setStep("franchise")} className="mt-6 min-h-11 text-sm text-muted">
-            Back to franchises
-          </button>
-        </section>
-      )}
+      {step === "spin" && <RoomSpin onReady={startDraft} />}
 
       {step === "draft" && (
         <section>
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-micro font-medium uppercase tracking-label text-subtle">
-                03 · Eight names · {team} · {era}
+                02 · Eight names · {team} · {era}
               </p>
               <p className="mt-1 text-sm text-muted">{picks.length} of 5 · Two-way names travel.</p>
             </div>
@@ -187,7 +146,7 @@ function SixteenPage() {
             <div className="mt-6 flex flex-wrap gap-2">
               <Button onClick={copyLine}>{copied ? "Copied" : "Copy line"}</Button>
               <Button variant="ghost" onClick={reset}>
-                Build another
+                Spin another
               </Button>
               <Link to="/shop" className={cn("inline-flex min-h-11 items-center px-4 text-sm text-muted")}>
                 Card Shop

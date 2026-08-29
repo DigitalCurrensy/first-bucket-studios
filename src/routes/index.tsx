@@ -11,7 +11,7 @@ const PRODUCTS = [
     href: "/games/82-0" as const,
     kicker: "Game",
     title: "Build an 82-0",
-    body: "Pick a franchise, an era, and five names. We project the season.",
+    body: "Spin the room. Spin an era. Draft five. We project the season.",
   },
   {
     href: "/games/daily" as const,
