@@ -41,7 +41,7 @@ const PRODUCTS = [
     href: "/shop" as const,
     kicker: "Shop",
     title: "Card Shop",
-    body: "The posters you already locked. On this device.",
+    body: "The posters you already locked. Save the PNG. On this device.",
   },
   {
     href: "/brief" as const,

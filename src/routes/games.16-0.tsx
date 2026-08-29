@@ -5,7 +5,9 @@ import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
 import { RoomSpin } from "@/components/room-spin";
+import { SeasonRecap } from "@/components/season-recap";
 import { SeasonWalk } from "@/components/season-walk";
+import { ShareCardButton } from "@/components/share-card-button";
 import {
   PLAYERS,
   dealFrom,
@@ -17,6 +19,7 @@ import {
   type Franchise,
   type Player,
 } from "@/lib/nba";
+import { recapOf, type Recap } from "@/lib/recap";
 import { playoffWalk, type Night } from "@/lib/sim";
 import { recordRun } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
@@ -38,6 +41,7 @@ function SixteenPage() {
   const [wins, setWins] = useState(0);
   const [projected, setProjected] = useState(0);
   const [nights, setNights] = useState<Night[]>([]);
+  const [recap, setRecap] = useState<Recap | null>(null);
   const [club, setClub] = useState("FBS");
   const [copied, setCopied] = useState(false);
 
@@ -64,9 +68,13 @@ function SixteenPage() {
   function lock() {
     if (roster.length !== 5 || !team || !era) return;
     const walk = playoffWalk(team, era, roster);
+    const last = walk.rounds[walk.rounds.length - 1];
+    const exit = last?.taken ? "Banner" : last?.round;
+    const summary = recapOf(walk.nights, walk.projected, exit);
     setWins(walk.wins);
     setProjected(walk.projected);
     setNights(walk.nights);
+    setRecap(summary);
     setClub(walk.us);
     setStep("season");
     recordRun({
@@ -77,6 +85,7 @@ function SixteenPage() {
       era,
       wins: walk.wins,
       roster: roster.map((p) => p.id),
+      recap: summary,
     });
   }
 
@@ -161,7 +170,9 @@ function SixteenPage() {
             <p className="mt-2 text-muted">
               {playoffLine(wins)} walked. Projected {projected} series wins as a formula. The rounds decide.
             </p>
+            {recap && <SeasonRecap recap={recap} />}
             <div className="mt-6 flex flex-wrap gap-2">
+              <ShareCardButton team={team} era={era} wins={wins} roster={roster} kind="playoff" />
               <Button onClick={copyLine}>{copied ? "Copied" : "Copy line"}</Button>
               <Button variant="ghost" onClick={reset}>
                 Spin another

@@ -5,7 +5,9 @@ import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
 import { RoomSpin } from "@/components/room-spin";
+import { SeasonRecap } from "@/components/season-recap";
 import { SeasonWalk } from "@/components/season-walk";
+import { ShareCardButton } from "@/components/share-card-button";
 import { useMounted } from "@/lib/hooks";
 import {
   dealFrom,
@@ -21,6 +23,7 @@ import {
   type Franchise,
   type Player,
 } from "@/lib/nba";
+import { recapOf, type Recap } from "@/lib/recap";
 import { seasonWalk, type Night } from "@/lib/sim";
 import { loadSave, recordRun, todayKey } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
@@ -56,6 +59,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   const [wins, setWins] = useState(0);
   const [projected, setProjected] = useState(0);
   const [nights, setNights] = useState<Night[]>([]);
+  const [recap, setRecap] = useState<Recap | null>(null);
   const [club, setClub] = useState("FBS");
   const [copied, setCopied] = useState(false);
   const [already, setAlready] = useState(false);
@@ -90,9 +94,11 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   function lock() {
     if (roster.length !== 5 || !activeEra || !activeTeam) return;
     const walk = seasonWalk(activeTeam, activeEra, roster);
+    const summary = recapOf(walk.nights, walk.projected);
     setWins(walk.wins);
     setProjected(walk.projected);
     setNights(walk.nights);
+    setRecap(summary);
     setClub(walk.us);
     setStep("season");
     const before = loadSave();
@@ -106,6 +112,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
         era: activeEra,
         wins: walk.wins,
         roster: roster.map((p) => p.id),
+        recap: summary,
       },
       daily ? stamp : undefined,
     );
@@ -227,9 +234,11 @@ export function EightyTwo({ mode }: { mode: Mode }) {
               {recordLine(wins)} walked. Projected {projected}.
               {eraFits ? ` ${eraFits} era fits in the five.` : " No era fits — the walk paid for that."}
             </p>
+            {recap && <SeasonRecap recap={recap} />}
             {daily && already && <p className="mt-3 text-sm text-subtle">Replay logged. Streak already counted today.</p>}
             {daily && !already && streak > 0 && <p className="mt-3 text-sm text-fg">Streak {streak}.</p>}
             <div className="mt-6 flex flex-wrap gap-2">
+              <ShareCardButton team={activeTeam} era={activeEra} wins={wins} roster={roster} />
               <Button onClick={copyLine}>{copied ? "Copied" : "Copy line"}</Button>
               <Button variant="ghost" onClick={reset}>
                 {daily ? "Watch it spin" : "Spin another"}

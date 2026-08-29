@@ -23,7 +23,7 @@ Saves live on this device. No account.
 - Brief Desk — weekly issue. Copy the brief. No signup
 
 **Studio**
-- Card Shop — locked posters, reopened
+- Card Shop — locked posters. Save the PNG.
 - The Board — fictional demo cards only. No clips, no NCAA claims
 - The Gym — scorebug and lower-third overlays, not highlight tapes
 

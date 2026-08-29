@@ -1,3 +1,4 @@
+import type { Recap } from "@/lib/recap";
 import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel } from "@/lib/nba";
 
 const KEY = "fbs.v1";
@@ -11,6 +12,7 @@ export type SavedRun = {
   era: string;
   wins: number;
   roster: string[];
+  recap?: Recap;
 };
 
 export type StudioSave = {

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
+import { ShareCardButton } from "@/components/share-card-button";
 import { PLAYERS, goatLabel, goatScore, type Player, type Pos } from "@/lib/nba";
 import { recordRun } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
@@ -87,6 +88,7 @@ function GoatPage() {
               free 99.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
+              <ShareCardButton team="GOAT Five" era="All-time" wins={score ?? 0} roster={roster} kind="goat" />
               <Button onClick={copyLine}>{copied ? "Copied" : "Copy line"}</Button>
               <Button variant="ghost" onClick={reset}>
                 Build another

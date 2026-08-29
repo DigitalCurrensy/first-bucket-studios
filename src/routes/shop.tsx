@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageIntro } from "@/components/page-intro";
 import { ResultPoster } from "@/components/result-poster";
+import { SeasonRecap } from "@/components/season-recap";
+import { ShareCardButton } from "@/components/share-card-button";
 import { useMounted } from "@/lib/hooks";
 import { PLAYERS_BY_ID, type Player } from "@/lib/nba";
 import { formatRun, loadSave, type SavedRun } from "@/lib/studio-save";
@@ -30,7 +32,7 @@ function ShopPage() {
       <PageIntro
         kicker="Card Shop"
         title="The posters you already locked."
-        lead="Runs live on this device. Open one. Copy from the game it came from. No printer, no fake tape."
+        lead="Runs live on this device. Open one. Save the PNG. No printer, no fake tape."
       />
 
       {!mounted ? (
@@ -86,6 +88,16 @@ function ShopPage() {
               <p className="mt-4 text-sm text-subtle">
                 {run.mode === "82-0" ? "Regular season" : run.mode === "daily" ? "Daily Bucket" : run.mode === "goat" ? "GOAT Five" : "Playoff 16-0"}
               </p>
+              <div className="mt-4">
+                <ShareCardButton
+                  team={run.team}
+                  era={run.era}
+                  wins={run.wins}
+                  roster={rosterOf(run)}
+                  kind={kindOf(run)}
+                />
+              </div>
+              {run.recap && <SeasonRecap recap={run.recap} />}
             </div>
           )}
         </div>
