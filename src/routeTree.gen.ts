@@ -19,6 +19,8 @@ import { Route as GymRouteImport } from './routes/gym'
 import { Route as KeepersRouteImport } from './routes/keepers'
 import { Route as MockRouteImport } from './routes/mock'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SlateRouteImport } from './routes/slate'
+import { Route as TradeRouteImport } from './routes/trade'
 import { Route as Games160RouteImport } from './routes/games.16-0'
 import { Route as Games820RouteImport } from './routes/games.82-0'
 import { Route as GamesDailyRouteImport } from './routes/games.daily'
@@ -74,6 +76,16 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SlateRoute = SlateRouteImport.update({
+  id: '/slate',
+  path: '/slate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TradeRoute = TradeRouteImport.update({
+  id: '/trade',
+  path: '/trade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Games160Route = Games160RouteImport.update({
   id: '/games/16-0',
   path: '/games/16-0',
@@ -106,6 +118,8 @@ export interface FileRoutesByFullPath {
   '/keepers': typeof KeepersRoute
   '/mock': typeof MockRoute
   '/shop': typeof ShopRoute
+  '/slate': typeof SlateRoute
+  '/trade': typeof TradeRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
   '/games/daily': typeof GamesDailyRoute
@@ -122,6 +136,8 @@ export interface FileRoutesByTo {
   '/keepers': typeof KeepersRoute
   '/mock': typeof MockRoute
   '/shop': typeof ShopRoute
+  '/slate': typeof SlateRoute
+  '/trade': typeof TradeRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
   '/games/daily': typeof GamesDailyRoute
@@ -139,6 +155,8 @@ export interface FileRoutesById {
   '/keepers': typeof KeepersRoute
   '/mock': typeof MockRoute
   '/shop': typeof ShopRoute
+  '/slate': typeof SlateRoute
+  '/trade': typeof TradeRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
   '/games/daily': typeof GamesDailyRoute
@@ -157,6 +175,8 @@ export interface FileRouteTypes {
     | '/keepers'
     | '/mock'
     | '/shop'
+    | '/slate'
+    | '/trade'
     | '/games/16-0'
     | '/games/82-0'
     | '/games/daily'
@@ -173,6 +193,8 @@ export interface FileRouteTypes {
     | '/keepers'
     | '/mock'
     | '/shop'
+    | '/slate'
+    | '/trade'
     | '/games/16-0'
     | '/games/82-0'
     | '/games/daily'
@@ -189,6 +211,8 @@ export interface FileRouteTypes {
     | '/keepers'
     | '/mock'
     | '/shop'
+    | '/slate'
+    | '/trade'
     | '/games/16-0'
     | '/games/82-0'
     | '/games/daily'
@@ -206,6 +230,8 @@ export interface RootRouteChildren {
   KeepersRoute: typeof KeepersRoute
   MockRoute: typeof MockRoute
   ShopRoute: typeof ShopRoute
+  SlateRoute: typeof SlateRoute
+  TradeRoute: typeof TradeRoute
   Games160Route: typeof Games160Route
   Games820Route: typeof Games820Route
   GamesDailyRoute: typeof GamesDailyRoute
@@ -284,6 +310,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/slate': {
+      id: '/slate'
+      path: '/slate'
+      fullPath: '/slate'
+      preLoaderRoute: typeof SlateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trade': {
+      id: '/trade'
+      path: '/trade'
+      fullPath: '/trade'
+      preLoaderRoute: typeof TradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games/16-0': {
       id: '/games/16-0'
       path: '/games/16-0'
@@ -326,6 +366,8 @@ const rootRouteChildren: RootRouteChildren = {
   KeepersRoute: KeepersRoute,
   MockRoute: MockRoute,
   ShopRoute: ShopRoute,
+  SlateRoute: SlateRoute,
+  TradeRoute: TradeRoute,
   Games160Route: Games160Route,
   Games820Route: Games820Route,
   GamesDailyRoute: GamesDailyRoute,

@@ -16,6 +16,8 @@ Saves live on this device. No account.
 
 **Fantasy**
 - Market Board — This Week, Tiers, Stream, Cut, Pace. Editorial, not a book
+- The Slate — tonight. One seeded board per day
+- Trade Desk — grade the deal, compare six cats. Not a book
 - Mock Lab — four-seat snake. You sit first. Need-first rooms
 - Keeper Desk — Keep / Trade / Cut. Not a league host
 - Brief Desk — weekly issue. Copy the brief. No signup

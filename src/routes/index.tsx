@@ -56,6 +56,18 @@ const PRODUCTS = [
     body: "This Week, Tiers, Stream, Cut, Pace. Editorial. Not a book.",
   },
   {
+    href: "/slate" as const,
+    kicker: "Board",
+    title: "The Slate",
+    body: "Tonight. One seeded board per day. Start, sit, or stream.",
+  },
+  {
+    href: "/trade" as const,
+    kicker: "Desk",
+    title: "Trade Desk",
+    body: "Grade the deal. Compare the cats. Not a book.",
+  },
+  {
     href: "/mock" as const,
     kicker: "Lab",
     title: "Mock Lab",

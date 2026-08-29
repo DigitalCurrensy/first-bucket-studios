@@ -1,4 +1,4 @@
-import { PLAYERS, type Player } from "@/lib/nba";
+import { PLAYERS, type Player } from "./nba.ts";
 
 export const CATS = ["PTS", "3s", "REB", "AST", "STL", "BLK"] as const;
 export type Cat = (typeof CATS)[number];
@@ -18,6 +18,23 @@ export function sixScore(player: Player) {
   return Math.round(
     player.pts + player.reb * 1.2 + player.ast * 1.4 + player.stl * 3 + player.blk * 3 + player.threes * 2,
   );
+}
+
+export function catValue(player: Player, cat: Cat) {
+  switch (cat) {
+    case "PTS":
+      return player.pts;
+    case "3s":
+      return player.threes;
+    case "REB":
+      return player.reb;
+    case "AST":
+      return player.ast;
+    case "STL":
+      return player.stl;
+    case "BLK":
+      return player.blk;
+  }
 }
 
 export type TierRow = { player: Player; score: number; rank: number };

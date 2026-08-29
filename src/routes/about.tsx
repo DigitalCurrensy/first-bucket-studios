@@ -25,9 +25,9 @@ function AboutPage() {
           MIXTAPE, THE U as lighthouse — stay separate. They do not merge into this studio.
         </p>
         <p>
-          The Brief Desk is the weekly habit. Keeper Desk is dynasty marks, not a league. 16-0 is a playoff card, not
-          an 82-game number. Copy the issue or come back. Saves live on this device. No account. If you clear the
-          browser, the streak goes with it.
+          The Brief Desk is the weekly habit. The Slate is tonight. Trade Desk grades a deal, it does not make a
+          market. Keeper Desk is dynasty marks, not a league. 16-0 is a playoff card, not an 82-game number. Copy the
+          issue or come back. Saves live on this device. No account. If you clear the browser, the streak goes with it.
         </p>
       </div>
     </div>
