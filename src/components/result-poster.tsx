@@ -1,0 +1,36 @@
+import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel, type Player } from "@/lib/nba";
+
+export function ResultPoster({
+  team,
+  era,
+  wins,
+  roster,
+  kind = "season",
+}: {
+  team: string;
+  era: string;
+  wins: number;
+  roster: Player[];
+  kind?: "season" | "goat" | "playoff";
+}) {
+  const line =
+    kind === "goat" ? goatLabel(wins) : kind === "playoff" ? `${playoffLine(wins)} · ${playoffLabel(wins)}` : `${recordLine(wins)} · ${winLabel(wins)}`;
+  return (
+    <article className="rise overflow-hidden rounded-xl bg-fg p-6 text-paper sm:p-8">
+      <p className="text-micro font-medium uppercase tracking-label text-accent">First Bucket</p>
+      <p className="mt-2 text-sm text-paper/70">
+        {team} · {era}
+      </p>
+      <p className="mt-8 font-display text-7xl font-semibold tabular-nums leading-none">{wins}</p>
+      <p className="mt-3 text-lg">{line}</p>
+      <ul className="mt-8 space-y-1 text-sm text-paper/80">
+        {roster.map((p) => (
+          <li key={p.id}>
+            {p.name}
+            <span className="ml-2 text-xs text-paper/50">{p.pos}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}

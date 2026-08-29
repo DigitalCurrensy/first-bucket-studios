@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="First Bucket Studio">
+  <rect width="32" height="32" rx="7" fill="#0C0B09"/>
+  <defs>
+    <clipPath id="ball">
+      <circle cx="16" cy="16" r="11"/>
+    </clipPath>
+  </defs>
+  <circle cx="16" cy="16" r="11" fill="#F4EFE4"/>
+  <g clip-path="url(#ball)" fill="none" stroke="#8A6A3B" stroke-width="2.5" stroke-linecap="square">
+    <path d="M16 5v22"/>
+    <path d="M5 16h22"/>
+    <path d="M7 7c5.2 3.6 5.2 14.4 0 18" stroke-linecap="round"/>
+    <path d="M25 7c-5.2 3.6-5.2 14.4 0 18" stroke-linecap="round"/>
+  </g>
+</svg>
