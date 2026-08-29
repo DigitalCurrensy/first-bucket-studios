@@ -30,14 +30,67 @@ export function cardCaption(opts: {
   return `Walked a ${recordLine(wins)} ${era} ${team} at First Bucket Studio: ${names}.`;
 }
 
+function drawCrest(ctx: CanvasRenderingContext2D, team: string, x: number, y: number, size: number) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.strokeStyle = ACCENT;
+  ctx.lineWidth = 3;
+  ctx.lineJoin = "round";
+  ctx.strokeRect(0, 0, size, size);
+  ctx.beginPath();
+  if (team === "Lakers") {
+    ctx.moveTo(size * 0.3, size * 0.75);
+    ctx.lineTo(size * 0.3, size * 0.25);
+    ctx.lineTo(size * 0.45, size * 0.25);
+    ctx.lineTo(size * 0.7, size * 0.75);
+  } else if (team === "Heat") {
+    ctx.moveTo(size * 0.5, size * 0.2);
+    ctx.quadraticCurveTo(size * 0.25, size * 0.5, size * 0.5, size * 0.8);
+    ctx.quadraticCurveTo(size * 0.75, size * 0.5, size * 0.5, size * 0.2);
+  } else if (team === "Celtics") {
+    ctx.arc(size * 0.5, size * 0.5, size * 0.32, 0, Math.PI * 2);
+  } else if (team === "Spurs") {
+    ctx.moveTo(size * 0.5, size * 0.18);
+    ctx.lineTo(size * 0.58, size * 0.42);
+    ctx.lineTo(size * 0.82, size * 0.42);
+    ctx.lineTo(size * 0.62, size * 0.58);
+    ctx.lineTo(size * 0.7, size * 0.82);
+    ctx.lineTo(size * 0.5, size * 0.66);
+    ctx.lineTo(size * 0.3, size * 0.82);
+    ctx.lineTo(size * 0.38, size * 0.58);
+    ctx.lineTo(size * 0.18, size * 0.42);
+    ctx.lineTo(size * 0.42, size * 0.42);
+    ctx.closePath();
+  } else if (team === "Nuggets") {
+    ctx.moveTo(size * 0.2, size * 0.75);
+    ctx.lineTo(size * 0.5, size * 0.22);
+    ctx.lineTo(size * 0.8, size * 0.75);
+    ctx.closePath();
+  } else if (team === "Warriors") {
+    ctx.moveTo(size * 0.2, size * 0.75);
+    ctx.lineTo(size * 0.35, size * 0.28);
+    ctx.lineTo(size * 0.5, size * 0.58);
+    ctx.lineTo(size * 0.65, size * 0.28);
+    ctx.lineTo(size * 0.8, size * 0.75);
+  } else {
+    ctx.moveTo(size * 0.28, size * 0.72);
+    ctx.lineTo(size * 0.28, size * 0.28);
+    ctx.lineTo(size * 0.72, size * 0.72);
+    ctx.lineTo(size * 0.72, size * 0.28);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
 export async function renderShareCard(opts: {
   team: string;
   era: string;
   wins: number;
   roster: Player[];
   kind?: CardKind;
+  luck?: string;
 }): Promise<Blob> {
-  const { team, era, wins, roster, kind = "season" } = opts;
+  const { team, era, wins, roster, kind = "season", luck } = opts;
   await document.fonts.ready;
   const w = 1080;
   const h = 1350;
@@ -50,15 +103,17 @@ export async function renderShareCard(opts: {
   ctx.fillStyle = INK;
   ctx.fillRect(0, 0, w, h);
 
+  if (kind !== "goat") drawCrest(ctx, team, 80, 80, 72);
+
   ctx.fillStyle = ACCENT;
   ctx.font = "600 22px 'Source Sans 3', sans-serif";
   ctx.letterSpacing = "0.14em";
-  ctx.fillText("FIRST BUCKET", 80, 120);
+  ctx.fillText("FIRST BUCKET", kind === "goat" ? 80 : 176, 108);
   ctx.letterSpacing = "0px";
 
   ctx.fillStyle = "rgba(250, 246, 238, 0.7)";
   ctx.font = "500 28px 'Source Sans 3', sans-serif";
-  ctx.fillText(`${team}  ·  ${era}`, 80, 180);
+  ctx.fillText(luck ? `${team}  ·  ${era}  ·  ${luck}` : `${team}  ·  ${era}`, kind === "goat" ? 80 : 176, 160);
 
   ctx.fillStyle = PAPER;
   ctx.font = "600 200px Fraunces, Georgia, serif";

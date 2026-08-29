@@ -1,3 +1,4 @@
+import { luckShift } from "./luck.ts";
 import {
   FRANCHISES,
   hashSeed,
@@ -47,10 +48,10 @@ function oppsFor(team: string) {
   };
 }
 
-export function seasonWalk(team: string, era: string, roster: Player[]) {
+export function seasonWalk(team: string, era: string, roster: Player[], luck = "Even") {
   const projected = projectWins(roster, era);
-  const p = projected / 82;
-  const rng = mulberry32(hashSeed(`season:${team}:${era}:${roster.map((r) => r.id).join(",")}`));
+  const p = Math.max(0.16, Math.min(0.92, projected / 82 + luckShift(luck)));
+  const rng = mulberry32(hashSeed(`season:${team}:${era}:${luck}:${roster.map((r) => r.id).join(",")}`));
   const { us, opps } = oppsFor(team);
   const nights: Night[] = [];
   let wins = 0;
@@ -65,10 +66,10 @@ export function seasonWalk(team: string, era: string, roster: Player[]) {
   return { projected, p, nights, wins, us };
 }
 
-export function playoffWalk(team: string, era: string, roster: Player[]) {
+export function playoffWalk(team: string, era: string, roster: Player[], luck = "Even") {
   const projected = playoffWins(roster);
-  const p = Math.max(0.22, Math.min(0.78, 0.28 + projected * 0.03));
-  const rng = mulberry32(hashSeed(`playoff:${team}:${era}:${roster.map((r) => r.id).join(",")}`));
+  const p = Math.max(0.2, Math.min(0.8, 0.28 + projected * 0.03 + luckShift(luck)));
+  const rng = mulberry32(hashSeed(`playoff:${team}:${era}:${luck}:${roster.map((r) => r.id).join(",")}`));
   const { us, opps } = oppsFor(team);
   const nights: Night[] = [];
   const rounds: { round: string; taken: boolean; wins: number; losses: number }[] = [];

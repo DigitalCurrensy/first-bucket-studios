@@ -1,8 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { EightyTwo } from "@/components/eighty-two";
+import { ERAS, FRANCHISES, type Era, type Franchise } from "@/lib/nba";
 
-export const Route = createFileRoute("/games/82-0")({ component: Page });
+type Search = {
+  team?: Franchise;
+  era?: Era;
+  beat?: number;
+};
+
+export const Route = createFileRoute("/games/82-0")({
+  validateSearch: (raw: Record<string, unknown>): Search => {
+    const team = typeof raw.team === "string" && (FRANCHISES as readonly string[]).includes(raw.team) ? (raw.team as Franchise) : undefined;
+    const era = typeof raw.era === "string" && (ERAS as readonly string[]).includes(raw.era) ? (raw.era as Era) : undefined;
+    const beat = Number(raw.beat);
+    return {
+      team,
+      era,
+      beat: Number.isFinite(beat) ? beat : undefined,
+    };
+  },
+  component: Page,
+});
 
 function Page() {
-  return <EightyTwo mode="82-0" />;
+  const search = Route.useSearch();
+  return <EightyTwo mode="82-0" challenge={search} />;
 }

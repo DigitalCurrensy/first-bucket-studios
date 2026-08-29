@@ -6,6 +6,14 @@ export const Route = createFileRoute("/changelog")({ component: ChangelogPage })
 const ENTRIES = [
   {
     date: "August 29, 2026",
+    title: "The machine",
+    items: [
+      "One pull. Three strips — franchise, era, luck. Cylinder. Tick and haptic on land.",
+      "Pack-rip: ten face-down, you turn five. Crest on the PNG. Copy a challenge URL and beat the walk.",
+    ],
+  },
+  {
+    date: "August 29, 2026",
     title: "The room flashes",
     items: [
       "Slot window is three rows. House crests flash past. The payline is the middle. Not NBA logos — First Bucket marks.",

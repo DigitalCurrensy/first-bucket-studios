@@ -41,7 +41,11 @@
   --scale-press: 0.98;
   --height-reel-item: 5.75rem;
   --height-reel: 17.25rem;
+  --height-reel-item-compact: 4.5rem;
+  --height-reel-compact: 13.5rem;
   --duration-spin: 1.8s;
+  --duration-spin-era: 2.15s;
+  --duration-spin-luck: 2.45s;
   --aspect-plate: 4 / 3;
 }
 
@@ -100,11 +104,14 @@ html[data-theme="night"] {
   .reel-window {
     height: var(--height-reel);
   }
-  .reel-strip {
-    will-change: transform;
+  .reel-window.reel-compact {
+    height: var(--height-reel-compact);
   }
-  .reel-strip.is-spinning {
-    filter: blur(0.7px);
+  .reel-window.is-whirring {
+    filter: blur(0.55px);
+  }
+  .reel-window.reel-idle .reel-face {
+    color: var(--color-muted);
   }
   .reel-land {
     animation: punch 280ms var(--ease-studio);
@@ -113,8 +120,70 @@ html[data-theme="night"] {
     top: var(--height-reel-item);
     height: var(--height-reel-item);
   }
+  .reel-compact .reel-payline {
+    top: var(--height-reel-item-compact);
+    height: var(--height-reel-item-compact);
+  }
+  .reel-scene {
+    perspective: 48rem;
+    transform-style: preserve-3d;
+  }
+  .reel-drum {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: var(--height-reel-item);
+    margin-top: calc(var(--height-reel-item) * -0.5);
+    transform-style: preserve-3d;
+  }
+  .reel-compact .reel-drum {
+    height: var(--height-reel-item-compact);
+    margin-top: calc(var(--height-reel-item-compact) * -0.5);
+  }
+  .reel-face {
+    height: var(--height-reel-item);
+    background: var(--color-paper);
+    backface-visibility: hidden;
+    box-shadow: 0 1px 0 var(--color-line);
+  }
+  .reel-compact .reel-face {
+    height: var(--height-reel-item-compact);
+  }
+  .reel-shade {
+    background: linear-gradient(
+      to bottom,
+      var(--color-paper) 0%,
+      transparent 28%,
+      transparent 72%,
+      var(--color-paper) 100%
+    );
+  }
   .deal-card {
+    perspective: 40rem;
     animation: rise 400ms var(--ease-studio) both;
+  }
+  .card-shell {
+    transform-style: preserve-3d;
+    transition: transform 400ms var(--ease-studio);
+  }
+  .card-shell.is-down {
+    transform: rotateY(180deg);
+  }
+  .card-face {
+    position: relative;
+    z-index: 1;
+    backface-visibility: hidden;
+  }
+  .card-back {
+    z-index: 0;
+    transform: rotateY(180deg);
+  }
+  .card-shell.is-down .card-face {
+    z-index: 0;
+  }
+  .card-shell.is-down .card-back {
+    z-index: 2;
   }
   .deal-card:nth-child(1) {
     animation-delay: 0ms;
@@ -175,5 +244,8 @@ html[data-theme="night"] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .reel-window.is-whirring {
+    filter: none;
   }
 }

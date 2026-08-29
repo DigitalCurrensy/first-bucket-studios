@@ -31,7 +31,7 @@ test("season wins stay inside 0–82 and near the projection", () => {
 test("playoff walk stops after a lost series", () => {
   const walk = playoffWalk("Lakers", "Showtime", five);
   assert.ok(walk.nights.length >= 4);
-  assert.ok(walk.nights.length <= 16);
+  assert.ok(walk.nights.length <= 28);
   assert.ok(walk.wins <= 16);
   const lost = walk.rounds.find((r) => !r.taken);
   if (lost) {

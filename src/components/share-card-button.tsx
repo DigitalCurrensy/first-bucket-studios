@@ -16,12 +16,14 @@ export function ShareCardButton({
   wins,
   roster,
   kind = "season",
+  luck,
 }: {
   team: string;
   era: string;
   wins: number;
   roster: Player[];
   kind?: CardKind;
+  luck?: string;
 }) {
   const [state, setState] = useState<"idle" | "busy" | "shared" | "saved" | "fail">("idle");
 
@@ -29,7 +31,7 @@ export function ShareCardButton({
     if (state === "busy" || roster.length === 0) return;
     setState("busy");
     try {
-      const blob = await renderShareCard({ team, era, wins, roster, kind });
+      const blob = await renderShareCard({ team, era, wins, roster, kind, luck });
       const name = cardFileName(team, wins);
       const text = cardCaption({ team, era, wins, roster, kind });
       if (mode === "save") {

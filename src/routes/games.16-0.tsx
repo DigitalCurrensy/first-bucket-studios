@@ -8,6 +8,7 @@ import { RoomSpin } from "@/components/room-spin";
 import { SeasonRecap } from "@/components/season-recap";
 import { SeasonWalk } from "@/components/season-walk";
 import { ShareCardButton } from "@/components/share-card-button";
+import { luckLine, type Luck } from "@/lib/luck";
 import {
   PLAYERS,
   dealFrom,
@@ -22,6 +23,7 @@ import {
 import { recapOf, type Recap } from "@/lib/recap";
 import { playoffWalk, type Night } from "@/lib/sim";
 import { recordRun } from "@/lib/studio-save";
+import { tick } from "@/lib/tick";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/games/16-0")({ component: SixteenPage });
@@ -36,8 +38,10 @@ function SixteenPage() {
   const [step, setStep] = useState<Step>("spin");
   const [team, setTeam] = useState<Franchise | "">("");
   const [era, setEra] = useState<Era | "">("");
+  const [luck, setLuck] = useState<Luck>("Even");
   const [pack, setPack] = useState<Player[]>([]);
   const [picks, setPicks] = useState<string[]>([]);
+  const [open, setOpen] = useState<string[]>([]);
   const [wins, setWins] = useState(0);
   const [projected, setProjected] = useState(0);
   const [nights, setNights] = useState<Night[]>([]);
@@ -49,15 +53,22 @@ function SixteenPage() {
     .map((id) => pack.find((p) => p.id === id))
     .filter((p): p is Player => Boolean(p));
 
-  const startDraft = useCallback((nextTeam: Franchise, nextEra: Era) => {
+  const startDraft = useCallback((nextTeam: Franchise, nextEra: Era, nextLuck: Luck) => {
     setTeam(nextTeam);
     setEra(nextEra);
-    setPack(dealPack(`${nextTeam}:${nextEra}:${Date.now()}`));
+    setLuck(nextLuck);
+    setPack(dealPack(`${nextTeam}:${nextEra}:${nextLuck}:${Date.now()}`));
     setPicks([]);
+    setOpen([]);
     setStep("draft");
   }, []);
 
-  function toggle(id: string) {
+  function flip(id: string) {
+    if (!open.includes(id)) {
+      setOpen((cur) => [...cur, id]);
+      tick();
+      return;
+    }
     setPicks((cur) => {
       if (cur.includes(id)) return cur.filter((x) => x !== id);
       if (cur.length >= 5) return cur;
@@ -65,9 +76,18 @@ function SixteenPage() {
     });
   }
 
+  function rip() {
+    pack.forEach((p, i) => {
+      window.setTimeout(() => {
+        setOpen((cur) => (cur.includes(p.id) ? cur : [...cur, p.id]));
+        tick();
+      }, i * 70);
+    });
+  }
+
   function lock() {
     if (roster.length !== 5 || !team || !era) return;
-    const walk = playoffWalk(team, era, roster);
+    const walk = playoffWalk(team, era, roster, luck);
     const last = walk.rounds[walk.rounds.length - 1];
     const exit = last?.taken ? "Banner" : last?.round;
     const summary = recapOf(walk.nights, walk.projected, exit);
@@ -93,14 +113,16 @@ function SixteenPage() {
     setStep("spin");
     setTeam("");
     setEra("");
+    setLuck("Even");
     setPack([]);
     setPicks([]);
+    setOpen([]);
     setNights([]);
     setCopied(false);
   }
 
   async function copyLine() {
-    const line = `Walked a ${playoffLine(wins)} ${era} ${team} playoff run at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}.`;
+    const line = `Walked a ${playoffLine(wins)} ${era} ${team} (${luck}) playoff run at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}.`;
     try {
       await navigator.clipboard.writeText(line);
       setCopied(true);
@@ -114,7 +136,7 @@ function SixteenPage() {
       <PageIntro
         kicker="Build a 16-0"
         title="Sixteen wins. One banner."
-        lead="Spin the room. Start five. Then the series play. A banner is four series you did not lose."
+        lead="One pull. Franchise, era, luck. Eight face-down. You turn five. Then the series play."
       />
 
       {step === "spin" && <RoomSpin onReady={startDraft} />}
@@ -124,12 +146,17 @@ function SixteenPage() {
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-micro font-medium uppercase tracking-label text-subtle">
-                02 · Eight names · {team} · {era}
+                02 · Rip · {team} · {era} · {luck}
               </p>
-              <p className="mt-1 text-sm text-muted">{picks.length} of 5 · Then the series play.</p>
+              <p className="mt-1 text-sm text-muted">
+                {open.length} turned · {picks.length} of 5 locked in. {luckLine(luck)}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="ghost" onClick={() => startDraft(team as Franchise, era as Era)}>
+              <Button variant="ghost" onClick={rip} disabled={open.length === pack.length}>
+                Turn them all
+              </Button>
+              <Button variant="ghost" onClick={() => startDraft(team as Franchise, era as Era, luck)}>
                 Redeal
               </Button>
               <Button onClick={lock} disabled={picks.length !== 5}>
@@ -142,9 +169,11 @@ function SixteenPage() {
               <PlayerCard
                 key={player.id}
                 player={player}
+                team={team}
+                revealed={open.includes(player.id)}
                 selected={picks.includes(player.id)}
                 index={picks.indexOf(player.id)}
-                onToggle={() => toggle(player.id)}
+                onToggle={() => flip(player.id)}
               />
             ))}
           </div>
@@ -164,15 +193,15 @@ function SixteenPage() {
 
       {step === "result" && (
         <section className="grid gap-8 lg:grid-cols-2">
-          <ResultPoster team={team} era={era} wins={wins} roster={roster} kind="playoff" />
+          <ResultPoster team={team} era={`${era} · ${luck}`} wins={wins} roster={roster} kind="playoff" />
           <div>
             <p className="font-display text-2xl font-semibold">{playoffLabel(wins)}</p>
             <p className="mt-2 text-muted">
-              {playoffLine(wins)} walked. Projected {projected} series wins as a formula. The rounds decide.
+              {playoffLine(wins)} walked. Projected {projected} series wins as a formula. {luckLine(luck)}
             </p>
             {recap && <SeasonRecap recap={recap} />}
             <div className="mt-6 flex flex-wrap gap-2">
-              <ShareCardButton team={team} era={era} wins={wins} roster={roster} kind="playoff" />
+              <ShareCardButton team={team} era={era} wins={wins} roster={roster} kind="playoff" luck={luck} />
               <Button onClick={copyLine}>{copied ? "Copied" : "Copy line"}</Button>
               <Button variant="ghost" onClick={reset}>
                 Spin another

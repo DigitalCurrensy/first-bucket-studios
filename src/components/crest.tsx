@@ -156,6 +156,51 @@ export function EraMark({ name, className }: { name: string; className?: string 
   }
 }
 
+export function LuckMark({ name, className }: { name: string; className?: string }) {
+  const stroke = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinejoin: "round" as const };
+  switch (name) {
+    case "Hot":
+      return (
+        <Mark className={className}>
+          <path d="M20 8 Q14 18 16 26 Q20 31 24 26 Q26 18 20 8 Z" {...stroke} />
+        </Mark>
+      );
+    case "Grit":
+      return (
+        <Mark className={className}>
+          <path d="M10 28 L20 10 L30 28" {...stroke} />
+          <path d="M14 28 H26" {...stroke} />
+        </Mark>
+      );
+    case "Thin":
+      return (
+        <Mark className={className}>
+          <path d="M12 10 V30 M20 10 V30 M28 10 V30" {...stroke} />
+        </Mark>
+      );
+    case "Pace":
+      return (
+        <Mark className={className}>
+          <path d="M8 20 H32 M24 12 L32 20 L24 28" {...stroke} />
+        </Mark>
+      );
+    case "Steel":
+      return (
+        <Mark className={className}>
+          <rect x="10" y="10" width="20" height="20" {...stroke} />
+          <path d="M10 20 H30 M20 10 V30" {...stroke} />
+        </Mark>
+      );
+    default:
+      return (
+        <Mark className={className}>
+          <circle cx="20" cy="20" r="12" {...stroke} />
+          <path d="M14 20 H26" {...stroke} />
+        </Mark>
+      );
+  }
+}
+
 export function clubAbbr(name: string) {
   return ABBR[name as Franchise] ?? name.slice(0, 3).toUpperCase();
 }

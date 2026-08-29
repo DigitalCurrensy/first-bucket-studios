@@ -11,13 +11,13 @@ const PRODUCTS = [
     href: "/games/82-0" as const,
     kicker: "Game",
     title: "Build an 82-0",
-    body: "Spin the room. Draft five. The season walks. The poster is the walk.",
+    body: "One pull. Three strips. Rip ten. The season walks.",
   },
   {
     href: "/games/daily" as const,
     kicker: "Game",
     title: "Daily Bucket",
-    body: "One locked deal per day. Keep the streak. No second seed.",
+    body: "The date pulls the room. Rip the pack. Keep the streak.",
   },
   {
     href: "/games/goat" as const,

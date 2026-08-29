@@ -1,114 +1,124 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TeamReel } from "@/components/team-reel";
+import { LUCKS, luckLine, type Luck } from "@/lib/luck";
 import { ERAS, FRANCHISES, hashSeed, mulberry32, pickIndex, type Era, type Franchise } from "@/lib/nba";
-
-type Phase = "team" | "era" | "ready";
 
 export function RoomSpin({
   locked,
   auto = false,
   onReady,
 }: {
-  locked?: { team: Franchise; era: Era };
+  locked?: { team: Franchise; era: Era; luck?: Luck };
   auto?: boolean;
-  onReady: (team: Franchise, era: Era) => void;
+  onReady: (team: Franchise, era: Era, luck: Luck) => void;
 }) {
-  const [phase, setPhase] = useState<Phase>("team");
   const [team, setTeam] = useState<Franchise | "">("");
   const [era, setEra] = useState<Era | "">("");
-  const [spinning, setSpinning] = useState(false);
+  const [luck, setLuck] = useState<Luck | "">("");
+  const [spinTeam, setSpinTeam] = useState(false);
+  const [spinEra, setSpinEra] = useState(false);
+  const [spinLuck, setSpinLuck] = useState(false);
+  const [ready, setReady] = useState(false);
   const booted = useRef(false);
   const handed = useRef(false);
+  const spinning = spinTeam || spinEra || spinLuck;
 
-  function spinTeam() {
+  const restTeam = useCallback(() => setSpinTeam(false), []);
+  const restEra = useCallback(() => setSpinEra(false), []);
+  const restLuck = useCallback(() => setSpinLuck(false), []);
+
+  function pull() {
     if (spinning) return;
-    const next = locked?.team ?? pickIndex(mulberry32(hashSeed(`team:${Date.now()}`)), FRANCHISES);
-    setTeam(next);
-    setEra("");
-    setPhase("team");
-    setSpinning(true);
+    const rng = mulberry32(hashSeed(`pull:${Date.now()}`));
+    setReady(false);
+    setTeam(locked?.team ?? pickIndex(rng, FRANCHISES));
+    setEra(locked?.era ?? pickIndex(rng, ERAS));
+    setLuck(locked?.luck ?? pickIndex(rng, LUCKS));
+    setSpinTeam(true);
+    window.setTimeout(() => setSpinEra(true), 90);
+    window.setTimeout(() => setSpinLuck(true), 180);
   }
-
-  function spinEra() {
-    if (spinning || !team) return;
-    const next = locked?.era ?? pickIndex(mulberry32(hashSeed(`era:${team}:${Date.now()}`)), ERAS);
-    setEra(next);
-    setPhase("era");
-    setSpinning(true);
-  }
-
-  const rest = useCallback(() => {
-    setSpinning(false);
-    setPhase((cur) => (cur === "team" ? "era" : cur === "era" ? "ready" : cur));
-  }, []);
 
   useEffect(() => {
     if (!auto || booted.current) return;
     booted.current = true;
-    const next = locked?.team ?? pickIndex(mulberry32(hashSeed(`team:${Date.now()}`)), FRANCHISES);
-    setTeam(next);
-    setEra("");
-    setPhase("team");
-    setSpinning(true);
+    const rng = mulberry32(hashSeed(`pull:${Date.now()}`));
+    setTeam(locked?.team ?? pickIndex(rng, FRANCHISES));
+    setEra(locked?.era ?? pickIndex(rng, ERAS));
+    setLuck(locked?.luck ?? pickIndex(rng, LUCKS));
+    setSpinTeam(true);
+    const a = window.setTimeout(() => setSpinEra(true), 90);
+    const b = window.setTimeout(() => setSpinLuck(true), 180);
+    return () => {
+      window.clearTimeout(a);
+      window.clearTimeout(b);
+    };
   }, [auto, locked]);
 
   useEffect(() => {
-    if (!auto || spinning || phase !== "era" || era) return;
-    const id = window.setTimeout(() => {
-      const next = locked?.era ?? pickIndex(mulberry32(hashSeed(`era:${team}:${Date.now()}`)), ERAS);
-      setEra(next);
-      setSpinning(true);
-    }, 280);
-    return () => window.clearTimeout(id);
-  }, [auto, spinning, phase, era, locked, team]);
+    if (spinning || !team || !era || !luck) return;
+    setReady(true);
+  }, [spinning, team, era, luck]);
 
   useEffect(() => {
-    if (!auto || phase !== "ready" || !team || !era || handed.current) return;
+    if (!auto || !ready || !team || !era || !luck || handed.current) return;
     handed.current = true;
-    const id = window.setTimeout(() => onReady(team, era), 400);
+    const id = window.setTimeout(() => onReady(team, era, luck), 400);
     return () => window.clearTimeout(id);
-  }, [auto, phase, team, era, onReady]);
+  }, [auto, ready, team, era, luck, onReady]);
 
-  const showEra = Boolean(era) && (phase === "era" || phase === "ready");
-  const items = showEra ? ERAS : FRANCHISES;
-  const target = showEra ? era : team;
   const kicker = spinning
-    ? showEra
-      ? "Spinning the era…"
-      : "Spinning the room…"
-    : phase === "ready"
-      ? `${team} · ${era}`
-      : phase === "era"
-        ? `${team} landed. Spin the era.`
-        : "The room moves. You draft who lands.";
+    ? "The machine is live."
+    : ready && team && era && luck
+      ? `${team} · ${era} · ${luck}. ${luckLine(luck)}`
+      : "One pull. Three strips. Who lands is the room.";
 
   return (
     <section>
-      <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">01 · Spin</p>
+      <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">01 · Pull</p>
       <p className="mb-4 text-sm text-muted">{kicker}</p>
-      <TeamReel items={items} target={target} spinning={spinning} onRest={rest} />
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">Franchise</p>
+          <TeamReel items={FRANCHISES} target={team} spinning={spinTeam} compact onRest={restTeam} />
+        </div>
+        <div>
+          <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">Era</p>
+          <TeamReel
+            items={ERAS}
+            target={era}
+            spinning={spinEra}
+            compact
+            durationClass="duration-spin-era"
+            onRest={restEra}
+          />
+        </div>
+        <div>
+          <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">Luck</p>
+          <TeamReel
+            items={LUCKS}
+            target={luck}
+            spinning={spinLuck}
+            compact
+            durationClass="duration-spin-luck"
+            onRest={restLuck}
+          />
+        </div>
+      </div>
       {!auto && (
         <div className="mt-6 flex flex-wrap gap-2">
-          {phase === "team" && !spinning && (
-            <Button onClick={spinTeam}>{team ? "Respin the room" : "Spin the room"}</Button>
+          {!ready && (
+            <Button onClick={pull} disabled={spinning}>
+              {spinning ? "Pulling…" : team ? "Pull again" : "Pull"}
+            </Button>
           )}
-          {phase === "era" && !spinning && (
+          {ready && team && era && luck && (
             <>
-              <Button onClick={spinEra}>Spin the era</Button>
+              <Button onClick={() => onReady(team, era, luck)}>Rip the pack</Button>
               {!locked && (
-                <Button variant="ghost" onClick={spinTeam}>
-                  Respin the room
-                </Button>
-              )}
-            </>
-          )}
-          {phase === "ready" && team && era && (
-            <>
-              <Button onClick={() => onReady(team, era)}>Draft five</Button>
-              {!locked && (
-                <Button variant="ghost" onClick={spinTeam}>
-                  Spin again
+                <Button variant="ghost" onClick={pull}>
+                  Pull again
                 </Button>
               )}
             </>
