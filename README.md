@@ -16,6 +16,7 @@ Saves live on this device. No account.
 
 **Fantasy**
 - Market Board — This Week, Tiers, Stream, Cut, Pace. Editorial, not a book
+- The Tape — UP / FLAT / DOWN. Marks, not a book
 - The Slate — tonight. One seeded board per day
 - Trade Desk — grade the deal, compare six cats. Not a book
 - Mock Lab — four-seat snake. You sit first. Need-first rooms

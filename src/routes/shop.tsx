@@ -88,7 +88,7 @@ function ShopPage() {
               <p className="mt-4 text-sm text-subtle">
                 {run.mode === "82-0" ? "Regular season" : run.mode === "daily" ? "Daily Bucket" : run.mode === "goat" ? "GOAT Five" : "Playoff 16-0"}
               </p>
-              <div className="mt-4">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <ShareCardButton
                   team={run.team}
                   era={run.era}

@@ -20,6 +20,7 @@ import { Route as KeepersRouteImport } from './routes/keepers'
 import { Route as MockRouteImport } from './routes/mock'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SlateRouteImport } from './routes/slate'
+import { Route as TapeRouteImport } from './routes/tape'
 import { Route as TradeRouteImport } from './routes/trade'
 import { Route as Games160RouteImport } from './routes/games.16-0'
 import { Route as Games820RouteImport } from './routes/games.82-0'
@@ -81,6 +82,11 @@ const SlateRoute = SlateRouteImport.update({
   path: '/slate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TapeRoute = TapeRouteImport.update({
+  id: '/tape',
+  path: '/tape',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TradeRoute = TradeRouteImport.update({
   id: '/trade',
   path: '/trade',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/mock': typeof MockRoute
   '/shop': typeof ShopRoute
   '/slate': typeof SlateRoute
+  '/tape': typeof TapeRoute
   '/trade': typeof TradeRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/mock': typeof MockRoute
   '/shop': typeof ShopRoute
   '/slate': typeof SlateRoute
+  '/tape': typeof TapeRoute
   '/trade': typeof TradeRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/mock': typeof MockRoute
   '/shop': typeof ShopRoute
   '/slate': typeof SlateRoute
+  '/tape': typeof TapeRoute
   '/trade': typeof TradeRoute
   '/games/16-0': typeof Games160Route
   '/games/82-0': typeof Games820Route
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/mock'
     | '/shop'
     | '/slate'
+    | '/tape'
     | '/trade'
     | '/games/16-0'
     | '/games/82-0'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/mock'
     | '/shop'
     | '/slate'
+    | '/tape'
     | '/trade'
     | '/games/16-0'
     | '/games/82-0'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/mock'
     | '/shop'
     | '/slate'
+    | '/tape'
     | '/trade'
     | '/games/16-0'
     | '/games/82-0'
@@ -231,6 +243,7 @@ export interface RootRouteChildren {
   MockRoute: typeof MockRoute
   ShopRoute: typeof ShopRoute
   SlateRoute: typeof SlateRoute
+  TapeRoute: typeof TapeRoute
   TradeRoute: typeof TradeRoute
   Games160Route: typeof Games160Route
   Games820Route: typeof Games820Route
@@ -317,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tape': {
+      id: '/tape'
+      path: '/tape'
+      fullPath: '/tape'
+      preLoaderRoute: typeof TapeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trade': {
       id: '/trade'
       path: '/trade'
@@ -367,6 +387,7 @@ const rootRouteChildren: RootRouteChildren = {
   MockRoute: MockRoute,
   ShopRoute: ShopRoute,
   SlateRoute: SlateRoute,
+  TapeRoute: TapeRoute,
   TradeRoute: TradeRoute,
   Games160Route: Games160Route,
   Games820Route: Games820Route,

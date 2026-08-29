@@ -18,6 +18,7 @@ const NAV = [
     group: "Fantasy",
     items: [
       { href: "/fantasy" as const, label: "Market Board" },
+      { href: "/tape" as const, label: "The Tape" },
       { href: "/slate" as const, label: "The Slate" },
       { href: "/trade" as const, label: "Trade Desk" },
       { href: "/mock" as const, label: "Mock Lab" },

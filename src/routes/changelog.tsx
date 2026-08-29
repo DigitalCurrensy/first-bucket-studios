@@ -6,6 +6,14 @@ export const Route = createFileRoute("/changelog")({ component: ChangelogPage })
 const ENTRIES = [
   {
     date: "August 29, 2026",
+    title: "Share the mark",
+    items: [
+      "Share the card — PNG plus caption with the studio on the line. Native share when the device has it. Save PNG still lives.",
+      "The Tape — UP / FLAT / DOWN, seeded to the date. Pin a mark. Share a mark. Not a book, not an NFT, not a player stock.",
+    ],
+  },
+  {
+    date: "August 29, 2026",
     title: "The card is the share",
     items: [
       "Save PNG from 82-0, Daily, GOAT Five, 16-0, and the Card Shop. Ink poster, no fake tape.",

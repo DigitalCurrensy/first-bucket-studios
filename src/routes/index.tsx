@@ -50,6 +50,12 @@ const PRODUCTS = [
     body: "Issue 001. Four games is the week. Copy the brief. No signup.",
   },
   {
+    href: "/tape" as const,
+    kicker: "Tape",
+    title: "The Tape",
+    body: "UP / FLAT / DOWN. Marks, not a book. Share the print.",
+  },
+  {
     href: "/fantasy" as const,
     kicker: "Board",
     title: "Market Board",

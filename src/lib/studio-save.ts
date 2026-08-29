@@ -24,6 +24,7 @@ export type StudioSave = {
   runs: SavedRun[];
   boardTiers: Record<string, 1 | 2 | 3>;
   keepers: Record<string, "KEEP" | "TRADE" | "CUT">;
+  tapePins: string[];
 };
 
 export const emptySave = (): StudioSave => ({
@@ -35,6 +36,7 @@ export const emptySave = (): StudioSave => ({
   runs: [],
   boardTiers: {},
   keepers: {},
+  tapePins: [],
 });
 
 function migrate(raw: StudioSave): StudioSave {
@@ -92,6 +94,13 @@ export function recordRun(run: SavedRun, dailyStamp?: string) {
 export function writeKeepers(keepers: StudioSave["keepers"]) {
   const save = loadSave();
   const next = { ...save, keepers };
+  writeSave(next);
+  return next;
+}
+
+export function writeTapePins(tapePins: string[]) {
+  const save = loadSave();
+  const next = { ...save, tapePins };
   writeSave(next);
   return next;
 }
