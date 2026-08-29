@@ -15,6 +15,9 @@ export function TeamReel<T extends string>({
   onRest?: () => void;
 }) {
   const rowRef = useRef<HTMLDivElement>(null);
+  const rested = useRef(false);
+  const onRestRef = useRef(onRest);
+  onRestRef.current = onRest;
   const [rowH, setRowH] = useState(72);
   const [offset, setOffset] = useState(0);
   const [armed, setArmed] = useState(false);
@@ -25,7 +28,8 @@ export function TeamReel<T extends string>({
   useEffect(() => {
     const node = rowRef.current;
     if (!node) return;
-    setRowH(node.offsetHeight);
+    const h = node.offsetHeight;
+    if (h > 0) setRowH(h);
   }, [items]);
 
   useEffect(() => {
@@ -34,16 +38,25 @@ export function TeamReel<T extends string>({
   }, [items]);
 
   useEffect(() => {
+    rested.current = false;
     if (!spinning || !target) return;
     setArmed(false);
     setOffset(0);
     const id = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setArmed(true);
-        setOffset(endIndex * rowH);
+        setOffset(endIndex * Math.max(rowH, 1));
       });
     });
-    return () => cancelAnimationFrame(id);
+    const failsafe = window.setTimeout(() => {
+      if (rested.current) return;
+      rested.current = true;
+      onRestRef.current?.();
+    }, 2000);
+    return () => {
+      cancelAnimationFrame(id);
+      window.clearTimeout(failsafe);
+    };
   }, [spinning, target, endIndex, rowH]);
 
   return (
@@ -57,7 +70,9 @@ export function TeamReel<T extends string>({
         style={{ transform: `translateY(-${offset}px)` }}
         onTransitionEnd={(e) => {
           if (e.propertyName !== "transform") return;
-          if (spinning) onRest?.();
+          if (!spinning || rested.current) return;
+          rested.current = true;
+          onRestRef.current?.();
         }}
       >
         {strip.map((name, i) => (

@@ -5,6 +5,7 @@ import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
 import { RoomSpin } from "@/components/room-spin";
+import { SeasonWalk } from "@/components/season-walk";
 import {
   PLAYERS,
   dealFrom,
@@ -12,17 +13,17 @@ import {
   mulberry32,
   playoffLabel,
   playoffLine,
-  playoffWins,
   type Era,
   type Franchise,
   type Player,
 } from "@/lib/nba";
+import { playoffWalk, type Night } from "@/lib/sim";
 import { recordRun } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/games/16-0")({ component: SixteenPage });
 
-type Step = "spin" | "draft" | "result";
+type Step = "spin" | "draft" | "season" | "result";
 
 function dealPack(seed: string) {
   return dealFrom(PLAYERS, mulberry32(hashSeed(seed)), 8);
@@ -35,6 +36,9 @@ function SixteenPage() {
   const [pack, setPack] = useState<Player[]>([]);
   const [picks, setPicks] = useState<string[]>([]);
   const [wins, setWins] = useState(0);
+  const [projected, setProjected] = useState(0);
+  const [nights, setNights] = useState<Night[]>([]);
+  const [club, setClub] = useState("FBS");
   const [copied, setCopied] = useState(false);
 
   const roster = picks
@@ -59,16 +63,19 @@ function SixteenPage() {
 
   function lock() {
     if (roster.length !== 5 || !team || !era) return;
-    const projected = playoffWins(roster);
-    setWins(projected);
-    setStep("result");
+    const walk = playoffWalk(team, era, roster);
+    setWins(walk.wins);
+    setProjected(walk.projected);
+    setNights(walk.nights);
+    setClub(walk.us);
+    setStep("season");
     recordRun({
       id: `${Date.now()}`,
       at: Date.now(),
       mode: "16-0",
       team,
       era,
-      wins: projected,
+      wins: walk.wins,
       roster: roster.map((p) => p.id),
     });
   }
@@ -79,11 +86,12 @@ function SixteenPage() {
     setEra("");
     setPack([]);
     setPicks([]);
+    setNights([]);
     setCopied(false);
   }
 
   async function copyLine() {
-    const line = `Built a ${playoffLine(wins)} ${era} ${team} playoff run at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}.`;
+    const line = `Walked a ${playoffLine(wins)} ${era} ${team} playoff run at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}.`;
     try {
       await navigator.clipboard.writeText(line);
       setCopied(true);
@@ -97,7 +105,7 @@ function SixteenPage() {
       <PageIntro
         kicker="Build a 16-0"
         title="Sixteen wins. One banner."
-        lead="Spin the room. Deal eight, start five. Two-way names travel. A third guard does not."
+        lead="Spin the room. Start five. Then the series play. A banner is four series you did not lose."
       />
 
       {step === "spin" && <RoomSpin onReady={startDraft} />}
@@ -109,7 +117,7 @@ function SixteenPage() {
               <p className="text-micro font-medium uppercase tracking-label text-subtle">
                 02 · Eight names · {team} · {era}
               </p>
-              <p className="mt-1 text-sm text-muted">{picks.length} of 5 · Two-way names travel.</p>
+              <p className="mt-1 text-sm text-muted">{picks.length} of 5 · Then the series play.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="ghost" onClick={() => startDraft(team as Franchise, era as Era)}>
@@ -134,14 +142,24 @@ function SixteenPage() {
         </section>
       )}
 
+      {step === "season" && (
+        <SeasonWalk
+          team={team}
+          us={club}
+          nights={nights}
+          of={nights.length}
+          projected={projected}
+          onDone={() => setStep("result")}
+        />
+      )}
+
       {step === "result" && (
         <section className="grid gap-8 lg:grid-cols-2">
           <ResultPoster team={team} era={era} wins={wins} roster={roster} kind="playoff" />
           <div>
             <p className="font-display text-2xl font-semibold">{playoffLabel(wins)}</p>
             <p className="mt-2 text-muted">
-              {playoffLine(wins)} in a 16-win draw. Peak, position mix, and steals plus blocks. This is not an 82-game
-              number.
+              {playoffLine(wins)} walked. Projected {projected} series wins as a formula. The rounds decide.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Button onClick={copyLine}>{copied ? "Copied" : "Copy line"}</Button>

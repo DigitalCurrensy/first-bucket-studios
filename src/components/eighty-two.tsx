@@ -5,6 +5,7 @@ import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
 import { RoomSpin } from "@/components/room-spin";
+import { SeasonWalk } from "@/components/season-walk";
 import { useMounted } from "@/lib/hooks";
 import {
   dealFrom,
@@ -14,18 +15,18 @@ import {
   mulberry32,
   pickIndex,
   PLAYERS,
-  projectWins,
   recordLine,
   winLabel,
   type Era,
   type Franchise,
   type Player,
 } from "@/lib/nba";
+import { seasonWalk, type Night } from "@/lib/sim";
 import { loadSave, recordRun, todayKey } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
 
 type Mode = "82-0" | "daily";
-type Step = "spin" | "draft" | "result";
+type Step = "spin" | "draft" | "season" | "result";
 
 function dealPack(seed: string) {
   const rng = mulberry32(hashSeed(seed));
@@ -53,6 +54,9 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   const [pack, setPack] = useState<Player[]>([]);
   const [picks, setPicks] = useState<string[]>([]);
   const [wins, setWins] = useState(0);
+  const [projected, setProjected] = useState(0);
+  const [nights, setNights] = useState<Night[]>([]);
+  const [club, setClub] = useState("FBS");
   const [copied, setCopied] = useState(false);
   const [already, setAlready] = useState(false);
   const [streak, setStreak] = useState(0);
@@ -85,9 +89,12 @@ export function EightyTwo({ mode }: { mode: Mode }) {
 
   function lock() {
     if (roster.length !== 5 || !activeEra || !activeTeam) return;
-    const projected = projectWins(roster, activeEra);
-    setWins(projected);
-    setStep("result");
+    const walk = seasonWalk(activeTeam, activeEra, roster);
+    setWins(walk.wins);
+    setProjected(walk.projected);
+    setNights(walk.nights);
+    setClub(walk.us);
+    setStep("season");
     const before = loadSave();
     const wasToday = Boolean(daily && before.lastDaily === stamp);
     const next = recordRun(
@@ -97,7 +104,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
         mode,
         team: activeTeam,
         era: activeEra,
-        wins: projected,
+        wins: walk.wins,
         roster: roster.map((p) => p.id),
       },
       daily ? stamp : undefined,
@@ -109,6 +116,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   function reset() {
     setPicks([]);
     setCopied(false);
+    setNights([]);
     setStep("spin");
     if (!daily) {
       setTeam("");
@@ -118,7 +126,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
   }
 
   async function copyLine() {
-    const line = `Built a ${recordLine(wins)} ${activeEra} ${activeTeam} at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}.`;
+    const line = `Walked a ${recordLine(wins)} ${activeEra} ${activeTeam} at First Bucket Studio: ${roster.map((p) => p.name).join(", ")}.`;
     try {
       await navigator.clipboard.writeText(line);
       setCopied(true);
@@ -142,11 +150,11 @@ export function EightyTwo({ mode }: { mode: Mode }) {
     <div>
       <PageIntro
         kicker={daily ? "Daily Bucket" : "Build an 82-0"}
-        title={daily ? "One deal. One day." : "Spin the room. Stack five."}
+        title={daily ? "One deal. One day." : "Spin the room. Walk the season."}
         lead={
           daily
-            ? "The franchise and era spin to the date. Then draft five. A balanced five travels."
-            : "The names move. Who lands is the room. Spin an era. Draft five. Balance travels."
+            ? "The franchise and era spin to the date. Draft five. Then 82 nights play."
+            : "The names move. Draft five. The formula is the center. The nights wander."
         }
       />
 
@@ -172,7 +180,7 @@ export function EightyTwo({ mode }: { mode: Mode }) {
               <p className="text-micro font-medium uppercase tracking-label text-subtle">
                 {daily ? "Today’s pack" : `02 · Draft five · ${team} · ${era}`}
               </p>
-              <p className="mt-1 text-sm text-muted">{picks.length} of 5 · A balanced five travels.</p>
+              <p className="mt-1 text-sm text-muted">{picks.length} of 5 · Then the season plays.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               {!daily && (
@@ -199,14 +207,25 @@ export function EightyTwo({ mode }: { mode: Mode }) {
         </section>
       )}
 
+      {step === "season" && (
+        <SeasonWalk
+          team={activeTeam}
+          us={club}
+          nights={nights}
+          of={82}
+          projected={projected}
+          onDone={() => setStep("result")}
+        />
+      )}
+
       {step === "result" && (
         <section className="grid gap-8 lg:grid-cols-2">
           <ResultPoster team={activeTeam} era={activeEra} wins={wins} roster={roster} />
           <div>
             <p className="font-display text-2xl font-semibold">{winLabel(wins)}</p>
             <p className="mt-2 text-muted">
-              {recordLine(wins)}. Peak average and position mix did the work
-              {eraFits ? `, plus ${eraFits} era fits.` : ". No era fits — the number paid for that."}
+              {recordLine(wins)} walked. Projected {projected}.
+              {eraFits ? ` ${eraFits} era fits in the five.` : " No era fits — the walk paid for that."}
             </p>
             {daily && already && <p className="mt-3 text-sm text-subtle">Replay logged. Streak already counted today.</p>}
             {daily && !already && streak > 0 && <p className="mt-3 text-sm text-fg">Streak {streak}.</p>}

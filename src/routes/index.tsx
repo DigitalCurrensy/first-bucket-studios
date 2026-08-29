@@ -11,7 +11,7 @@ const PRODUCTS = [
     href: "/games/82-0" as const,
     kicker: "Game",
     title: "Build an 82-0",
-    body: "Spin the room. Spin an era. Draft five. We project the season.",
+    body: "Spin the room. Draft five. The season walks. The poster is the walk.",
   },
   {
     href: "/games/daily" as const,
@@ -29,7 +29,7 @@ const PRODUCTS = [
     href: "/games/16-0" as const,
     kicker: "Game",
     title: "Build a 16-0",
-    body: "Playoffs. Deal eight, start five. Sixteen wins is a banner.",
+    body: "Playoffs as series, not a clamp. Four rounds. A banner is rare.",
   },
   {
     href: "/keepers" as const,

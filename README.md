@@ -9,10 +9,10 @@ Saves live on this device. No account.
 ## What ships
 
 **Games**
-- Build an 82-0 — spin a franchise, spin an era, draft five, projected season
-- Daily Bucket — the room spins to the date. Keep the streak.
+- Build an 82-0 — spin a franchise, draft five, walk 82 nights
+- Daily Bucket — the room spins to the date. Then the season plays
 - GOAT Five — five names from the book. Score the circle
-- Build a 16-0 — playoff draw. Eight names, five starters, sixteen-win banner
+- Build a 16-0 — four series. Lose one, the run is over
 
 **Fantasy**
 - Market Board — This Week, Tiers, Stream, Cut, Pace. Editorial, not a book

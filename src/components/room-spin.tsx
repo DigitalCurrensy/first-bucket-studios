@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TeamReel } from "@/components/team-reel";
 import { ERAS, FRANCHISES, hashSeed, mulberry32, pickIndex, type Era, type Franchise } from "@/lib/nba";
@@ -15,8 +15,8 @@ export function RoomSpin({
   onReady: (team: Franchise, era: Era) => void;
 }) {
   const [phase, setPhase] = useState<Phase>("team");
-  const [team, setTeam] = useState<Franchise | "">(locked?.team ?? "");
-  const [era, setEra] = useState<Era | "">(locked?.era ?? "");
+  const [team, setTeam] = useState<Franchise | "">("");
+  const [era, setEra] = useState<Era | "">("");
   const [spinning, setSpinning] = useState(false);
   const booted = useRef(false);
   const handed = useRef(false);
@@ -38,16 +38,17 @@ export function RoomSpin({
     setSpinning(true);
   }
 
-  function rest() {
+  const rest = useCallback(() => {
     setSpinning(false);
     setPhase((cur) => (cur === "team" ? "era" : cur === "era" ? "ready" : cur));
-  }
+  }, []);
 
   useEffect(() => {
     if (!auto || booted.current) return;
     booted.current = true;
     const next = locked?.team ?? pickIndex(mulberry32(hashSeed(`team:${Date.now()}`)), FRANCHISES);
     setTeam(next);
+    setEra("");
     setPhase("team");
     setSpinning(true);
   }, [auto, locked]);
