@@ -5,6 +5,7 @@ import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
 import { RoomSpin } from "@/components/room-spin";
+import { RosterRail } from "@/components/roster-rail";
 import { SeasonRecap } from "@/components/season-recap";
 import { SeasonWalk } from "@/components/season-walk";
 import { ShareCardButton } from "@/components/share-card-button";
@@ -259,18 +260,21 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {activePack.map((player) => (
-              <PlayerCard
-                key={player.id}
-                player={player}
-                team={activeTeam}
-                revealed={open.includes(player.id)}
-                selected={picks.includes(player.id)}
-                index={picks.indexOf(player.id)}
-                onToggle={() => flip(player.id)}
-              />
-            ))}
+          <div className="grid gap-6 lg:grid-cols-dashboard">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {activePack.map((player) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  team={activeTeam}
+                  revealed={open.includes(player.id)}
+                  selected={picks.includes(player.id)}
+                  index={picks.indexOf(player.id)}
+                  onToggle={() => flip(player.id)}
+                />
+              ))}
+            </div>
+            <RosterRail roster={roster} />
           </div>
         </section>
       )}

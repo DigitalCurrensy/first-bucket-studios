@@ -2,6 +2,50 @@
 @import "tailwindcss";
 
 @theme {
+  --color-bg: #0c0b09;
+  --color-paper: #141210;
+  --color-surface: #1a1814;
+  --color-fg: #f4efe4;
+  --color-muted: #b4ad9f;
+  --color-subtle: #8c867a;
+  --color-line: #2c2923;
+  --color-accent: #c4a574;
+  --color-accent-fg: #0c0b09;
+  --color-good: #3d9a68;
+  --color-warn: #c4894a;
+  --color-ink: #f4efe4;
+  --color-night: #0c0b09;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.3;
+  --tracking-label: 0.14em;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --shadow-border: 0 0 0 1px rgba(244, 239, 228, 0.08);
+  --shadow-border-hover: 0 0 0 1px rgba(244, 239, 228, 0.14);
+  --max-width-studio: 86rem;
+  --min-width-board: 42rem;
+  --grid-template-columns-shell: 14.5rem minmax(0, 1fr);
+  --grid-template-columns-dashboard: minmax(0, 1fr) 22rem;
+  --ease-studio: cubic-bezier(0.22, 1, 0.36, 1);
+  --scale-press: 0.98;
+  --height-reel-item: 5.75rem;
+  --height-reel: 17.25rem;
+  --height-reel-item-compact: 4.5rem;
+  --height-reel-compact: 13.5rem;
+  --duration-spin: 1.8s;
+  --duration-spin-era: 2.15s;
+  --duration-spin-luck: 2.45s;
+  --aspect-plate: 4 / 3;
+  --aspect-card: 16 / 9;
+}
+
+html[data-theme="light"] {
   --color-bg: #f3eee4;
   --color-paper: #faf6ee;
   --color-surface: #fffaf1;
@@ -15,17 +59,6 @@
   --color-warn: #8a5a22;
   --color-ink: #16140f;
   --color-night: #0c0b09;
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --text-micro: 0.6875rem;
-  --text-micro--line-height: 1.3;
-  --tracking-label: 0.14em;
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
   --shadow-border:
     0px 0px 0px 1px rgba(22, 20, 15, 0.06),
     0px 1px 2px -1px rgba(22, 20, 15, 0.06),
@@ -34,35 +67,6 @@
     0px 0px 0px 1px rgba(22, 20, 15, 0.1),
     0px 1px 2px -1px rgba(22, 20, 15, 0.08),
     0px 2px 4px 0px rgba(22, 20, 15, 0.06);
-  --max-width-studio: 75rem;
-  --min-width-board: 42rem;
-  --grid-template-columns-shell: 13.75rem minmax(0, 1fr);
-  --ease-studio: cubic-bezier(0.22, 1, 0.36, 1);
-  --scale-press: 0.98;
-  --height-reel-item: 5.75rem;
-  --height-reel: 17.25rem;
-  --height-reel-item-compact: 4.5rem;
-  --height-reel-compact: 13.5rem;
-  --duration-spin: 1.8s;
-  --duration-spin-era: 2.15s;
-  --duration-spin-luck: 2.45s;
-  --aspect-plate: 4 / 3;
-}
-
-html[data-theme="night"] {
-  --color-bg: #0c0b09;
-  --color-paper: #141210;
-  --color-surface: #1a1814;
-  --color-fg: #f4efe4;
-  --color-muted: #b4ad9f;
-  --color-subtle: #8c867a;
-  --color-line: #2c2923;
-  --color-accent: #c4a574;
-  --color-accent-fg: #0c0b09;
-  --color-ink: #f4efe4;
-  --color-night: #0c0b09;
-  --shadow-border: 0 0 0 1px rgba(244, 239, 228, 0.08);
-  --shadow-border-hover: 0 0 0 1px rgba(244, 239, 228, 0.14);
 }
 
 @layer base {
@@ -98,6 +102,10 @@ html[data-theme="night"] {
 }
 
 @layer components {
+  .media-frame {
+    outline: 1px solid color-mix(in oklab, var(--color-fg) 12%, transparent);
+    outline-offset: -1px;
+  }
   .rise {
     animation: rise 400ms var(--ease-studio) both;
   }

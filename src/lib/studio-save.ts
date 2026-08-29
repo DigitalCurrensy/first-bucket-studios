@@ -2,7 +2,7 @@ import type { Recap } from "@/lib/recap";
 import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel } from "@/lib/nba";
 
 const KEY = "fbs.v1";
-const VERSION = 1;
+const VERSION = 2;
 
 export type SavedRun = {
   id: string;
@@ -29,7 +29,7 @@ export type StudioSave = {
 
 export const emptySave = (): StudioSave => ({
   version: VERSION,
-  theme: "light",
+  theme: "night",
   streak: 0,
   lastDaily: null,
   bestWins: 0,
@@ -40,7 +40,9 @@ export const emptySave = (): StudioSave => ({
 });
 
 function migrate(raw: StudioSave): StudioSave {
-  return { ...emptySave(), ...raw, version: VERSION };
+  const next = { ...emptySave(), ...raw, version: VERSION };
+  if ((raw.version ?? 0) < 2) next.theme = "night";
+  return next;
 }
 
 export function loadSave(): StudioSave {

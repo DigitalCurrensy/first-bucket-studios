@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PageIntro } from "@/components/page-intro";
 import { PlayerCard } from "@/components/player-card";
 import { ResultPoster } from "@/components/result-poster";
+import { RosterRail } from "@/components/roster-rail";
 import { ShareCardButton } from "@/components/share-card-button";
 import { PLAYERS, goatLabel, goatScore, type Player, type Pos } from "@/lib/nba";
 import { recordRun } from "@/lib/studio-save";
@@ -131,16 +132,19 @@ function GoatPage() {
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {shown.map((player) => (
-              <PlayerCard
-                key={player.id}
-                player={player}
-                selected={picks.includes(player.id)}
-                index={picks.indexOf(player.id)}
-                onToggle={() => toggle(player.id)}
-              />
-            ))}
+          <div className="grid gap-6 lg:grid-cols-dashboard">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {shown.map((player) => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  selected={picks.includes(player.id)}
+                  index={picks.indexOf(player.id)}
+                  onToggle={() => toggle(player.id)}
+                />
+              ))}
+            </div>
+            <RosterRail roster={roster} title="Your five" />
           </div>
         </section>
       )}
