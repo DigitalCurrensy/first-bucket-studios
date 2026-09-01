@@ -2,6 +2,8 @@
 
 **Rip a pack. Five names. Eighty-two nights. Send the card.**
 
+Basketball pack · NBA · WNBA · sports cards · holographic foil · WebGL · 82-0
+
 A browser basketball pack you can fork. Not a shop. Not a sportsbook. Not the NBA.
 
 **Live booth:** [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app)  

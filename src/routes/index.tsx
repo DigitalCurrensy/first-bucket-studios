@@ -11,6 +11,11 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Rip the pack. Send the card. · First Bucket Studio" },
       { name: "description", content: "Tear the foil. A franchise lands. Five names. The card is yours." },
+      {
+        name: "keywords",
+        content:
+          "basketball pack, NBA cards, WNBA, sports cards, holographic foil, pack opener, 82-0, first bucket, trading cards, basketball game",
+      },
     ],
   }),
   component: Home,

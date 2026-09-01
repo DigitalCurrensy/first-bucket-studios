@@ -22,9 +22,13 @@ Save is a native file link (`<a download>` with a PNG data URL). A nested previe
 
 ## Share on social did nothing
 
-**Share** is the system sheet on a phone (Messages, TikTok, Snapchat, Discord). On a desktop it opens the tray: X, Threads, Reddit, Facebook, TikTok, Snapchat, Discord.
+**Share** is the phone sheet (Messages, TikTok, Snapchat, Discord, Instagram). On a desktop the tray opens the real destination:
 
-TikTok and Snapchat have no web post button. Those buttons save a 9:16 plate and copy the caption — then you post in the app.
+- **X / Threads / Reddit / Facebook / WhatsApp / Telegram / LinkedIn** — post the walk in that app.
+- **Discord** — copies the walk, then opens Discord. Paste it.
+- **TikTok / Snapchat / Instagram** — saves a 9:16 plate, copies the caption, then opens the app. Finish the post there.
+
+Those three have no web post button. The file and the caption still leave this desk.
 
 ## Thunder is pinned and I never pinned it
 

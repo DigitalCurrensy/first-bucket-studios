@@ -14,7 +14,7 @@ export function ExportStudioButton({
     <Button
       variant={tone === "ghost" ? "ghost" : "primary"}
       onClick={() => {
-        downloadStudioFile();
+        void downloadStudioFile();
       }}
     >
       {loud ? "Export the desk" : "Export desk"}

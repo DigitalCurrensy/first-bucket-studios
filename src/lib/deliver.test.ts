@@ -1,6 +1,20 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { asShareFile, canUseSavePicker, discordCopy, facebookIntent, redditIntent, shareAttempts, shareSheetOk, threadsIntent, tweetIntent } from "./deliver.ts";
+import {
+  asShareFile,
+  canUseSavePicker,
+  discordCopy,
+  discordOpen,
+  facebookIntent,
+  linkedinIntent,
+  redditIntent,
+  shareAttempts,
+  shareSheetOk,
+  telegramIntent,
+  threadsIntent,
+  tweetIntent,
+  whatsappIntent,
+} from "./deliver.ts";
 
 test("share attempts send the file, never files plus url, never text as the card", () => {
   const file = new File(["png"], "first-bucket-thunder-58.png", { type: "image/png" });
@@ -74,4 +88,13 @@ test("discord copy is caption plus the public walk", () => {
   const text = discordCopy("51–31 Thunder · First Bucket Studio", "https://first-bucket-studios.vercel.app/walk/v1.OKC");
   assert.match(text, /Thunder/);
   assert.match(text, /first-bucket-studios\.vercel\.app\/walk/);
+});
+
+test("whatsapp, telegram, linkedin, and discord open real destinations", () => {
+  const walk = "https://first-bucket-studios.vercel.app/walk/v1.OKC";
+  assert.match(whatsappIntent("51–31 Thunder", walk), /wa\.me/);
+  assert.match(telegramIntent("51–31 Thunder", walk), /t\.me\/share/);
+  assert.match(linkedinIntent(walk), /linkedin\.com\/sharing/);
+  assert.equal(discordOpen(), "https://discord.com/channels/@me");
+  assert.equal(linkedinIntent("/walk/v1.OKC").includes("url="), false);
 });

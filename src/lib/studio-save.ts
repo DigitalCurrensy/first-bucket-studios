@@ -1,5 +1,5 @@
 import type { Recap } from "./recap.ts";
-import { copyText, presentFile } from "./deliver.ts";
+import { copyText, presentFile, saveCardFile } from "./deliver.ts";
 import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel } from "./nba.ts";
 import { storeGet, storeSet } from "./safe-store.ts";
 
@@ -286,10 +286,11 @@ export function markExported() {
   writeSave({ ...save, exportedAt: Date.now() });
 }
 
-export function downloadStudioFile() {
+export async function downloadStudioFile() {
   markExported();
   const blob = new Blob([exportStudio()], { type: "application/json" });
-  presentFile(blob, "first-bucket-studio.json", "First Bucket Studio file. Import it on another desk.");
+  presentFile(blob, "first-bucket-studio.json", "Desk file. Load it on another desk.");
+  void saveCardFile(blob, "first-bucket-studio.json").catch(() => {});
 }
 
 export function needsExportNag(save = loadSave()) {

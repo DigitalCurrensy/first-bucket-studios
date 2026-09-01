@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { ALLTIME } from "./book-alltime.ts";
 import { CURRENT } from "./book-current.ts";
 import { WNBA } from "./book-wnba.ts";
-import { ALLTIME } from "./book-alltime.ts";
+import { shuffle } from "./utils.ts";
 import {
   clubAbbr,
   cornersOk,
@@ -63,6 +64,13 @@ test("nba book is current NBA only", () => {
 
 test("thirty franchises", () => {
   assert.equal(FRANCHISES.length, 30);
+});
+
+test("visual shuffle does not always lead with Lakers", () => {
+  const first = new Set<string>();
+  for (let i = 0; i < 48; i += 1) first.add(shuffle(FRANCHISES)[0]!);
+  assert.ok(first.size >= 8);
+  assert.equal(first.has("Lakers") && first.size === 1, false);
 });
 
 test("wnbaBook length >= 36", () => {

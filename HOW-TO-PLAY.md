@@ -32,9 +32,9 @@ One pull on tape: [docs/tape/demo.mp4](docs/tape/demo.mp4)
 | **Save the card** | Downloads `first-bucket-{team}-{wins}.png`. |
 | **Share** | Phone: the system share sheet (Messages, TikTok, Snapchat, Discord). Desktop: the tray. |
 | **Pin this walk** | Keeps it on the rail. Unpin anytime. Nothing is pinned until you pin it. |
-| **X / Threads / Reddit / Facebook** | Open those apps with the walk. |
-| **TikTok / Snapchat** | Saves a 9:16 plate. Open the app and post it. |
-| **Discord** | Copies the walk for paste. |
+| **X / Threads / Reddit / Facebook / WhatsApp / Telegram / LinkedIn** | Opens that app with the walk. |
+| **Discord** | Copies the walk, then opens Discord. Paste it. |
+| **TikTok / Snapchat / Instagram** | Saves a 9:16 plate, copies the caption, opens the app. |
 | **Copy the walk** | Copies the public walk URL so you can paste it. |
 | **Open the walk** | Same five, same nights, forever. |
 

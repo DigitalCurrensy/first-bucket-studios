@@ -4,15 +4,23 @@ import { X } from "lucide-react";
 import {
   copyText,
   discordCopy,
+  discordOpen,
   facebookIntent,
+  instagramOpen,
+  linkedinIntent,
   nativeShare,
   objectUrl,
+  openTab,
   redditIntent,
   registerProofOpener,
   saveCardFile,
   shareSheetOk,
+  snapchatOpen,
+  telegramIntent,
   threadsIntent,
+  tiktokOpen,
   tweetIntent,
+  whatsappIntent,
   type Proof,
 } from "@/lib/deliver";
 import { ASPECTS, lastShareOpts, renderShareCard, type CardAspect } from "@/lib/share-card";
@@ -126,7 +134,7 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
     await onCopyWalk();
   }
 
-  async function shareStory(app: "tiktok" | "snap") {
+  async function shareStory(app: "tiktok" | "snap" | "instagram") {
     markDemo("save", app);
     if (canShare) {
       const result = await nativeShare(sheet, proof.name, proof.caption, shareHref || undefined);
@@ -136,7 +144,9 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
     try {
       await saveCardFile(sheet, proof.name.replace(/\.png$/i, "") + "-story.png");
       await copyText([postText, shareHref].filter(Boolean).join("\n"));
-      setNote(app === "tiktok" ? "9:16 plate saved. Open TikTok and post it." : "9:16 plate saved. Open Snapchat and post it.");
+      const dest = app === "tiktok" ? tiktokOpen() : app === "snap" ? snapchatOpen() : instagramOpen();
+      openTab(dest);
+      setNote("Plate saved. Caption copied. Finish the post in the app.");
     } catch {
       setNote("Save the plate, then open the app.");
     }
@@ -149,7 +159,14 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
       if (result === "shared" || result === "abort") return;
     }
     const ok = await copyText(discordCopy(postText, shareHref));
-    setNote(ok ? "Copied for Discord. Paste it in a chat." : "Copy the walk, then paste in Discord.");
+    openTab(discordOpen());
+    setNote(ok ? "Copied. Paste it in Discord." : "Copy the walk, then paste in Discord.");
+  }
+
+  async function onCopyFile() {
+    const text = await proof.blob.text();
+    const ok = await copyText(text);
+    setNote(ok ? "Desk JSON copied." : "Couldn’t copy.");
   }
 
   function onOpenWalk() {
@@ -310,14 +327,50 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
                   Facebook
                 </a>
               ) : null}
+              {shareHref ? (
+                <a
+                  className="tray-btn"
+                  href={whatsappIntent(postText, shareHref)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => markDemo("save", "whatsapp")}
+                >
+                  WhatsApp
+                </a>
+              ) : null}
+              {shareHref ? (
+                <a
+                  className="tray-btn"
+                  href={telegramIntent(postText, shareHref)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => markDemo("save", "telegram")}
+                >
+                  Telegram
+                </a>
+              ) : null}
+              {shareHref ? (
+                <a
+                  className="tray-btn"
+                  href={linkedinIntent(shareHref)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => markDemo("save", "linkedin")}
+                >
+                  LinkedIn
+                </a>
+              ) : null}
+              <button type="button" className="tray-btn" onClick={() => void onDiscord()}>
+                Discord
+              </button>
               <button type="button" className="tray-btn" onClick={() => void shareStory("tiktok")}>
                 TikTok
               </button>
               <button type="button" className="tray-btn" onClick={() => void shareStory("snap")}>
                 Snapchat
               </button>
-              <button type="button" className="tray-btn" onClick={() => void onDiscord()}>
-                Discord
+              <button type="button" className="tray-btn" onClick={() => void shareStory("instagram")}>
+                Instagram
               </button>
               {walkPath ? (
                 <button type="button" className="tray-btn" onClick={() => void onCopyWalk()}>
@@ -348,6 +401,9 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
             ) : (
               <span className="tray-btn tray-btn-primary opacity-40">Save the file</span>
             )}
+            <button type="button" className="tray-btn" onClick={() => void onCopyFile()}>
+              Copy JSON
+            </button>
           </div>
         )}
       </div>

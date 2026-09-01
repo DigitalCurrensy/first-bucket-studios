@@ -44,7 +44,9 @@ function typedBlob(blob: Blob, name: string) {
     ? "image/png"
     : /\.jpe?g$/i.test(name)
       ? "image/jpeg"
-      : blob.type || "application/octet-stream";
+      : /\.json$/i.test(name)
+        ? "application/json"
+        : blob.type || "application/octet-stream";
   return new Blob([blob], { type });
 }
 
@@ -272,7 +274,50 @@ export function redditIntent(url: string, title: string) {
   return href.toString();
 }
 
+export function whatsappIntent(text: string, url?: string) {
+  const href = new URL("https://wa.me/");
+  const absolute = absoluteHttp(url);
+  href.searchParams.set("text", absolute ? `${text}\n${absolute}` : text);
+  return href.toString();
+}
+
+export function telegramIntent(text: string, url?: string) {
+  const href = new URL("https://t.me/share/url");
+  const absolute = absoluteHttp(url);
+  if (absolute) href.searchParams.set("url", absolute);
+  href.searchParams.set("text", text);
+  return href.toString();
+}
+
+export function linkedinIntent(url: string) {
+  const href = new URL("https://www.linkedin.com/sharing/share-offsite/");
+  const absolute = absoluteHttp(url);
+  if (absolute) href.searchParams.set("url", absolute);
+  return href.toString();
+}
+
 export function discordCopy(text: string, url?: string) {
   const absolute = absoluteHttp(url);
   return absolute ? `${text}\n${absolute}` : text;
+}
+
+export function discordOpen() {
+  return "https://discord.com/channels/@me";
+}
+
+export function tiktokOpen() {
+  return "https://www.tiktok.com/";
+}
+
+export function snapchatOpen() {
+  return "https://www.snapchat.com/";
+}
+
+export function instagramOpen() {
+  return "https://www.instagram.com/";
+}
+
+export function openTab(href: string) {
+  if (typeof window === "undefined" || !href) return;
+  window.open(href, "_blank", "noopener,noreferrer");
 }

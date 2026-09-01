@@ -1,9 +1,10 @@
 import type { PointerEvent, ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RipPack } from "@/components/rip-pack";
 import { useSpecular } from "@/lib/hooks";
 import { markDemo } from "@/lib/demo-funnel";
+import { FRANCHISES } from "@/lib/nba";
 import { cn } from "@/lib/utils";
 
 export function PressStage({
@@ -93,6 +94,10 @@ export function StepRail({
 export function PackHero() {
   const navigate = useNavigate();
   const [ripping, setRipping] = useState(false);
+  const [club, setClub] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    setClub(FRANCHISES[Math.floor(Math.random() * FRANCHISES.length)]);
+  }, []);
   const well = useRef<HTMLDivElement>(null);
   useSpecular(well);
 
@@ -139,7 +144,7 @@ export function PackHero() {
       >
         <div className="pack-float">
           <div className="pack-tilt">
-            <RipPack lot="live:home" ripping={ripping} onRip={go} />
+            <RipPack lot={`live:home:${club}`} team={club} ripping={ripping} onRip={go} />
           </div>
         </div>
       </div>

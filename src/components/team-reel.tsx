@@ -3,7 +3,7 @@ import { Crest, EraMark, LuckMark, clubAbbr } from "@/components/crest";
 import { ERAS, FRANCHISES, WNBA_FRANCHISES } from "@/lib/nba";
 import { LUCKS } from "@/lib/luck";
 import { tick } from "@/lib/tick";
-import { cn } from "@/lib/utils";
+import { cn, shuffle } from "@/lib/utils";
 
 export function TeamReel<T extends string>({
   items,
@@ -29,15 +29,19 @@ export function TeamReel<T extends string>({
   const [rot, setRot] = useState(0);
   const [armed, setArmed] = useState(false);
   const [landed, setLanded] = useState(false);
-  const n = Math.max(items.length, 1);
+  const [faces, setFaces] = useState<T[]>(() => [...items] as T[]);
+  useEffect(() => {
+    setFaces(shuffle(items));
+  }, [items]);
+  const n = Math.max(faces.length, 1);
   const angle = 360 / n;
   const radius = rowH / (2 * Math.tan(Math.PI / n));
-  const land = target ? Math.max(0, items.indexOf(target as T)) : 0;
-  const clubs = items[0]
-    ? (FRANCHISES as readonly string[]).includes(items[0]) || (WNBA_FRANCHISES as readonly string[]).includes(items[0])
+  const land = target ? Math.max(0, faces.indexOf(target as T)) : Math.floor(n / 2);
+  const clubs = faces[0]
+    ? (FRANCHISES as readonly string[]).includes(faces[0]) || (WNBA_FRANCHISES as readonly string[]).includes(faces[0])
     : false;
-  const eras = items[0] ? (ERAS as readonly string[]).includes(items[0]) : false;
-  const lucks = items[0] ? (LUCKS as readonly string[]).includes(items[0]) : false;
+  const eras = faces[0] ? (ERAS as readonly string[]).includes(faces[0]) : false;
+  const lucks = faces[0] ? (LUCKS as readonly string[]).includes(faces[0]) : false;
   const idle = !target;
   const markSize = compact ? "size-6" : "size-11";
 
@@ -46,7 +50,7 @@ export function TeamReel<T extends string>({
     if (!node) return;
     const h = node.offsetHeight;
     if (h > 0) setRowH(h);
-  }, [items, compact]);
+  }, [faces, compact]);
 
   useEffect(() => {
     rested.current = false;
@@ -120,7 +124,7 @@ export function TeamReel<T extends string>({
             rest();
           }}
         >
-          {items.map((name, i) => (
+          {faces.map((name, i) => (
             <div
               key={`${name}-${i}`}
               ref={i === 0 ? rowRef : undefined}
