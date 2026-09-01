@@ -17,7 +17,9 @@ Read [NOTICE](NOTICE) first if your change touches names, crests, or plates.
 | Copy the loop into another sport | [FORK.md](FORK.md) |
 | Fix copy, stills, or how-to | `HOW-TO-PLAY.md`, `docs/stills` |
 | Touch the mixer / house pin | Stop. See “Do not” below. |
-| Change foil, tray, or the card | One of those rooms. [docs/STUDIO.md](docs/STUDIO.md) |
+| Change foil, tray, or the card | One room. [docs/STUDIO.md](docs/STUDIO.md) |
+| Eval pipe / Stream-JSON | [docs/STREAM-JSON.md](docs/STREAM-JSON.md) |
+| Visual loop stills | [docs/BENCHMARKS.md](docs/BENCHMARKS.md) |
 | Add a test | [docs/TESTING.md](docs/TESTING.md) |
 
 ## Run it
@@ -26,6 +28,13 @@ Read [NOTICE](NOTICE) first if your change touches names, crests, or plates.
 npm install
 npm run dev
 npm run test:pin
+npm run test:vl
+```
+
+Studio already running:
+
+```bash
+npm run test:demo
 ```
 
 Node 22. Auth off. Database unused.
@@ -36,11 +45,13 @@ House pin must stay green:
 v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga
 ```
 
+`test:demo` prints [Stream-JSON](docs/STREAM-JSON.md) (one object per line). `test:vl` fails if the card stills go cream.
+
 ## Pull requests
 
 - One room per PR. Mixer + UI + a new mode is three PRs.
 - Title the loop, not the ticket. “Tray copies the walk” beats “fix share.”
-- Run `npm run test:pin`.
+- Run `npm run test:pin` and `npm run test:vl`.
 - If the face of the loop changed, run `npm run capture` and commit stills + tape.
 - Leave `public/__grok/` alone.
 - Do not add a shop, accounts, or a tracker that leaves the device.

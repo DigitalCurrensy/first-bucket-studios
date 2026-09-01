@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 /**
  * Demo eval. Studio must already be running.
- * Live pack ≠ house pin. Tray opens. Funnel reaches card.
+ * Emits Stream-JSON (NDJSON) on stdout. See docs/STREAM-JSON.md.
  */
 import { chromium } from "playwright";
 
 const BASE = process.env.FBS_BASE ?? "http://127.0.0.1:8080";
 const HOUSE = "v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga";
 const BUDGET_MS = 120_000;
+
+function emit(msg) {
+  process.stdout.write(`${JSON.stringify(msg)}\n`);
+}
 
 async function ping() {
   try {
@@ -19,7 +23,12 @@ async function ping() {
 }
 
 if (!(await ping())) {
-  console.error(`Studio is not up at ${BASE}. Start it, then npm run test:demo.`);
+  emit({
+    type: "result",
+    ok: false,
+    ms: 0,
+    error: `Studio is not up at ${BASE}. Start it, then npm run test:demo.`,
+  });
   process.exit(1);
 }
 
@@ -32,10 +41,19 @@ const context = await browser.newContext({
 const page = await context.newPage();
 page.setDefaultTimeout(25_000);
 const started = Date.now();
-const fail = (msg) => {
-  console.error(JSON.stringify({ ok: false, error: msg, ms: Date.now() - started }, null, 2));
-  process.exitCode = 1;
-};
+const seen = new Set();
+
+async function flushBeats() {
+  const demo = await page.evaluate(() => window.__fbsDemo ?? null);
+  for (const event of demo?.log?.events ?? []) {
+    if (seen.has(event.beat)) continue;
+    seen.add(event.beat);
+    emit({ type: "beat", beat: event.beat, ms: event.ms, note: event.note });
+  }
+  return demo;
+}
+
+emit({ type: "system", subtype: "init", version: 1, studio: "first-bucket", at: Date.now() });
 
 try {
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
@@ -48,8 +66,10 @@ try {
   });
   await page.reload({ waitUntil: "networkidle" });
   await page.waitForFunction(() => window.__fbsDemo?.funnel?.order?.includes("home"));
+  await flushBeats();
   await page.locator("main").getByRole("link", { name: "Rip the pack" }).click();
   await page.waitForURL(/\/games\/82-0/);
+  await flushBeats();
   await context.route("https://grok.com/**", (route) => route.abort());
   const pack = page.locator(".rip-pack");
   await pack.waitFor({ state: "visible" });
@@ -61,6 +81,7 @@ try {
   await pack.click();
   const cards = page.locator(".pack-grid button");
   await cards.first().waitFor({ state: "visible" });
+  await flushBeats();
   const n = await cards.count();
   if (n < 5) throw new Error(`pack dealt ${n} cards`);
   const all = page.getByRole("button", { name: "Turn them all" });
@@ -71,37 +92,35 @@ try {
   }
   await page.getByRole("button", { name: "Lock five" }).click();
   await page.getByRole("button", { name: "Send the card" }).waitFor();
+  await flushBeats();
   const walk = (await page.locator("text=/\\/walk\\/v1\\./").first().textContent()) ?? "";
   const id = walk.replace(/^[\s\S]*\/walk\//, "").trim();
   if (!id.startsWith("v1.")) throw new Error(`no walk on the card: ${walk}`);
   if (id === HOUSE) throw new Error("live pack collapsed to the house pin");
+  emit({ type: "walk", id, live: true });
   await page.getByRole("button", { name: "Send the card" }).click();
   await page.getByRole("link", { name: "Save the card" }).waitFor();
   await page.getByRole("button", { name: "Copy the walk" }).click();
   await page.waitForTimeout(250);
-  const demo = await page.evaluate(() => window.__fbsDemo ?? null);
+  const demo = await flushBeats();
   const funnel = demo?.funnel;
   const ms = Date.now() - started;
   if (ms > BUDGET_MS) throw new Error(`loop ${ms}ms over ${BUDGET_MS}ms budget`);
-  if (!funnel?.order?.includes("home")) throw new Error(`funnel missed home: ${JSON.stringify(funnel)}`);
-  if (!funnel.order.includes("rip")) throw new Error(`funnel missed rip: ${JSON.stringify(funnel)}`);
-  if (!funnel.order.includes("card")) throw new Error(`funnel missed card: ${JSON.stringify(funnel)}`);
-  if (!funnel.order.includes("tray")) throw new Error(`funnel missed tray: ${JSON.stringify(funnel)}`);
-  if (!funnel.sent) throw new Error(`funnel did not send: ${JSON.stringify(funnel)}`);
-  console.log(
-    JSON.stringify(
-      {
-        ok: true,
-        walk: `/walk/${id}`,
-        ms,
-        funnel,
-      },
-      null,
-      2,
-    ),
-  );
+  if (!funnel?.order?.includes("home")) throw new Error("funnel missed home");
+  if (!funnel.order.includes("rip")) throw new Error("funnel missed rip");
+  if (!funnel.order.includes("card")) throw new Error("funnel missed card");
+  if (!funnel.order.includes("tray")) throw new Error("funnel missed tray");
+  if (!funnel.sent) throw new Error("funnel did not send");
+  emit({ type: "result", ok: true, ms, walk: `/walk/${id}`, funnel });
 } catch (err) {
-  fail(err instanceof Error ? err.message : String(err));
+  const ms = Date.now() - started;
+  emit({
+    type: "result",
+    ok: false,
+    ms,
+    error: err instanceof Error ? err.message : String(err),
+  });
+  process.exitCode = 1;
 } finally {
   await browser.close();
 }

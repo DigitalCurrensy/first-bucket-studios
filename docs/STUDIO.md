@@ -1,7 +1,5 @@
 # Studio rooms
 
-Specialists, themes, updates, performance. Touch one room at a time.
-
 ## Specialists
 
 | Room | File | Job |
@@ -9,6 +7,7 @@ Specialists, themes, updates, performance. Touch one room at a time.
 | **Live pack** | `src/lib/nba.ts` `dealFrom` | Fisher–Yates on mulberry32. New franchise every pull. |
 | **House pack** | `src/lib/house-pack.ts` | A table. Thunder 51–31. Never shuffle this. |
 | **Walk** | `src/lib/walk.ts` | Certificate encode / decode. |
+| **Stream-JSON** | `src/lib/stream-json.ts` | NDJSON eval pipe. Beats, walk, result. |
 | **Season** | `src/lib/sim.ts` | 82 nights from five ids. |
 | **Foil** | `src/components/foil-gl.tsx` | Small WebGL layer on the pack. CSS fallback. |
 | **Lithograph** | `src/lib/share-card.ts` | 2D canvas PNG. Not WebGL. Night stock. |
@@ -54,8 +53,8 @@ If the booth feels slow, look at click tax (foil should auto-turn the ten) and t
 
 ## GitHub Action
 
-[`.github/workflows/pin.yml`](../.github/workflows/pin.yml) runs `npm run test:pin` on push and pull request. That is the mixer lock. Demo eval stays local because it needs a running studio.
+[`.github/workflows/pin.yml`](../.github/workflows/pin.yml) runs `npm run test:pin` and `npm run test:vl` on push and pull request. Demo eval stays local because it needs a running studio.
 
 ## Demo evals
 
-See [TESTING.md](TESTING.md). The eval that matters: live pack ≠ house pin, tray opens, card beat fires.
+See [TESTING.md](TESTING.md). The eval that matters: live pack ≠ house pin, tray opens, card beat fires, Stream-JSON `result.ok` is true.

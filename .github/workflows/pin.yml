@@ -7,7 +7,7 @@ on:
 
 jobs:
   pin:
-    name: House pin + walk
+    name: House pin + visual loop
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -18,3 +18,4 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:pin
+      - run: npm run test:vl

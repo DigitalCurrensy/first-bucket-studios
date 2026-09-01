@@ -5,6 +5,7 @@ What beat does this change? (`home` `rip` `room` `foil` `lock` `card` `tray` `sa
 ## Proof
 
 - [ ] `npm run test:pin` is green
+- [ ] `npm run test:vl` is green
 - [ ] Live pack is not always Thunder 51
 - [ ] `public/__grok/` untouched
 - [ ] NOTICE read if names / plates / crests moved
