@@ -240,6 +240,17 @@ export function walkUrl(id: string) {
   return `${origin}${path}`;
 }
 
+/** Public booth. Social posts always point here, never a sandbox host. */
+export const LIVE_ORIGIN = "https://first-bucket-studios.vercel.app";
+
+export function publicWalkUrl(id: string) {
+  const path = walkHref(id);
+  if (typeof window === "undefined") return `${LIVE_ORIGIN}${path}`;
+  const origin = window.location?.origin;
+  if (origin && origin !== "null" && !isEphemeralOrigin(origin)) return `${origin}${path}`;
+  return `${LIVE_ORIGIN}${path}`;
+}
+
 export function walkIdFromHref(href: string) {
   if (!href) return "";
   try {

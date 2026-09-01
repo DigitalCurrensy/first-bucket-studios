@@ -91,15 +91,23 @@ try {
     if ((await card.getAttribute("aria-pressed")) !== "true") await card.click();
   }
   await page.getByRole("button", { name: "Lock five" }).click();
-  await page.getByRole("button", { name: "Send the card" }).waitFor();
+  await page.getByRole("link", { name: "Save the card" }).waitFor();
+  await page.getByRole("link", { name: "Post to X" }).waitFor();
   await flushBeats();
   const walk = (await page.locator("text=/\\/walk\\/v1\\./").first().textContent()) ?? "";
   const id = walk.replace(/^[\s\S]*\/walk\//, "").trim();
   if (!id.startsWith("v1.")) throw new Error(`no walk on the card: ${walk}`);
   if (id === HOUSE) throw new Error("live pack collapsed to the house pin");
   emit({ type: "walk", id, live: true });
-  await page.getByRole("button", { name: "Send the card" }).click();
-  await page.getByRole("link", { name: "Save the card" }).waitFor();
+  const save = page.getByRole("link", { name: "Save the card" }).first();
+  const href = await save.getAttribute("href");
+  if (!href?.startsWith("data:image/png")) throw new Error(`save is not a png data url: ${href?.slice(0, 40)}`);
+  if (!(await save.getAttribute("download"))?.endsWith(".png")) throw new Error("save has no png download name");
+  const post = page.getByRole("link", { name: "Post to X" });
+  const tweet = await post.getAttribute("href");
+  if (!tweet?.includes("x.com/intent/tweet")) throw new Error(`post to x is not an intent: ${tweet}`);
+  await page.getByRole("button", { name: "More ways to send" }).click();
+  await page.getByRole("link", { name: "Save the card" }).nth(1).waitFor();
   await page.getByRole("button", { name: "Copy the walk" }).click();
   await page.waitForTimeout(250);
   const demo = await flushBeats();

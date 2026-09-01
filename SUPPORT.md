@@ -18,7 +18,11 @@ Do not paste secrets. Walks are public certificates; they are safe to share.
 
 ## Save did not download
 
-Save is a native file link. A nested preview can swallow it. Open the walk in a top-level tab, then Save. Copy the walk still works in the frame.
+Save is a native file link (`<a download>` with a PNG data URL). A nested preview can swallow it. Open the live booth in a top-level tab, then Save. Copy the walk still works in the frame.
+
+## Share on social did nothing
+
+**Post to X** is a real X intent. It posts the walk URL. The PNG is a separate file — Save it, then attach it on X if you want the plate in the post. Instagram has no web share target; pick **9:16 studio** in More ways to send, Save, then upload.
 
 ## Every pack is Thunder 51
 

@@ -208,3 +208,54 @@ export function shareAttempts(file: File, text?: string): ShareData[] {
   attempts.push({ title, files });
   return attempts;
 }
+
+export function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(reader.error ?? new Error("Couldn’t read the card"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+/** Direct download. Data URL so iframe hosts that block blob: still get a file. */
+export async function saveCardFile(blob: Blob, name: string) {
+  const typed = typedBlob(blob, name);
+  const href = await blobToDataUrl(typed);
+  const a = document.createElement("a");
+  a.href = href;
+  a.download = name;
+  a.rel = "noopener";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  return href;
+}
+
+function absoluteHttp(url?: string) {
+  return url && /^https?:\/\//i.test(url) ? url : "";
+}
+
+/** X web intent. Image posts still need the PNG (Save), then attach. */
+export function tweetIntent(text: string, url?: string) {
+  const href = new URL("https://x.com/intent/tweet");
+  const absolute = absoluteHttp(url);
+  href.searchParams.set("text", text);
+  if (absolute) href.searchParams.set("url", absolute);
+  return href.toString();
+}
+
+export function threadsIntent(text: string, url?: string) {
+  const href = new URL("https://www.threads.net/intent/post");
+  const absolute = absoluteHttp(url);
+  href.searchParams.set("text", absolute ? `${text}\n${absolute}` : text);
+  return href.toString();
+}
+
+export function facebookIntent(url: string) {
+  const href = new URL("https://www.facebook.com/sharer/sharer.php");
+  const absolute = absoluteHttp(url);
+  if (absolute) href.searchParams.set("u", absolute);
+  return href.toString();
+}

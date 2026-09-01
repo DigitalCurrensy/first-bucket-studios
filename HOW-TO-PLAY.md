@@ -10,7 +10,7 @@ Live booth: [first-bucket-studios.vercel.app](https://first-bucket-studios.verce
 1. **Rip the pack.** A franchise, an era, and a luck lane land. New every time.
 2. **Tear the foil.** Ten cards flip. Tap five.
 3. **Lock five.** Eighty-two nights walk from those names. The number on the card is that walk.
-4. **Send the card.** Save the PNG. Copy the walk. The URL is the certificate.
+4. **Send the card.** Save the PNG. Post to X. Copy the walk. The URL is the certificate.
 
 ![Home](docs/stills/01-home.jpg)
 
@@ -29,9 +29,11 @@ One pull on tape: [docs/tape/demo.mp4](docs/tape/demo.mp4)
 | **Rip the pack** | Deals a new room. New ten. |
 | **Rip pack** / tap the foil | Tears it. The ten turn. |
 | **Lock five** | Walks 82 nights. |
-| **Send the card** | Opens the tray. |
 | **Save the card** | Downloads `first-bucket-{team}-{wins}.png`. |
-| **Copy the walk** | Copies `/walk/v1.…` so you can paste it. |
+| **Post to X** | Opens X with the walk. Attach the PNG if you want the plate in the post. |
+| **Threads / Facebook** | In **More ways to send**. Same walk URL. |
+| **More ways to send** | Opens the tray: story frame, native share, copy. |
+| **Copy the walk** | Copies the public walk URL so you can paste it. |
 | **Open the walk** | Same five, same nights, forever. |
 
 There is no “copy image.” The file is the card. The URL is the walk.

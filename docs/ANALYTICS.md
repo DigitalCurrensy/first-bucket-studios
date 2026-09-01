@@ -16,8 +16,8 @@ Product analytics live in [`src/lib/demo-funnel.ts`](../src/lib/demo-funnel.ts).
 | `foil` | Tear the foil | Second rip confused them. |
 | `lock` | Five names locked | Draft tax. |
 | `card` | Number on the lithograph | Walk never finished. |
-| `tray` | Send the card | They liked the poster and stalled. |
-| `save` | Save the card | File is the souvenir. |
+| `tray` | More ways to send | They opened the tray. |
+| `save` | Save the card / Post to X | File or social. |
 | `copy` | Copy the walk | URL is the certificate. |
 | `open` | Open the walk | Revisit. Optional. |
 

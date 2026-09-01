@@ -1,10 +1,7 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
 import { ResultPoster } from "@/components/result-poster";
-import { cardCaption, renderShareCard, shareFile } from "@/lib/share-card";
-import { decodeWalk, playersOf, walkUrl, type WalkPayload } from "@/lib/walk";
-import { rememberWalk } from "@/lib/studio-save";
+import { ShareCardButton } from "@/components/share-card-button";
+import { decodeWalk, playersOf, type WalkPayload } from "@/lib/walk";
 import type { Player } from "@/lib/nba";
 
 export function WalkCard({ id }: { id: string }) {
@@ -35,54 +32,22 @@ export function WalkCard({ id }: { id: string }) {
           kind={payload.kind}
         />
       </Link>
-      <WalkSend id={id} payload={payload} roster={roster} />
+      <div className="mt-2 flex flex-wrap gap-2">
+        <WalkSend payload={payload} roster={roster} />
+      </div>
     </article>
   );
 }
 
-function WalkSend({ id, payload, roster }: { id: string; payload: WalkPayload; roster: Player[] }) {
-  const [state, setState] = useState<"idle" | "busy" | "shared" | "saved" | "fail">("idle");
-
-  async function send() {
-    if (state === "busy") return;
-    setState("busy");
-    try {
-      const blob = await renderShareCard({
-        team: payload.team,
-        era: payload.era,
-        wins: payload.wins,
-        roster,
-        kind: payload.kind === "playoff" ? "playoff" : payload.kind === "wnba" ? "wnba" : payload.kind === "goat" ? "goat" : "season",
-        luck: payload.kind === "goat" ? undefined : payload.luck,
-      });
-      const text = cardCaption({
-        team: payload.team,
-        era: payload.era,
-        wins: payload.wins,
-        roster,
-        kind: payload.kind === "playoff" ? "playoff" : payload.kind === "wnba" ? "wnba" : payload.kind === "goat" ? "goat" : "season",
-        luck: payload.kind === "goat" ? undefined : payload.luck,
-        walk: id,
-      });
-      rememberWalk(id);
-      const result = await shareFile(blob, `first-bucket-${payload.wins}.png`, text, walkUrl(id));
-      setState(result === "shared" ? "shared" : "saved");
-    } catch {
-      setState("fail");
-    }
-  }
-
+function WalkSend({ payload, roster }: { payload: WalkPayload; roster: Player[] }) {
   return (
-    <Button variant="ghost" onClick={() => void send()} className="mt-2">
-      {state === "busy"
-        ? "Sending…"
-        : state === "shared"
-          ? "Sent"
-          : state === "saved"
-            ? "Saved"
-            : state === "fail"
-              ? "Couldn’t send"
-              : "Send the card"}
-    </Button>
+    <ShareCardButton
+      team={payload.team}
+      era={payload.era}
+      wins={payload.wins}
+      roster={roster}
+      kind={payload.kind === "playoff" ? "playoff" : payload.kind === "wnba" ? "wnba" : payload.kind === "goat" ? "goat" : "season"}
+      luck={payload.kind === "goat" ? undefined : payload.luck}
+    />
   );
 }

@@ -3,16 +3,19 @@ import { useNavigate } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import {
   copyText,
+  facebookIntent,
   nativeShare,
   objectUrl,
   registerProofOpener,
   shareSheetOk,
+  threadsIntent,
+  tweetIntent,
   type Proof,
 } from "@/lib/deliver";
 import { ASPECTS, lastShareOpts, renderShareCard, type CardAspect } from "@/lib/share-card";
 import { rememberWalk } from "@/lib/studio-save";
 import { markDemo } from "@/lib/demo-funnel";
-import { walkHref, walkIdFromHref } from "@/lib/walk";
+import { publicWalkUrl, walkHref, walkIdFromHref } from "@/lib/walk";
 import { useSpecular } from "@/lib/hooks";
 import { toast } from "@/components/toast-host";
 import { cn } from "@/lib/utils";
@@ -32,7 +35,7 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   useSpecular(sheetRef);
-  const [url, setUrl] = useState("");
+  const [url, setUrl] = useState(() => objectUrl(proof.blob));
   const [saveHref, setSaveHref] = useState("");
   const [preview, setPreview] = useState("");
   const [aspect, setAspect] = useState<CardAspect>("plate");
@@ -42,10 +45,18 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
   const canShare = shareSheetOk();
   const walkId = proof.href ? walkIdFromHref(proof.href) : "";
   const walkPath = walkId ? walkHref(walkId) : proof.href || "";
+  const shareHref = walkId ? publicWalkUrl(walkId) : "";
+  const postText = (proof.caption || "First Bucket Studio")
+    .replace(/\shttps?:\/\/\S+$/, "")
+    .replace(/\s\/walk\/\S+$/, "")
+    .slice(0, 180);
 
   useEffect(() => {
     const next = objectUrl(proof.blob);
-    setUrl(next);
+    setUrl((prev) => {
+      if (prev && prev !== next) URL.revokeObjectURL(prev);
+      return next;
+    });
     setSheet(proof.blob);
     if (proof.kind === "json" || proof.kind === "file") {
       void proof.blob.text().then((text) => setPreview(text.slice(0, 2400)));
@@ -74,8 +85,9 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
 
   async function onCopyWalk() {
     if (!walkPath) return;
-    markDemo("copy", walkPath);
-    const ok = await copyText(walkPath);
+    const copied = shareHref || walkPath;
+    markDemo("copy", copied);
+    const ok = await copyText(copied);
     setNote(ok ? "Walk copied." : "Select the walk and copy it.");
     if (ok) toast("Walk copied.");
     field.current?.select();
@@ -191,7 +203,7 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
             <input
               ref={field}
               readOnly
-              value={walkPath}
+              value={shareHref || walkPath}
               onFocus={(event) => event.currentTarget.select()}
               className="mt-1 w-full min-h-11 rounded-md glass-control px-3 font-mono text-xs text-fg"
             />
@@ -201,6 +213,10 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
         ) : null}
 
         {note ? <p className="mt-3 text-sm text-fg">{note}</p> : null}
+
+        <p className="v-secondary mt-4 text-sm">
+          Save the PNG. Post the walk on X. Story frame is for Instagram — save, then upload.
+        </p>
 
         <div className="tray-actions mt-5">
           {fileHref ? (
@@ -215,14 +231,47 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
           ) : (
             <span className="tray-btn tray-btn-primary opacity-40">Save the card</span>
           )}
+          {shareHref ? (
+            <a
+              className="tray-btn tray-btn-primary"
+              href={tweetIntent(postText, shareHref)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => markDemo("save", "x")}
+            >
+              Post to X
+            </a>
+          ) : null}
           {walkPath ? (
-            <button type="button" className="tray-btn tray-btn-primary" onClick={() => void onCopyWalk()}>
+            <button type="button" className="tray-btn" onClick={() => void onCopyWalk()}>
               Copy the walk
             </button>
           ) : null}
+          {shareHref ? (
+            <a
+              className="tray-btn"
+              href={threadsIntent(postText, shareHref)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => markDemo("save", "threads")}
+            >
+              Threads
+            </a>
+          ) : null}
+          {shareHref ? (
+            <a
+              className="tray-btn"
+              href={facebookIntent(shareHref)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => markDemo("save", "facebook")}
+            >
+              Facebook
+            </a>
+          ) : null}
           {canShare ? (
             <button type="button" className="tray-btn" onClick={() => void onShare()}>
-              Send
+              Send to apps
             </button>
           ) : null}
           {walkId ? (

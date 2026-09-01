@@ -43,7 +43,7 @@ import { seasonTelemetry } from "@/lib/telemetry";
 import { seasonWalk, wnbaWalk, type Night } from "@/lib/sim";
 import { bestFrom, justFiled, loadSave, needsExportNag, recordRun, todayKey, yesterdayKey } from "@/lib/studio-save";
 import { ripTick } from "@/lib/tick";
-import { dailyRoom, encodeChallengeIds, encodeWalk, encodeWnbaWalk, houseWalk, playersOf, walkUrl } from "@/lib/walk";
+import { dailyRoom, encodeChallengeIds, encodeWalk, encodeWnbaWalk, houseWalk, playersOf, publicWalkUrl } from "@/lib/walk";
 import { cn } from "@/lib/utils";
 
 type Mode = "82-0" | "daily" | "corners" | "wnba";
@@ -317,7 +317,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
   }
 
   async function copyWalk() {
-    const url = walkUrl(walkId);
+    const url = publicWalkUrl(walkId);
     const ok = await copyText(url);
     setWalkCopied(ok);
     if (ok) markDemo("copy", walkId);

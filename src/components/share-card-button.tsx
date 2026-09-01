@@ -1,9 +1,28 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { cardCaption, cardFileName, renderShareCard, shareFile, type CardKind } from "@/lib/share-card";
-import { encodeGoatWalk, encodePlayoffWalk, encodeWalk, encodeWnbaWalk, walkUrl } from "@/lib/walk";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { blobToDataUrl, presentFile, saveCardFile, tweetIntent } from "@/lib/deliver";
+import { markDemo } from "@/lib/demo-funnel";
+import { cardCaption, cardFileName, renderShareCard, tweetLine, type CardKind } from "@/lib/share-card";
 import { rememberWalk } from "@/lib/studio-save";
+import { encodeGoatWalk, encodePlayoffWalk, encodeWalk, encodeWnbaWalk, publicWalkUrl } from "@/lib/walk";
+import { cn } from "@/lib/utils";
 import type { Player } from "@/lib/nba";
+
+function walkOf(opts: { team: string; era: string; wins: number; roster: Player[]; kind: CardKind; luck?: string }) {
+  const ids = opts.roster.map((p) => p.id);
+  if (opts.kind === "goat") return encodeGoatWalk({ wins: opts.wins, ids });
+  if (!opts.luck) return "";
+  if (opts.kind === "playoff") {
+    return encodePlayoffWalk({ team: opts.team, era: opts.era, luck: opts.luck, wins: opts.wins, ids });
+  }
+  if (opts.kind === "wnba") {
+    return encodeWnbaWalk({ team: opts.team, era: opts.era, luck: opts.luck, wins: opts.wins, ids });
+  }
+  if (opts.kind === "season") {
+    return encodeWalk({ team: opts.team, era: opts.era, luck: opts.luck, wins: opts.wins, ids });
+  }
+  return "";
+}
 
 export function ShareCardButton({
   team,
@@ -26,66 +45,114 @@ export function ShareCardButton({
   ghostNights?: { win: boolean }[];
   beat?: number;
 }) {
-  const [state, setState] = useState<"idle" | "busy" | "shared" | "fail">("idle");
+  const [saveHref, setSaveHref] = useState("");
+  const [saveName, setSaveName] = useState("");
+  const [state, setState] = useState<"idle" | "busy" | "saved" | "fail">("idle");
   const ready = useRef<Blob | null>(null);
   const rosterKey = roster.map((p) => p.id).join("~");
+  const walk = walkOf({ team, era, wins, roster, kind, luck });
+  const publicHref = walk ? publicWalkUrl(walk) : "";
+  const caption = cardCaption({ team, era, wins, roster, kind, luck, walk, beat });
+  const post = tweetLine({ team, era, wins, kind });
+  const xHref = tweetIntent(post, publicHref);
 
   useEffect(() => {
     if (roster.length === 0) return;
     ready.current = null;
+    setSaveHref("");
+    const name = cardFileName(team, wins);
+    setSaveName(name);
     let live = true;
-    void renderShareCard({ team, era, wins, roster, kind, luck, nights, ghostNights }).then((blob) => {
-      if (!live) return;
-      ready.current = blob;
-    });
+    void renderShareCard({ team, era, wins, roster, kind, luck, nights, ghostNights })
+      .then(async (blob) => {
+        if (!live) return;
+        ready.current = blob;
+        const href = await blobToDataUrl(blob);
+        if (!live) return;
+        setSaveHref(href);
+      })
+      .catch(() => {
+        if (live) setState("fail");
+      });
     return () => {
       live = false;
     };
   }, [team, era, wins, rosterKey, kind, luck, roster, nights, ghostNights]);
 
-  async function run() {
+  async function printCard() {
+    const blob =
+      ready.current ?? (await renderShareCard({ team, era, wins, roster, kind, luck, nights, ghostNights }));
+    ready.current = blob;
+    if (!saveHref) setSaveHref(await blobToDataUrl(blob));
+    return blob;
+  }
+
+  async function onSave() {
     if (state === "busy" || roster.length === 0) return;
     setState("busy");
     try {
-      const blob = ready.current ?? (await renderShareCard({ team, era, wins, roster, kind, luck, nights, ghostNights }));
-      ready.current = blob;
-      const name = cardFileName(team, wins);
-      const ids = roster.map((p) => p.id);
-      const walk =
-        kind === "goat"
-          ? encodeGoatWalk({ wins, ids })
-          : luck && kind === "playoff"
-            ? encodePlayoffWalk({ team, era, luck, wins, ids })
-            : luck && kind === "wnba"
-              ? encodeWnbaWalk({ team, era, luck, wins, ids })
-              : luck && kind === "season"
-                ? encodeWalk({ team, era, luck, wins, ids })
-                : undefined;
-      const text = cardCaption({ team, era, wins, roster, kind, luck, walk, beat });
+      const blob = await printCard();
+      const name = saveName || cardFileName(team, wins);
       if (walk) rememberWalk(walk);
-      const result = await shareFile(blob, name, text, walk ? walkUrl(walk) : undefined);
-      if (result === "abort") {
-        setState("idle");
-        return;
-      }
-      setState("shared");
+      markDemo("save", name);
+      await saveCardFile(blob, name);
+      setState("saved");
     } catch {
       setState("fail");
     }
   }
 
-  const shareLabel =
-    state === "busy"
-      ? "Sharing…"
-      : state === "shared"
-        ? "On the press"
-        : state === "fail"
-          ? "Couldn’t share"
-          : "Send the card";
+  async function onTray() {
+    if (roster.length === 0) return;
+    try {
+      const blob = await printCard();
+      const name = saveName || cardFileName(team, wins);
+      if (walk) rememberWalk(walk);
+      presentFile(blob, name, caption, publicHref || undefined);
+    } catch {
+      setState("fail");
+    }
+  }
+
+  const empty = roster.length === 0;
 
   return (
-    <Button onClick={() => void run()} disabled={state === "busy" || roster.length === 0}>
-      {shareLabel}
-    </Button>
+    <>
+      {saveHref ? (
+        <a
+          className={cn(buttonVariants({ variant: "primary" }))}
+          href={saveHref}
+          download={saveName}
+          onClick={() => {
+            if (walk) rememberWalk(walk);
+            markDemo("save", saveName);
+            setState("saved");
+          }}
+        >
+          {state === "saved" ? "Card saved" : "Save the card"}
+        </a>
+      ) : (
+        <Button onClick={() => void onSave()} disabled={empty || state === "busy"}>
+          {state === "busy" ? "Printing…" : state === "fail" ? "Couldn’t save" : "Printing…"}
+        </Button>
+      )}
+      {walk ? (
+        <a
+          className={cn(buttonVariants({ variant: "bronze" }))}
+          href={xHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => {
+            if (walk) rememberWalk(walk);
+            markDemo("save", "x");
+          }}
+        >
+          Post to X
+        </a>
+      ) : null}
+      <Button variant="ghost" onClick={() => void onTray()} disabled={empty}>
+        More ways to send
+      </Button>
+    </>
   );
 }

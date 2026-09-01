@@ -30,7 +30,7 @@ Ninety seconds. [HOW-TO-PLAY.md](HOW-TO-PLAY.md) is the sheet.
 
 ![The card](docs/stills/03-result.jpg)
 
-**4. Send the card.** Save the PNG. Copy the walk. The URL is the certificate.
+**4. Send the card.** Save the PNG. Post to X. Copy the walk. The URL is the certificate.
 
 ![Send](docs/stills/04-tray.jpg)
 
@@ -40,9 +40,10 @@ Tape: [docs/tape/demo.mp4](docs/tape/demo.mp4)
 | --- | --- |
 | **Rip the pack** | New room. New ten. |
 | **Lock five** | 82 nights from those names. |
-| **Send the card** | Opens the tray. |
 | **Save the card** | `first-bucket-{team}-{wins}.png` |
-| **Copy the walk** | `/walk/v1.…` — paste it anywhere. |
+| **Post to X** | Opens X with the walk. Attach the PNG for the plate. |
+| **More ways to send** | Tray: story frame, Threads, Facebook, native share. |
+| **Copy the walk** | Public `/walk/v1.…` — paste it anywhere. |
 | **Open the walk** | Same five, same nights, forever. |
 
 There is no “copy image.” The file is the card. The URL is the walk.

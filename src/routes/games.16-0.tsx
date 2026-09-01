@@ -35,7 +35,7 @@ import { playoffTelemetry } from "@/lib/telemetry";
 import { playoffWalk, type Night } from "@/lib/sim";
 import { bestFrom, loadSave, recordRun } from "@/lib/studio-save";
 import { ripTick, tick } from "@/lib/tick";
-import { decodeChallengeIds, encodePlayoffWalk, playersOf } from "@/lib/walk";
+import { decodeChallengeIds, encodePlayoffWalk, playersOf, publicWalkUrl } from "@/lib/walk";
 import { cn } from "@/lib/utils";
 
 type Search = {
@@ -221,8 +221,9 @@ function SixteenPage() {
   }
 
   async function copyWalk() {
+    if (!walkId) return;
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/walk/${encodeURIComponent(walkId)}`);
+      await navigator.clipboard.writeText(publicWalkUrl(walkId));
       setWalkCopied(true);
     } catch {
       setWalkCopied(false);

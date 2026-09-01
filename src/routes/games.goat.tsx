@@ -19,7 +19,7 @@ import { PLAYERS, dealFrom, freshEntropy, goatLabel, goatScore, rngFrom, type Pl
 import { bestFrom, loadSave, recordRun } from "@/lib/studio-save";
 import { goatTelemetry } from "@/lib/telemetry";
 import { ripTick } from "@/lib/tick";
-import { decodeChallengeIds, encodeGoatWalk, playersOf } from "@/lib/walk";
+import { decodeChallengeIds, encodeGoatWalk, playersOf, publicWalkUrl } from "@/lib/walk";
 
 export const Route = createFileRoute("/games/goat")({
   validateSearch: (raw: Record<string, unknown>) => ({
@@ -152,8 +152,9 @@ function GoatPage() {
   }
 
   async function copyWalk() {
+    if (!walkId) return;
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/walk/${encodeURIComponent(walkId)}`);
+      await navigator.clipboard.writeText(publicWalkUrl(walkId));
       setWalkCopied(true);
     } catch {
       setWalkCopied(false);

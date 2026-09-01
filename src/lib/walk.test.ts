@@ -13,6 +13,8 @@ import {
   houseWalkDates,
   houseWalkWnba,
   isEphemeralOrigin,
+  LIVE_ORIGIN,
+  publicWalkUrl,
   rosterKey,
   walkHref,
   walkIdFromHref,
@@ -177,6 +179,12 @@ test("walkHref encodes tildes, walkUrl is a path in node", () => {
   assert.match(id, /~/);
   assert.equal(walkHref(id), `/walk/${encodeURIComponent(id)}`);
   assert.equal(walkUrl(id), walkHref(id));
+});
+
+test("publicWalkUrl always burns the live booth in node", () => {
+  const id = encodeWalk({ team: "Bucks", era: "90s East", luck: "Thin", wins: 18, ids });
+  assert.equal(publicWalkUrl(id), `${LIVE_ORIGIN}${walkHref(id)}`);
+  assert.match(publicWalkUrl(id), /^https:\/\/first-bucket-studios\.vercel\.app\/walk\//);
 });
 
 test("sandbox and loopback origins are ephemeral", () => {

@@ -1,6 +1,6 @@
 import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel, eraLabel, type Player } from "./nba.ts";
 import { drawCrestOps } from "./crest-marks.ts";
-import { nativeShare, presentFile } from "./deliver.ts";
+import { presentFile } from "./deliver.ts";
 import { HOUSE_WALK_ID } from "./house-pack.ts";
 import { houseInk } from "./house-ink.ts";
 import { initials, cardSerial } from "./plates.ts";
@@ -86,6 +86,20 @@ export function cardCaption(opts: {
     return `Walked a ${recordLine(wins, 40)} ${eraLabel(era)} ${team} at First Bucket Studio: ${names}.${delta}${path}`;
   }
   return `Walked a ${recordLine(wins)} ${eraLabel(era)} ${team} at First Bucket Studio: ${names}.${delta}${path}`;
+}
+
+/** Short enough for an X post plus the walk URL. */
+export function tweetLine(opts: {
+  team: string;
+  era: string;
+  wins: number;
+  kind?: CardKind;
+}) {
+  const { team, era, wins, kind = "season" } = opts;
+  if (kind === "goat") return `GOAT Five ${wins} · ${goatLabel(wins)} · First Bucket Studio`;
+  if (kind === "playoff") return `${playoffLine(wins)} ${eraLabel(era)} ${team} · First Bucket Studio`;
+  if (kind === "wnba") return `${recordLine(wins, 40)} ${eraLabel(era)} ${team} · First Bucket Studio`;
+  return `${recordLine(wins)} ${eraLabel(era)} ${team} · First Bucket Studio`;
 }
 
 function hexA(hex: string, a: number) {
@@ -662,9 +676,6 @@ export function downloadBlob(blob: Blob, name: string) {
 }
 
 export async function shareFile(blob: Blob, name: string, text: string, href?: string) {
-  const result = await nativeShare(blob, name, text);
-  if (result === "shared") return "shared" as const;
-  if (result === "abort") return "abort" as const;
   presentFile(blob, name, text, href);
   return "saved" as const;
 }

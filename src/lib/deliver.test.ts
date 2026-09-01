@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { asShareFile, canUseSavePicker, shareAttempts, shareSheetOk } from "./deliver.ts";
+import { asShareFile, canUseSavePicker, facebookIntent, shareAttempts, shareSheetOk, threadsIntent, tweetIntent } from "./deliver.ts";
 
 test("share attempts send the file, never files plus url, never text as the card", () => {
   const file = new File(["png"], "first-bucket-thunder-58.png", { type: "image/png" });
@@ -40,4 +40,20 @@ test("share sheet stays off without a top-level navigator.share", () => {
 
 test("save picker stays off in node and framed contexts", () => {
   assert.equal(canUseSavePicker(), false);
+});
+
+test("tweet intent carries text and an https walk, never a relative path", () => {
+  const href = tweetIntent("51–31 Thunder · First Bucket Studio", "https://first-bucket-studios.vercel.app/walk/v1.OKC");
+  assert.match(href, /https:\/\/x\.com\/intent\/tweet/);
+  assert.match(href, /url=/);
+  assert.match(href, /first-bucket-studios/);
+  const relative = tweetIntent("51–31 Thunder · First Bucket Studio", "/walk/v1.OKC");
+  assert.equal(relative.includes("url="), false);
+});
+
+test("threads and facebook intents need a public walk", () => {
+  const walk = "https://first-bucket-studios.vercel.app/walk/v1.OKC";
+  assert.match(threadsIntent("51–31 Thunder · First Bucket Studio", walk), /threads\.net\/intent\/post/);
+  assert.match(facebookIntent(walk), /facebook\.com\/sharer/);
+  assert.equal(facebookIntent("/walk/v1.OKC").includes("u="), false);
 });
