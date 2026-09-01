@@ -29,14 +29,24 @@ export const FOIL_GL_ATTRS: WebGLContextAttributes = {
 
 let probed: boolean | null = null;
 
-/** True when the studio is inside a host iframe. GPU probes stall and pop there. */
+/** True when GPU foil would paint a white sheet over the pack. */
 export function foilNestedFrame() {
   if (typeof window === "undefined") return false;
   try {
-    return window.self !== window.top;
+    if (window.self !== window.top) return true;
   } catch {
     return true;
   }
+  try {
+    const host = window.location.hostname.toLowerCase();
+    if (host === "grok-sandbox.com" || host.endsWith(".grok-sandbox.com")) return true;
+    if (host.includes(".preview.")) return true;
+    const ancestors = window.location.ancestorOrigins;
+    if (ancestors && ancestors.length > 0) return true;
+  } catch {
+    return true;
+  }
+  return false;
 }
 
 export function foilGpuAllowed() {
@@ -47,6 +57,10 @@ export function foilGlSupported() {
   if (probed != null) return probed;
   if (typeof document === "undefined") return false;
   if (reducedMotion()) {
+    probed = false;
+    return false;
+  }
+  if (foilNestedFrame()) {
     probed = false;
     return false;
   }

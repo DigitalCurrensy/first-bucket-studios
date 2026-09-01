@@ -47,11 +47,12 @@ await page.waitForFunction(() => {
   return Boolean(el && el.getAttribute("aria-label") && !/house prospect/i.test(el.getAttribute("aria-label") || ""));
 });
 await page.waitForTimeout(500);
-await shot("02-foil.jpg");
 
 await page.locator(".rip-pack").click();
 await page.waitForSelector(".pack-grid button");
+await page.waitForSelector(".plate-name");
 await page.waitForTimeout(700);
+await shot("02-foil.jpg");
 
 const cards = page.locator(".pack-grid button");
 const n = await cards.count();

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { foilGlSupported, mountFoil, type FoilHandle } from "@/lib/foil-gl";
 import { subscribeGyro } from "@/lib/gyro";
 import { cn } from "@/lib/utils";
@@ -31,10 +31,16 @@ export function FoilGl({
   ready.current = onReady;
   const colors = useRef({ foil, flare, ink: ink ?? foil });
   colors.current = { foil, flare, ink: ink ?? foil };
+  const [allow, setAllow] = useState(false);
+  const [live, setLive] = useState(false);
+
+  useEffect(() => {
+    setAllow(foilGlSupported());
+  }, []);
 
   useEffect(() => {
     const canvas = ref.current;
-    if (!canvas || !foilGlSupported()) return;
+    if (!allow || !canvas) return;
     const parent = canvas.parentElement ?? canvas;
     const host = (canvas.closest(".rip-pack") as HTMLElement | null) ?? parent;
     let io: IntersectionObserver | null = null;
@@ -67,7 +73,6 @@ export function FoilGl({
         }
         next = mounted;
         handle.current = mounted;
-        ready.current?.();
         document.addEventListener("visibilitychange", onVis);
         host.addEventListener("pointermove", onMove);
         host.addEventListener("pointerleave", onLeave);
@@ -83,6 +88,8 @@ export function FoilGl({
         if (ro) ro.observe(parent);
         mounted.resize();
         mounted.start();
+        setLive(true);
+        ready.current?.();
       })
       .catch(() => {
         /* CSS hologram stays. */
@@ -90,6 +97,7 @@ export function FoilGl({
 
     return () => {
       dead = true;
+      setLive(false);
       document.removeEventListener("visibilitychange", onVis);
       host.removeEventListener("pointermove", onMove);
       host.removeEventListener("pointerleave", onLeave);
@@ -99,11 +107,12 @@ export function FoilGl({
       next?.dispose();
       handle.current = null;
     };
-  }, []);
+  }, [allow]);
 
   useEffect(() => {
     handle.current?.setColors(foil, flare, ink ?? foil);
   }, [foil, flare, ink]);
 
-  return <canvas ref={ref} className={cn("foil-gl", className)} aria-hidden="true" />;
+  if (!allow) return null;
+  return <canvas ref={ref} className={cn("foil-gl", live && "is-live", className)} aria-hidden="true" />;
 }

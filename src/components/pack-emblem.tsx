@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Crest } from "@/components/crest";
 import { cn } from "@/lib/utils";
 
 const FILES = new Set([
@@ -70,6 +72,9 @@ export function PackEmblem({
   className?: string;
 }) {
   const src = emblemSrc(name, room);
+  const [ok, setOk] = useState(false);
+  const mark = name ?? "First Bucket";
+
   return (
     <span className={cn("pack-plate", className)}>
       <svg viewBox="0 0 100 100" className="pack-plate-reg" aria-hidden="true">
@@ -79,7 +84,16 @@ export function PackEmblem({
           <path d="M50 3.5 V10.5 M46.5 7 H53.5" />
         </g>
       </svg>
-      <img src={src} alt="" className="pack-plate-mark" crossOrigin="anonymous" decoding="async" />
+      {ok ? null : <Crest name={mark} className="relative size-24 text-accent" />}
+      <img
+        src={src}
+        alt=""
+        className="pack-plate-mark"
+        decoding="async"
+        hidden={!ok}
+        onLoad={() => setOk(true)}
+        onError={() => setOk(false)}
+      />
     </span>
   );
 }

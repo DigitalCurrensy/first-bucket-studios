@@ -190,26 +190,15 @@ html[data-theme="light"] {
     animation: rise 400ms var(--ease-studio) both;
   }
   .card-shell {
-    transform-style: preserve-3d;
-    transition: transform 400ms var(--ease-studio);
-  }
-  .card-shell.is-down {
-    transform: rotateY(180deg);
-  }
-  .card-face {
     position: relative;
-    z-index: 1;
-    backface-visibility: hidden;
+    aspect-ratio: 5 / 7;
+    isolation: isolate;
   }
+  .card-face,
   .card-back {
-    z-index: 0;
-    transform: rotateY(180deg);
-  }
-  .card-shell.is-down .card-face {
-    z-index: 0;
-  }
-  .card-shell.is-down .card-back {
-    z-index: 2;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
   }
   .deal-card:nth-child(1) {
     animation-delay: 0ms;
@@ -446,8 +435,10 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  isolation: isolate;
   aspect-ratio: 5 / 7;
   color: var(--color-fg);
+  background-color: var(--color-night);
   border-radius: 0 0 4px 4px;
   transform-origin: 50% 80%;
   transform: rotateY(-8deg) rotateX(6deg);
@@ -460,12 +451,13 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
 }
 .rip-pack:hover .rip-pack-body,
 .rip-pack:focus-visible .rip-pack-body { transform: rotateY(-2deg) rotateX(2deg) translateY(-6px); }
-.rip-pack-shine,
 .pack-holo,
-.pack-holo-prism {
+.pack-holo-prism,
+.rip-pack-shine {
   pointer-events: none;
   position: absolute;
   inset: 0;
+  z-index: 0;
 }
 .rip-pack-shine {
   background: linear-gradient(105deg, transparent 32%, color-mix(in oklab, var(--pack-foil, var(--color-fg)) 28%, transparent) 48%, transparent 64%);
@@ -486,16 +478,81 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
 }
 .foil-gyro { --foil-x: 50%; --foil-y: 40%; }
 .foil-gyro .pack-holo { background-position: var(--foil-x) var(--foil-y); }
-.foil-gl { position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: color-dodge; width: 100%; height: 100%; display: block; }
+.foil-gl {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: plus-lighter;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: transparent;
+  opacity: 0;
+}
+.foil-gl.is-live { opacity: 1; }
+.rip-pack-body > .relative { position: relative; z-index: 1; }
 .rip-pack.has-foil-gl .pack-holo,
 .rip-pack.has-foil-gl .pack-holo-prism,
 .rip-pack.has-foil-gl .rip-pack-shine { display: none; }
 .rip-pack.is-ripping .rip-pack-body { transform: rotateX(12deg) scale(0.96); }
 
-.pack-plate { display: grid; place-items: center; width: 100%; height: 100%; }
-.pack-plate-mark { max-height: 100%; width: auto; }
+.pack-plate { position: relative; display: grid; place-items: center; width: 100%; height: 100%; }
+.pack-plate-reg {
+  pointer-events: none;
+  position: absolute;
+  inset: 10%;
+  color: color-mix(in oklab, var(--pack-foil, var(--color-accent)) 40%, transparent);
+}
+.pack-plate-mark { position: relative; z-index: 1; max-height: 86%; max-width: 76%; width: auto; height: auto; object-fit: contain; background: transparent; }
+.pack-plate-mark[hidden] { display: none !important; }
 .pack-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.5rem; }
 .pack-grid > * { min-width: 0; }
+
+.card-edge { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-fg) 16%, transparent); }
+.paper-grain,
+.ink-grain {
+  background-color: var(--color-night);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--pack-ink, var(--color-accent)) 18%, transparent), transparent 55%),
+    repeating-radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--color-fg) 12%, transparent) 0 1px, transparent 1px 3px);
+}
+.card-club-bar {
+  display: block;
+  height: 5px;
+  background: linear-gradient(90deg, var(--pack-ink, var(--color-accent)), var(--pack-foil, var(--color-fg)), var(--pack-flare, var(--color-holo-pink)));
+}
+.card-holo {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  mix-blend-mode: plus-lighter;
+  background: linear-gradient(118deg, transparent 20%, color-mix(in oklab, var(--pack-foil, var(--color-fg)) 40%, transparent) 48%, transparent 72%);
+}
+.card-guilloche {
+  pointer-events: none;
+  position: absolute;
+  inset: 12%;
+  opacity: 0.28;
+  background:
+    repeating-radial-gradient(circle at 50% 50%, transparent 0 10px, color-mix(in oklab, currentColor 22%, transparent) 11px 12px);
+  mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 72%);
+}
+.card-caption { padding: 0.45rem 0.55rem 0.6rem; }
+.plate-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+.plate-cut {
+  font-size: 2.35rem;
+  line-height: 1;
+  text-shadow: 0 8px 18px color-mix(in oklab, var(--color-night) 55%, transparent);
+}
+.plate-window { min-height: 0; }
 
 .tray-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .tray-btn {

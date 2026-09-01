@@ -16,7 +16,15 @@ function CardBackFace({ team, stamp, shelf }: { team?: string; stamp?: string; s
       <span className="card-guilloche text-accent" aria-hidden="true" />
       <PlateRosette className="absolute inset-4 text-accent/20" />
       {mark ? (
-        <img src={mark} alt="" className="relative size-12 object-contain" crossOrigin="anonymous" decoding="async" />
+        <img
+          src={mark}
+          alt=""
+          className="relative size-12 object-contain"
+          decoding="async"
+          onError={(event) => {
+            event.currentTarget.hidden = true;
+          }}
+        />
       ) : team ? (
         <Crest name={team} className="relative size-10 text-accent/90" />
       ) : (
@@ -61,7 +69,7 @@ export function PlayerCard({
     "--pack-flare": pal.flare,
   } as CSSProperties;
   const inner = (
-    <div className={cn("card-shell", !revealed && "is-down")}>
+    <div className="card-shell">
       {revealed ? (
         <div
           className={cn(
@@ -91,8 +99,10 @@ export function PlayerCard({
               alt=""
               className="absolute inset-0 size-full object-cover"
               style={{ objectPosition: plateCrop(player.id) }}
-              crossOrigin="anonymous"
               decoding="async"
+              onError={(event) => {
+                event.currentTarget.hidden = true;
+              }}
             />
             <span className={cn("absolute inset-0", inverted ? "bg-paper/45" : "bg-fg/40")} aria-hidden="true" />
             <span className={cn("plate-letter plate-cut relative", inverted ? "text-fg" : "text-paper")}>
@@ -116,9 +126,8 @@ export function PlayerCard({
           </div>
         </div>
       ) : (
-        <div className="card-face rounded-sm bg-paper" />
+        <CardBackFace team={club ?? team} stamp={stamp} shelf={player.shelf} />
       )}
-      <CardBackFace team={club ?? team} stamp={stamp} shelf={player.shelf} />
     </div>
   );
 
@@ -156,8 +165,7 @@ export function FaceDownCard({ stamp, compact = false }: { stamp?: string; compa
       className={cn("deal-card rounded-lg bg-surface p-2 shadow-border", compact && "max-w-[9rem]")}
       aria-hidden="true"
     >
-      <div className="card-shell is-down">
-        <div className="card-face rounded-sm bg-paper" />
+      <div className="card-shell">
         <CardBackFace stamp={stamp} />
       </div>
     </div>

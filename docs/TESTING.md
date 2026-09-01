@@ -14,7 +14,33 @@ There is no staging account. There is no fake toast. A test that cannot fail is 
 | **4. Demo eval** | Playwright rips a **live** pack, not the house pin, and opens the tray. Prints Stream-JSON. | `npm run test:demo` |
 | **5. Stills** | README pictures still match the loop. | `npm run capture` |
 
-GitHub Action runs layers 1 and 3 on every push. Layer 4 needs the studio running.
+GitHub Action **Pin** runs layers 1 and 3 on every push to `main`. Layer 4 needs the studio running.
+
+## What a live demo needs
+
+| Piece | Status | Notes |
+| --- | --- | --- |
+| Home pack | Ready | Night stock + emblem. CSS hologram in a nested preview. |
+| Live 82-0 pack | Ready | Random franchise. Tear. Ten plates. Not Thunder every time. |
+| Player cards | Ready | One 5×7 face. Night plate. Pick five. Court back only when face-down. |
+| House pin | Ready | Thunder 51–31, same walk every time. Optional. |
+| Send PNG | Ready in a top-level tab | Tray: Save the card / Copy the walk / Open the walk. |
+| Pin tests | Must stay green | `npm run test:pin` then `npm run test:vl` |
+| Public URL | **Not yet** | Repo is private on purpose. Flip public when you want the world in. |
+
+### Host limits (not product bugs)
+
+- **Save inside this nested preview** can be swallowed by the host. Open a top-level tab, then Save.
+- **WebGL foil** stays off in a host iframe / sandbox so the pack is never a white rectangle. CSS hologram is the foil here. A top-level tab gets GL.
+
+### Still missing for a public booth
+
+1. Flip the GitHub repo public (or ship a public host). There is no public URL while it is private.
+2. One rip, not two. Home poster then 82-0 foil is the current door.
+3. Save must be tested in a **top-level** tab. Nested preview cannot prove the download.
+
+Do not ship a cream pack, a Thunder-only live pull, stacked card faces, or a tray that toasts instead of saving.
+
 
 ## Layer 1 — the pin
 
