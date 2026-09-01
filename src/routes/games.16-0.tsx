@@ -145,6 +145,15 @@ function SixteenPage() {
     window.setTimeout(() => {
       setRipped(true);
       setRipping(false);
+      pack.forEach((p, i) => {
+        window.setTimeout(
+          () => {
+            setOpen((cur) => (cur.includes(p.id) ? cur : [...cur, p.id]));
+            ripTick();
+          },
+          reduce ? 0 : i * 70,
+        );
+      });
     }, reduce ? 0 : 480);
   }
 
@@ -243,6 +252,7 @@ function SixteenPage() {
 
       {step === "spin" && (
         <RoomSpin
+          auto
           onReady={startDraft}
           locked={challenge.team && challenge.era ? { team: challenge.team, era: challenge.era, luck: challenge.luck } : undefined}
         />

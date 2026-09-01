@@ -97,6 +97,15 @@ function GoatPage() {
     window.setTimeout(() => {
       setRipped(true);
       setRipping(false);
+      pack.forEach((p, i) => {
+        window.setTimeout(
+          () => {
+            setOpen((cur) => (cur.includes(p.id) ? cur : [...cur, p.id]));
+            ripTick();
+          },
+          reduce ? 0 : i * 70,
+        );
+      });
     }, reduce ? 0 : 480);
   }
 

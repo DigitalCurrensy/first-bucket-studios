@@ -210,7 +210,6 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
         const staged = walkHouse();
         setOpen(staged.ten.map((p) => p.id));
         setPicks(staged.five.map((p) => p.id));
-        commitWalk(staged.five, staged.walked);
         return;
       }
       ids.forEach((id, i) => {
