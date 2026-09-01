@@ -7,9 +7,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-fg text-paper",
-        ghost: "bg-transparent text-fg shadow-border hover:shadow-border-hover",
-        bronze: "bg-accent text-accent-fg",
+        primary: "bg-fg text-paper hover:opacity-90",
+        ghost: "glass-control text-fg",
+        bronze: "bg-accent text-accent-fg hover:opacity-90",
       },
     },
     defaultVariants: { variant: "primary" },

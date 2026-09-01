@@ -1,4 +1,4 @@
-export const TABS = ["Play", "Tape", "Cards"] as const;
+export const TABS = ["Play", "Cards"] as const;
 
 export type Tab = (typeof TABS)[number];
 
@@ -9,16 +9,10 @@ export type Product = {
     | "/games/goat"
     | "/games/16-0"
     | "/games/corners"
+    | "/games/wnba"
     | "/keepers"
     | "/shop"
     | "/brief"
-    | "/tape"
-    | "/fantasy"
-    | "/slate"
-    | "/trade"
-    | "/mock"
-    | "/board"
-    | "/gym"
     | "/wall";
   tab: Tab;
   kicker: string;
@@ -34,7 +28,7 @@ export const PRODUCTS: Product[] = [
     tab: "Play",
     kicker: "Game",
     title: "Build an 82-0",
-    body: "One pull. Three strips. Rip ten. The season walks. The card is a URL.",
+    body: "Thunder in the foil. Rip ten. The five is marked. Send the card.",
     image: "/cards/arena.jpg",
     badge: "Popular",
   },
@@ -43,7 +37,7 @@ export const PRODUCTS: Product[] = [
     tab: "Play",
     kicker: "Game",
     title: "Daily Bucket",
-    body: "The date pulls the room. Same five for the house. Keep the streak.",
+    body: "The date pulls the room. Same pack. The house five hangs on the Brief. Yours is yours.",
     image: "/cards/tunnel.jpg",
     badge: "Daily",
   },
@@ -52,7 +46,7 @@ export const PRODUCTS: Product[] = [
     tab: "Play",
     kicker: "Game",
     title: "Four corners",
-    body: "Start G/G/F/F/C. The corners have to hold. Then 82 nights.",
+    body: "The pack deals G/G/F/F/C. Then 82 nights.",
     image: "/cards/gym.jpg",
     badge: "New",
   },
@@ -61,47 +55,40 @@ export const PRODUCTS: Product[] = [
     tab: "Play",
     kicker: "Game",
     title: "GOAT Five",
-    body: "Five names. No franchise. No era. Score the circle.",
-    image: "/cards/gym.jpg",
+    body: "Five names. No franchise. No era. Score the circle. The card is a URL.",
+    image: "/cards/locker.jpg",
   },
   {
     href: "/games/16-0",
     tab: "Play",
     kicker: "Game",
     title: "Build a 16-0",
-    body: "Playoffs as series. Four rounds. 2-2-1-1-1. A banner is rare.",
+    body: "Playoffs as series. Four rounds. 2-2-1-1-1. Ten face-down. Lose a series, the run is over.",
     image: "/cards/rim.jpg",
   },
   {
-    href: "/tape",
-    tab: "Tape",
-    kicker: "Tape",
-    title: "The Tape",
-    body: "UP / FLAT / DOWN. Marks, not a book. The week is the print.",
-    image: "/cards/rim.jpg",
+    href: "/games/wnba",
+    tab: "Play",
+    kicker: "Game",
+    title: "WNBA walk",
+    body: "Forty nights. House crests. A walk, not a shelf.",
+    image: "/plates/rafters.jpg",
+    badge: "New",
   },
   {
     href: "/brief",
-    tab: "Tape",
+    tab: "Cards",
     kicker: "Desk",
     title: "Brief Desk",
     body: "The week in one issue. House walk on the page. No signup.",
     image: "/plates/locker.jpg",
   },
   {
-    href: "/slate",
-    tab: "Tape",
-    kicker: "Board",
-    title: "The Slate",
-    body: "This week’s board. Start, sit, or stream. Seeded to the week.",
-    image: "/plates/night.jpg",
-  },
-  {
     href: "/shop",
     tab: "Cards",
     kicker: "Shop",
-    title: "Card Shop",
-    body: "The posters you already locked. Save the PNG. Export the studio.",
+    title: "The press",
+    body: "Proofs with trim marks. The file is the sheet. Export the studio file.",
     image: "/plates/night.jpg",
   },
   {
@@ -109,16 +96,16 @@ export const PRODUCTS: Product[] = [
     tab: "Cards",
     kicker: "Wall",
     title: "The Wall",
-    body: "Walks on this device. Share the URL. No graffiti, no database.",
+    body: "Fourteen house walks. No accounts. Yours hang under the rule.",
     image: "/cards/arena.jpg",
     badge: "New",
   },
   {
-    href: "/gym",
+    href: "/keepers",
     tab: "Cards",
-    kicker: "Kit",
-    title: "The Gym",
-    body: "Scorebug and lower-third. Export the PNG. Overlays, not tapes.",
-    image: "/cards/gym.jpg",
+    kicker: "Dynasty",
+    title: "Keepers",
+    body: "KEEP first. Holes fill from this week’s Tape. Walk this five.",
+    image: "/plates/locker.jpg",
   },
 ];

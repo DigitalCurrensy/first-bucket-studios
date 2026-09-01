@@ -44,8 +44,8 @@ test("1.04 owns 2.01 — the turnaround", () => {
 });
 
 test("seat names put You on the chosen slot", () => {
-  assert.deepEqual(seatNames(0), ["You", "Room A", "Room B", "Room C"]);
-  assert.deepEqual(seatNames(3), ["Room A", "Room B", "Room C", "You"]);
+  assert.deepEqual(seatNames(0), ["You", "Tape", "Brief", "Slate"]);
+  assert.deepEqual(seatNames(3), ["Tape", "Brief", "Slate", "You"]);
 });
 
 test("need-first taxes a third guard and boosts a missing big", () => {
@@ -61,4 +61,13 @@ test("empty roster is peak order — first pick is BPA", () => {
   const a = p("star", "G", 99);
   const b = p("big", "C", 94);
   assert.equal(roomSelect([b, a], [])?.id, "star");
+});
+
+test("KEEP at a hole boosts, KEEP into a filled position is taxed", () => {
+  const roster = [p("g1", "G", 96), p("g2", "G", 94)];
+  const keepGuard = p("g3", "G", 90);
+  const keepCenter = p("c1", "C", 86);
+  const keepers = { g3: "KEEP" as const, c1: "KEEP" as const };
+  assert.ok(scoreNeed(keepCenter, roster, keepers) > scoreNeed(keepGuard, roster, keepers));
+  assert.ok(scoreNeed(keepCenter, roster, keepers) > scoreNeed(keepCenter, roster));
 });

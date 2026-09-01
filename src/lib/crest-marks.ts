@@ -89,6 +89,84 @@ export const CREST_MARKS: Record<string, CrestOp[]> = {
   "Trail Blazers": [{ t: "path", d: "M6 28 L18 8 H34 L22 28 Z" }],
   Hornets: [{ t: "path", d: "M20 6 L32 14 V26 L20 34 L8 26 V14 Z" }],
   Wizards: [{ t: "path", d: "M8 12 L14 28 L20 16 L26 28 L32 12" }],
+  Aces: [
+    { t: "path", d: "M20 6 L24 16 L34 16 L26 22 L29 32 L20 26 L11 32 L14 22 L6 16 L16 16 Z" },
+    { t: "circle", cx: 20, cy: 20, r: 4 },
+  ],
+  LVA: [
+    { t: "path", d: "M20 6 L24 16 L34 16 L26 22 L29 32 L20 26 L11 32 L14 22 L6 16 L16 16 Z" },
+    { t: "circle", cx: 20, cy: 20, r: 4 },
+  ],
+  Liberty: [
+    { t: "rect", x: 10, y: 8, w: 20, h: 24, rx: 2 },
+    { t: "path", d: "M20 12 V28 M14 18 H26" },
+  ],
+  NYL: [
+    { t: "rect", x: 10, y: 8, w: 20, h: 24, rx: 2 },
+    { t: "path", d: "M20 12 V28 M14 18 H26" },
+  ],
+  Lynx: [
+    { t: "path", d: "M8 28 L20 8 L32 28" },
+    { t: "path", d: "M14 28 L20 16 L26 28" },
+  ],
+  MIN: [
+    { t: "path", d: "M8 28 L20 8 L32 28" },
+    { t: "path", d: "M14 28 L20 16 L26 28" },
+  ],
+  Fever: [{ t: "path", d: "M12 28 L20 8 L28 28 M16 22 H24" }],
+  IND: [{ t: "path", d: "M12 28 L20 8 L28 28 M16 22 H24" }],
+  Sun: [
+    { t: "circle", cx: 20, cy: 20, r: 8 },
+    { t: "path", d: "M20 6 V10 M20 30 V34 M6 20 H10 M30 20 H34 M10 10 L13 13 M27 27 L30 30 M30 10 L27 13 M13 27 L10 30" },
+  ],
+  CON: [
+    { t: "circle", cx: 20, cy: 20, r: 8 },
+    { t: "path", d: "M20 6 V10 M20 30 V34 M6 20 H10 M30 20 H34 M10 10 L13 13 M27 27 L30 30 M30 10 L27 13 M13 27 L10 30" },
+  ],
+  Storm: [
+    { t: "path", d: "M8 16 H28 L22 22 H32 L14 32" },
+    { t: "path", d: "M12 12 H24" },
+  ],
+  SEA: [
+    { t: "path", d: "M8 16 H28 L22 22 H32 L14 32" },
+    { t: "path", d: "M12 12 H24" },
+  ],
+  Mercury: [
+    { t: "circle", cx: 20, cy: 16, r: 7 },
+    { t: "path", d: "M20 23 V32 M16 28 H24" },
+  ],
+  PHX: [
+    { t: "circle", cx: 20, cy: 16, r: 7 },
+    { t: "path", d: "M20 23 V32 M16 28 H24" },
+  ],
+  Wings: [{ t: "path", d: "M6 22 L20 10 L34 22 M10 22 L20 32 L30 22" }],
+  DAL: [{ t: "path", d: "M6 22 L20 10 L34 22 M10 22 L20 32 L30 22" }],
+  Sky: [
+    { t: "path", d: "M8 26 Q20 8 32 26" },
+    { t: "path", d: "M12 26 H28" },
+  ],
+  CHI: [
+    { t: "path", d: "M8 26 Q20 8 32 26" },
+    { t: "path", d: "M12 26 H28" },
+  ],
+  Mystics: [{ t: "path", d: "M20 6 L24 16 L34 18 L24 22 L20 34 L16 22 L6 18 L16 16 Z" }],
+  WAS: [{ t: "path", d: "M20 6 L24 16 L34 18 L24 22 L20 34 L16 22 L6 18 L16 16 Z" }],
+  Dream: [{ t: "path", d: "M8 28 V14 L20 24 L32 14 V28" }],
+  ATL: [{ t: "path", d: "M8 28 V14 L20 24 L32 14 V28" }],
+  Sparks: [
+    { t: "path", d: "M20 6 L22 16 L32 14 L24 20 L30 30 L20 24 L10 30 L16 20 L8 14 L18 16 Z" },
+  ],
+  LAS: [
+    { t: "path", d: "M20 6 L22 16 L32 14 L24 20 L30 30 L20 24 L10 30 L16 20 L8 14 L18 16 Z" },
+  ],
+  Valkyries: [
+    { t: "path", d: "M8 28 L12 12 L20 20 L28 12 L32 28" },
+    { t: "path", d: "M12 28 H28" },
+  ],
+  GSV: [
+    { t: "path", d: "M8 28 L12 12 L20 20 L28 12 L32 28" },
+    { t: "path", d: "M12 28 H28" },
+  ],
 };
 
 export const DEFAULT_CREST: CrestOp[] = [{ t: "rect", x: 6, y: 6, w: 28, h: 28, rx: 4 }];

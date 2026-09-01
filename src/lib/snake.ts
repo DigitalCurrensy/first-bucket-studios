@@ -56,7 +56,7 @@ export function overallFor(round0: number, seat: number, seats = SEAT_COUNT) {
 }
 
 export function seatNames(youSlot: number) {
-  const rooms = ["Room A", "Room B", "Room C"];
+  const rooms = ["Tape", "Brief", "Slate"];
   let r = 0;
   return Array.from({ length: SEAT_COUNT }, (_, i) => (i === youSlot ? "You" : rooms[r++]!));
 }
@@ -72,7 +72,11 @@ export function posCounts(roster: Player[]) {
   return counts;
 }
 
-export function scoreNeed(player: Player, roster: Player[]) {
+export function scoreNeed(
+  player: Player,
+  roster: Player[],
+  keepers: Record<string, "KEEP" | "TRADE" | "CUT" | string> = {},
+) {
   const counts = posCounts(roster);
   const missing = (["G", "F", "C"] as const).filter((pos) => counts[pos] === 0);
   const copies = counts[player.pos];
@@ -81,15 +85,24 @@ export function scoreNeed(player: Player, roster: Player[]) {
   if (missing.length > 0 && !missing.includes(player.pos)) score -= 3;
   if (copies >= 2) score -= 8;
   if (copies >= 3) score -= 12;
+  const mark = keepers[player.id];
+  if (mark === "KEEP") {
+    if (missing.includes(player.pos)) score += 8;
+    else score -= 10;
+  }
   return score;
 }
 
-export function roomSelect(available: Player[], roster: Player[]) {
+export function roomSelect(
+  available: Player[],
+  roster: Player[],
+  keepers: Record<string, "KEEP" | "TRADE" | "CUT" | string> = {},
+) {
   if (available.length === 0) return undefined;
   let best = available[0]!;
   let bestScore = Number.NEGATIVE_INFINITY;
   for (const player of available) {
-    const score = scoreNeed(player, roster);
+    const score = scoreNeed(player, roster, keepers);
     if (score > bestScore) {
       bestScore = score;
       best = player;
@@ -108,4 +121,5 @@ export const NEED_MATH = [
   { n: "−3", text: "A hole remains and this name does not fill it." },
   { n: "−8", text: "Third copy of a position." },
   { n: "−12", text: "Fourth copy. The room will not stack a fourth guard." },
+  { n: "KEEP", text: "A KEEP at a hole is worth more. A KEEP into a filled position is taxed." },
 ] as const;

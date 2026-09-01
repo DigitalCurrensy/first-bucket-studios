@@ -12,7 +12,7 @@ build/
 *.local
 *.log
 .DS_Store
-artifacts/
+attachments/
 screenshots/
 .project_id
 .node_modules.lock
@@ -20,3 +20,5 @@ data/
 pglite/
 AGENTS.md
 AGENTS.project.md
+__pycache__/
+*.pyc

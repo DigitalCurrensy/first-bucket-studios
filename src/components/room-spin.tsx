@@ -3,18 +3,22 @@ import { Button } from "@/components/ui/button";
 import { StepKicker } from "@/components/game-bar";
 import { TeamReel } from "@/components/team-reel";
 import { LUCKS, luckLine, type Luck } from "@/lib/luck";
-import { ERAS, FRANCHISES, hashSeed, mulberry32, pickIndex, type Era, type Franchise } from "@/lib/nba";
+import { ERAS, FRANCHISES, freshEntropy, pickIndex, rngFrom, type Era } from "@/lib/nba";
 
 export function RoomSpin({
   locked,
   auto = false,
+  clubs = FRANCHISES,
+  clubLabel = "Franchise",
   onReady,
 }: {
-  locked?: { team: Franchise; era: Era; luck?: Luck };
+  locked?: { team: string; era: Era; luck?: Luck };
   auto?: boolean;
-  onReady: (team: Franchise, era: Era, luck: Luck) => void;
+  clubs?: readonly string[];
+  clubLabel?: string;
+  onReady: (team: string, era: Era, luck: Luck) => void;
 }) {
-  const [team, setTeam] = useState<Franchise | "">("");
+  const [team, setTeam] = useState<string>("");
   const [era, setEra] = useState<Era | "">("");
   const [luck, setLuck] = useState<Luck | "">("");
   const [spinTeam, setSpinTeam] = useState(false);
@@ -31,9 +35,10 @@ export function RoomSpin({
 
   function pull() {
     if (spinning) return;
-    const rng = mulberry32(hashSeed(`pull:${Date.now()}`));
+    const next = freshEntropy();
+    const rng = rngFrom(`pull:${next}`);
     setReady(false);
-    setTeam(locked?.team ?? pickIndex(rng, FRANCHISES));
+    setTeam(locked?.team ?? pickIndex(rng, clubs));
     setEra(locked?.era ?? pickIndex(rng, ERAS));
     setLuck(locked?.luck ?? pickIndex(rng, LUCKS));
     setSpinTeam(true);
@@ -44,8 +49,9 @@ export function RoomSpin({
   useEffect(() => {
     if (!auto || booted.current) return;
     booted.current = true;
-    const rng = mulberry32(hashSeed(`pull:${Date.now()}`));
-    setTeam(locked?.team ?? pickIndex(rng, FRANCHISES));
+    const entropy = freshEntropy();
+    const rng = rngFrom(`pull:${entropy}`);
+    setTeam(locked?.team ?? pickIndex(rng, clubs));
     setEra(locked?.era ?? pickIndex(rng, ERAS));
     setLuck(locked?.luck ?? pickIndex(rng, LUCKS));
     setSpinTeam(true);
@@ -55,7 +61,7 @@ export function RoomSpin({
       window.clearTimeout(a);
       window.clearTimeout(b);
     };
-  }, [auto, locked]);
+  }, [auto, locked, clubs]);
 
   useEffect(() => {
     if (spinning || !team || !era || !luck) return;
@@ -80,8 +86,8 @@ export function RoomSpin({
       <StepKicker n={1} label="Pull" hint={kicker} className="mb-4" />
       <div className="grid grid-cols-3 gap-2">
         <div>
-          <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">Franchise</p>
-          <TeamReel items={FRANCHISES} target={team} spinning={spinTeam} compact onRest={restTeam} />
+          <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">{clubLabel}</p>
+          <TeamReel items={clubs} target={team} spinning={spinTeam} compact onRest={restTeam} />
         </div>
         <div>
           <p className="mb-2 text-micro font-medium uppercase tracking-label text-subtle">Era</p>
@@ -107,17 +113,17 @@ export function RoomSpin({
         </div>
       </div>
       {!auto && (
-        <div className="mt-6 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {!ready && (
-            <Button onClick={pull} disabled={spinning}>
+            <Button onClick={() => pull()} disabled={spinning}>
               {spinning ? "Pulling…" : team ? "Pull again" : "Pull"}
             </Button>
           )}
           {ready && team && era && luck && (
             <>
-              <Button onClick={() => onReady(team, era, luck)}>Rip the pack</Button>
+              <Button onClick={() => onReady(team, era, luck)}>Take the pack</Button>
               {!locked && (
-                <Button variant="ghost" onClick={pull}>
+                <Button variant="ghost" onClick={() => pull()}>
                   Pull again
                 </Button>
               )}

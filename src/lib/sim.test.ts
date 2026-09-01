@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { PLAYERS_BY_ID } from "./nba.ts";
-import { playoffWalk, seasonWalk } from "./sim.ts";
+import { playoffWalk, seasonWalk, wnbaWalk } from "./sim.ts";
 
 const five = [
   PLAYERS_BY_ID.mj,
@@ -9,6 +9,14 @@ const five = [
   PLAYERS_BY_ID.bird,
   PLAYERS_BY_ID.magic,
   PLAYERS_BY_ID.russell,
+];
+
+const wnbaFive = [
+  PLAYERS_BY_ID.aja,
+  PLAYERS_BY_ID.sabrina,
+  PLAYERS_BY_ID.napheesa,
+  PLAYERS_BY_ID.caitlin,
+  PLAYERS_BY_ID.athomas,
 ];
 
 test("same seed walks the same season", () => {
@@ -46,5 +54,18 @@ test("a different room is a different walk", () => {
   assert.notDeepEqual(
     a.nights.map((n) => n.us),
     b.nights.map((n) => n.us),
+  );
+});
+
+test("wnba walk is 40 nights and same seed same walk", () => {
+  const a = wnbaWalk("Aces", "Positionless", wnbaFive);
+  const b = wnbaWalk("Aces", "Positionless", wnbaFive);
+  assert.equal(a.nights.length, 40);
+  assert.equal(b.nights.length, 40);
+  assert.equal(a.wins, b.wins);
+  assert.ok(a.wins >= 0 && a.wins <= 40);
+  assert.deepEqual(
+    a.nights.map((n) => n.win),
+    b.nights.map((n) => n.win),
   );
 });

@@ -1,3 +1,7 @@
+import { clubAbbr, currentBook, FRANCHISES, rngFrom, type Player, type Pos, WNBA_FRANCHISES } from "./nba.ts";
+import { weekDensity } from "./schedule.ts";
+import { buildTape } from "./tape.ts";
+
 export type KeepCall = "KEEP" | "TRADE" | "CUT";
 
 export type KeeperRow = {
@@ -6,21 +10,103 @@ export type KeeperRow = {
   team: string;
   pos: string;
   note: string;
+  peak: number;
 };
 
-export const KEEPER_ROWS: KeeperRow[] = [
-  { id: "jokic", name: "Nikola Jokic", team: "DEN", pos: "C", note: "The floor is a championship. Keep until the league ends." },
-  { id: "sga", name: "Shai Gilgeous-Alexander", team: "OKC", pos: "G", note: "Usage and age. This is a keep even in a shallow room." },
-  { id: "wemby", name: "Victor Wembanyama", team: "SAS", pos: "C", note: "Blocks plus the counting cats that come later. Keep." },
-  { id: "luka", name: "Luka Doncic", team: "LAL", pos: "G", note: "Volume is the contract. Keep unless the price is a farm." },
-  { id: "giannis", name: "Giannis Antetokounmpo", team: "MIL", pos: "F", note: "Still a keep. The window is not closed." },
-  { id: "aja", name: "A'ja Wilson", team: "LVA", pos: "F", note: "Basketball, not just the men’s league. Keep the usage." },
-  { id: "cade", name: "Cade Cunningham", team: "DET", pos: "G", note: "Hold. The counting stats arrived. Do not trade for a rental." },
-  { id: "ant", name: "Anthony Edwards", team: "MIN", pos: "G", note: "Keep in dynasty. Sit him on a road B2B this week." },
-  { id: "tatum", name: "Jayson Tatum", team: "BOS", pos: "F", note: "Keep. Sitting a B2B is not a trade signal." },
-  { id: "kd", name: "Kevin Durant", team: "HOU", pos: "F", note: "Trade window is open if a contender overpays. Not a cut." },
-  { id: "kawhi", name: "Kawhi Leonard", team: "LAC", pos: "F", note: "Load management is the player. Trade the availability, do not cut the peak." },
-  { id: "sabrina", name: "Sabrina Ionescu", team: "NYL", pos: "G", note: "Threes and dimes. Keep in a 6-cat that counts 3s." },
-];
-
 export const KEEP_CALLS: KeepCall[] = ["KEEP", "TRADE", "CUT"];
+
+export function keeperNote(player: Player) {
+  if (player.peak >= 94) return "Title player. KEEP unless the return is a farm.";
+  if (player.peak >= 90) return "First-round usage. KEEP is the default.";
+  if (player.shelf === "wnba" && player.peak >= 84) return "Counts in both rooms. KEEP the minutes.";
+  if (player.pos === "C" && player.peak >= 86) return "Paint cats. Hard to replace.";
+  if (player.pos === "G" && player.peak >= 86) return "Volume. KEEP in a six-cat.";
+  if (player.peak >= 84) return "Hold. One sit night is not a TRADE.";
+  if (player.peak >= 80) return "TRADE if a contender overpays. Not a CUT.";
+  return "Stream or move. Peak is not a decade.";
+}
+
+export function keeperRows(pool: Player[] = currentBook()): KeeperRow[] {
+  return [...pool]
+    .sort((a, b) => b.peak - a.peak || a.name.localeCompare(b.name))
+    .map((player) => ({
+      id: player.id,
+      name: player.name,
+      team: player.club,
+      pos: player.pos,
+      note: keeperNote(player),
+      peak: player.peak,
+    }));
+}
+
+/** KEEP first, need-first 2G/2F/1C. Holes prefer this week’s Tape UPs. Seeded to the week. */
+export function keepFive(
+  marks: Record<string, KeepCall | string>,
+  week: string,
+  pool: Player[] = currentBook(),
+): Player[] {
+  const kept = pool.filter((p) => marks[p.id] === "KEEP");
+  if (kept.length === 0) return [];
+  const rng = rngFrom(`keep-five:${week}`);
+  const up = new Set(buildTape(week, pool).filter((row) => row.mark === "UP").map((row) => row.player.id));
+  const jitter = new Map(pool.map((p) => [p.id, rng()] as const));
+  const five: Player[] = [];
+  const used = new Set<string>();
+  const rank = (player: Player) => (up.has(player.id) ? 20 : 0) + player.peak + (jitter.get(player.id) ?? 0);
+  const take = (want: Pos, from: Player[]) => {
+    const next = from
+      .filter((p) => p.pos === want && !used.has(p.id))
+      .sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name))[0];
+    if (!next) return false;
+    used.add(next.id);
+    five.push(next);
+    return true;
+  };
+  take("G", kept);
+  take("G", kept);
+  take("F", kept);
+  take("F", kept);
+  take("C", kept);
+  for (const player of [...kept].sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name))) {
+    if (five.length >= 5) break;
+    if (used.has(player.id)) continue;
+    used.add(player.id);
+    five.push(player);
+  }
+  const open = pool.filter((p) => !used.has(p.id) && marks[p.id] !== "CUT");
+  while (five.length < 5) {
+    const counts: Record<Pos, number> = { G: 0, F: 0, C: 0 };
+    for (const p of five) counts[p.pos] += 1;
+    const want: Pos = counts.G < 2 ? "G" : counts.F < 2 ? "F" : counts.C < 1 ? "C" : "G";
+    const pick = open
+      .filter((p) => !used.has(p.id) && p.pos === want)
+      .sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name))[0]
+      ?? open.filter((p) => !used.has(p.id)).sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name))[0];
+    if (!pick) break;
+    used.add(pick.id);
+    five.push(pick);
+  }
+  return five.slice(0, 5);
+}
+
+export function keepWalkTeam(week: string, wnba = false) {
+  const clubs = wnba ? WNBA_FRANCHISES : FRANCHISES;
+  const rows = [...weekDensity(week, clubs)].sort((a, b) => b.games - a.games || a.team.localeCompare(b.team));
+  const code = rows[0]?.team ?? (wnba ? "LVA" : "LAL");
+  if (wnba) return WNBA_FRANCHISES.find((name) => clubAbbr(name) === code) ?? "Aces";
+  return FRANCHISES.find((name) => clubAbbr(name) === code) ?? "Lakers";
+}
+
+export function keepWalkPlan(week: string, five: Player[]) {
+  const wnba = five.filter((p) => p.shelf === "wnba").length >= 3;
+  return {
+    wnba,
+    team: keepWalkTeam(week, wnba),
+    era: "Positionless" as const,
+    luck: "Even" as const,
+    ids: five.map((p) => p.id),
+  };
+}
+
+/** Legacy twelve. Do not use as the desk. Tests and copy may mention the names. */
+export const KEEPER_ROWS: KeeperRow[] = keeperRows().slice(0, 12);

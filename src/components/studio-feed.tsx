@@ -1,78 +1,74 @@
 import { Link } from "@tanstack/react-router";
 import { NamePlate } from "@/components/name-plate";
-import { shortDate } from "@/lib/season";
-import { buildTape } from "@/lib/tape";
-import { cn } from "@/lib/utils";
+import { WalkCard } from "@/components/walk-card";
+import { useMounted } from "@/lib/hooks";
+import { PLAYERS_BY_ID } from "@/lib/nba";
+import { loadSave } from "@/lib/studio-save";
+import { houseWalk } from "@/lib/walk";
 
 export function StudioFeed({ dateKey }: { dateKey: string }) {
-  const rows = buildTape(dateKey);
-  const feed = rows.slice(0, 6);
-  const movers = rows.filter((row) => row.mark !== "FLAT").slice(0, 4);
-  const stamp = shortDate();
+  void dateKey;
+  const mounted = useMounted();
+  const save = mounted ? loadSave() : null;
+  const last = save?.runs[0];
+  const house = houseWalk();
+  const lastNames = last?.roster.map((id) => PLAYERS_BY_ID[id]?.name).filter(Boolean) ?? [];
 
   return (
     <div className="flex flex-col gap-6">
       <section className="rounded-xl bg-paper p-4 shadow-border">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-micro font-medium uppercase tracking-label text-good">Live</span>
-            <p className="text-sm font-medium">Studio Feed</p>
-          </div>
-          <Link to="/tape" className="text-sm text-muted hover:text-fg">
-            View
-          </Link>
+          <p className="text-sm font-medium">This device</p>
+          {last?.walk ? (
+            <Link to="/walk/$id" params={{ id: last.walk }} className="text-sm text-muted hover:text-fg">
+              Open
+            </Link>
+          ) : (
+            <Link to="/games/82-0" className="text-sm text-muted hover:text-fg">
+              Rip
+            </Link>
+          )}
         </div>
         <ul className="flex flex-col gap-4">
-          {feed.map((row) => (
-            <li key={row.player.id}>
-              <Link to="/tape" className="flex gap-3">
-                <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} id={row.player.id} />
+          {last && (
+            <li>
+              <Link to={last.walk ? "/walk/$id" : "/shop"} params={last.walk ? { id: last.walk } : undefined} className="flex gap-3">
+                <NamePlate name={lastNames[0] ?? last.team} id={last.roster[0]} size="sm" />
                 <span className="min-w-0">
                   <span className="flex items-baseline justify-between gap-2">
-                    <span className="truncate text-sm font-medium">{row.player.name}</span>
-                    <span
-                      className={cn(
-                        "shrink-0 text-micro font-medium uppercase tracking-label",
-                        row.mark === "UP" && "text-good",
-                        row.mark === "DOWN" && "text-warn",
-                        row.mark === "FLAT" && "text-subtle",
-                      )}
-                    >
-                      {row.mark}
-                    </span>
+                    <span className="truncate text-sm font-medium">Last run · {last.team}</span>
+                    <span className="shrink-0 text-micro font-medium uppercase tracking-label text-fg">{last.wins}</span>
                   </span>
-                  <span className="mt-0.5 block text-micro uppercase tracking-label text-subtle">
-                    {row.player.pos} · {row.player.era}
-                  </span>
-                  <span className="mt-1 block text-sm text-muted">{row.note}</span>
-                  <span className="mt-1 block text-micro text-subtle">The Tape · {stamp}</span>
+                  <span className="mt-1 block text-sm text-muted">{lastNames.slice(0, 3).join(", ") || last.era}</span>
                 </span>
               </Link>
             </li>
-          ))}
+          )}
+          <li>
+            <Link to="/walk/$id" params={{ id: house.id }} className="flex gap-3">
+              <NamePlate name={house.five[0]?.name ?? "House"} id={house.five[0]?.id} size="sm" />
+              <span className="min-w-0">
+                <span className="flex items-baseline justify-between gap-2">
+                  <span className="truncate text-sm font-medium">House walk · {house.room.team}</span>
+                  <span className="shrink-0 text-micro font-medium uppercase tracking-label text-good">{house.walk.wins}</span>
+                </span>
+                <span className="mt-1 block text-sm text-muted">{house.five.map((p) => p.name).join(", ")}</span>
+                <span className="mt-1 block text-micro text-subtle">Today’s room</span>
+              </span>
+            </Link>
+          </li>
         </ul>
       </section>
 
       <section className="rounded-xl bg-paper p-4 shadow-border">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="text-sm font-medium">On the move</p>
-          <Link to="/tape" className="text-sm text-muted hover:text-fg">
-            The Tape
+          <p className="text-sm font-medium">House walk</p>
+          <Link to="/wall" className="text-sm text-muted hover:text-fg">
+            The wall
           </Link>
         </div>
-        <ul className="flex flex-col gap-3">
-          {movers.map((row) => (
-            <li key={row.player.id} className="flex items-center gap-3">
-              <NamePlate name={row.player.name} pos={row.player.pos} era={row.player.era} size="sm" id={row.player.id} />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium">{row.player.name}</span>
-                <span className="text-micro uppercase tracking-label text-subtle">{row.player.pos}</span>
-              </span>
-              <span className={cn("text-sm font-medium", row.mark === "UP" ? "text-good" : "text-warn")}>{row.mark}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-4 text-micro text-subtle">Marks. Not a book. Not a player stock.</p>
+        <WalkCard id={house.id} />
+        <p className="mt-4 text-micro text-subtle">The file is the card. The URL is the walk.</p>
       </section>
     </div>
   );

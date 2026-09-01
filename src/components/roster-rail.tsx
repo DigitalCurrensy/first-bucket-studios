@@ -1,4 +1,5 @@
 import { NamePlate } from "@/components/name-plate";
+import { cardSerial } from "@/lib/plates";
 import type { Player } from "@/lib/nba";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +18,7 @@ export function RosterRail({
     <aside className="w-full self-start rounded-xl bg-paper p-4 shadow-border lg:sticky lg:top-8">
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-micro font-medium uppercase tracking-label text-subtle">{title}</p>
-        <p className="text-micro font-medium tabular-nums text-muted">
+        <p className="plate-stamp text-muted">
           {roster.length}/{of}
         </p>
       </div>
@@ -32,12 +33,17 @@ export function RosterRail({
                 <NamePlate name={player.name} pos={player.pos} era={player.era} size="sm" id={player.id} />
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-medium">{player.name}</span>
-                  <span className="text-micro uppercase tracking-label text-subtle">{player.pos}</span>
+                  <span className="mt-0.5 flex items-center gap-2">
+                    <span className="text-micro uppercase tracking-label text-subtle">{player.pos}</span>
+                    <span className="plate-stamp text-subtle">{cardSerial(player.id)}</span>
+                  </span>
                 </span>
               </>
             ) : (
               <>
-                <NamePlate empty size="sm" />
+                <span className="grid size-9 shrink-0 place-items-center rounded-sm text-micro text-subtle shadow-border">
+                  {i + 1}
+                </span>
                 <span className="text-sm text-muted">Open</span>
               </>
             )}

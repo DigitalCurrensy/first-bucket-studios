@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PosFilter } from "@/lib/draft";
@@ -11,6 +10,7 @@ export const GAME_MODES = [
   { id: "classic", label: "Classic", href: "/games/82-0", mode: "82-0" },
   { id: "daily", label: "Daily", href: "/games/daily", mode: "daily" },
   { id: "corners", label: "Corners", href: "/games/corners", mode: "corners" },
+  { id: "wnba", label: "WNBA", href: "/games/wnba", mode: "wnba" },
   { id: "alltime", label: "All-time", href: "/games/goat", mode: "goat" },
   { id: "playoffs", label: "Playoffs", href: "/games/16-0", mode: "16-0" },
 ] as const;
@@ -25,42 +25,27 @@ function formatBest(current: GameMode) {
   const n = bestFrom(runs, item.mode);
   if (item.mode === "goat") return String(n);
   if (item.mode === "16-0") return playoffLine(n);
+  if (item.mode === "wnba") return recordLine(n, 40);
   return recordLine(n);
 }
 
 export function GameBar({ current, onNew }: { current: GameMode; onNew?: () => void }) {
   const mounted = useMounted();
   const best = mounted ? formatBest(current) : null;
+  if (!best && !onNew) return null;
 
   return (
-    <div className="mb-8 flex flex-col gap-3 border-b border-line sm:flex-row sm:items-end sm:justify-between">
-      <div className="flex gap-1 overflow-x-auto">
-        {GAME_MODES.map((item) => (
-          <Link
-            key={item.id}
-            to={item.href}
-            aria-current={item.id === current ? "page" : undefined}
-            className={cn(
-              "min-h-11 shrink-0 px-3 text-sm font-medium transition-colors duration-150",
-              item.id === current ? "border-b-2 border-fg text-fg" : "text-muted hover:text-fg",
-            )}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-3 pb-3">
-        {best && (
-          <p className="text-sm text-muted">
-            Best <span className="font-medium tabular-nums text-fg">{best}</span>
-          </p>
-        )}
-        {onNew && (
-          <Button variant="ghost" onClick={onNew}>
-            New game
-          </Button>
-        )}
-      </div>
+    <div className="mb-8 flex flex-wrap items-center justify-end gap-3 border-b border-line pb-3">
+      {best && (
+        <p className="text-sm text-muted">
+          Best <span className="font-medium tabular-nums text-fg">{best}</span>
+        </p>
+      )}
+      {onNew && (
+        <Button variant="ghost" onClick={onNew}>
+          New game
+        </Button>
+      )}
     </div>
   );
 }

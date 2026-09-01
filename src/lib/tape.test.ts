@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { clubAbbr } from "./nba.ts";
+import { weekDensity } from "./schedule.ts";
 import { buildTape } from "./tape.ts";
 
 test("same date prints the same tape", () => {
@@ -28,4 +30,25 @@ test("a different day is a different print", () => {
     a.map((r) => r.player.id),
     b.map((r) => r.player.id),
   );
+});
+
+test("W40 and W41 differ in ids or order", () => {
+  const a = buildTape("2026-W40");
+  const b = buildTape("2026-W41");
+  assert.equal(a.length, 12);
+  assert.notDeepEqual(
+    a.map((r) => r.player.id),
+    b.map((r) => r.player.id),
+  );
+});
+
+test("UP clubs are at least as dense as FLAT", () => {
+  const week = "2026-W40";
+  const rows = buildTape(week);
+  const dens = Object.fromEntries(weekDensity(week).map((row) => [row.team, row.games]));
+  const avg = (mark: "UP" | "FLAT") => {
+    const games = rows.filter((row) => row.mark === mark).map((row) => dens[clubAbbr(row.player.club)] ?? 0);
+    return games.reduce((n, g) => n + g, 0) / Math.max(1, games.length);
+  };
+  assert.ok(avg("UP") >= avg("FLAT"));
 });

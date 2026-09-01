@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Crest } from "@/components/crest";
 import { DotStrip } from "@/components/dot-strip";
 import { Button } from "@/components/ui/button";
 import type { Night } from "@/lib/sim";
+import { writeLastScrub } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
 
 export function SeasonWalk({
@@ -20,19 +22,29 @@ export function SeasonWalk({
   onDone: () => void;
 }) {
   const [i, setI] = useState(0);
-  const night = nights[Math.min(i, nights.length - 1)];
+  const [ticker, setTicker] = useState(true);
+  const night = nights[Math.min(i, Math.max(0, nights.length - 1))];
   const played = nights.slice(0, Math.min(i + 1, nights.length));
   const wins = played.filter((n) => n.win).length;
   const losses = played.length - wins;
-  const done = i >= nights.length - 1;
+  const done = nights.length === 0 || i >= nights.length - 1;
   const ms = nights.length > 40 ? 40 : 110;
+
+  function go(n: number) {
+    const next = Math.max(0, Math.min(nights.length - 1, n));
+    setI(next);
+    const hit = nights[next];
+    if (hit) writeLastScrub({ n: hit.n, us: hit.us, them: hit.them, opp: hit.opp, home: hit.home, team });
+  }
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || nights.length === 0) {
+    if (reduce) {
       setI(Math.max(0, nights.length - 1));
-      return;
+      const skip = window.setTimeout(onDone, 80);
+      return () => window.clearTimeout(skip);
     }
+    if (!ticker || nights.length === 0) return;
     const id = window.setInterval(() => {
       setI((cur) => {
         if (cur >= nights.length - 1) {
@@ -43,25 +55,43 @@ export function SeasonWalk({
       });
     }, ms);
     return () => window.clearInterval(id);
-  }, [nights, ms]);
+  }, [nights, ms, ticker, onDone]);
+
+  useEffect(() => {
+    if (!ticker) return;
+    if (nights.length === 0 || i < nights.length - 1) return;
+    const id = window.setTimeout(onDone, 700);
+    return () => window.clearTimeout(id);
+  }, [i, nights.length, ticker, onDone]);
 
   if (!night) return null;
 
   return (
     <section>
       <p className="mb-3 text-micro font-medium uppercase tracking-label text-subtle">
-        {night.round ?? "The season"} · Game {night.n} / {of}
+        {night.round ?? "The season"} · Night {night.n} / {of}
         {night.b2b ? " · B2B" : ""}
         {night.sit ? " · Sit" : ""}
       </p>
       <div className="overflow-hidden rounded-xl bg-fg p-4 text-paper sm:p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <Crest name={team} className="size-10 text-paper" />
+          <div className="min-w-0">
+            <p className="font-display text-xl font-semibold leading-tight">{team}</p>
+            <p className="text-micro font-medium uppercase tracking-label text-paper/55">
+              Night {night.n} · {night.home ? "Home" : "Away"}
+              {night.b2b ? " · B2B" : ""}
+              {night.sit ? " · Sit" : ""}
+            </p>
+          </div>
+        </div>
         <div className="flex items-center justify-between gap-4 font-display text-2xl font-semibold tabular-nums sm:text-3xl">
           <span>
             {us}
             <span className="ml-2">{night.us}</span>
           </span>
           <span className="font-sans text-xs font-medium uppercase tracking-label text-paper/60">
-            {night.home ? "HOME" : "AWAY"} · {night.win ? "W" : "L"}
+            {night.win ? "W" : "L"}
           </span>
           <span>
             <span className="mr-2">{night.them}</span>
@@ -73,27 +103,52 @@ export function SeasonWalk({
         {wins}–{losses}
       </p>
       <p className="mt-2 text-sm text-muted">
-        {team}. Projected {projected}. The nights wander.
+        {team}. Projected {projected}. One night at a time.
       </p>
-      <DotStrip nights={played} tone="ink" className="mt-6 max-w-xl" />
+      <DotStrip nights={nights} tone="ink" className="mt-6 max-w-xl" active={i} onPick={go} />
+      <ol className="mt-4 flex flex-wrap gap-1">
+        {nights.slice(Math.max(0, i - 7), i + 1).map((n, idx) => {
+          const abs = Math.max(0, i - 7) + idx;
+          return (
+            <li key={n.n}>
+              <button
+                type="button"
+                onClick={() => go(abs)}
+                className={cn(
+                  "min-h-11 rounded-lg px-2 py-1 text-left shadow-border",
+                  abs === i ? "bg-fg text-paper shadow-none" : "bg-paper",
+                )}
+              >
+                <span className="block font-mono text-micro tabular-nums text-subtle">N{n.n}</span>
+                <span className="font-display text-sm font-semibold tabular-nums">
+                  {n.us}–{n.them}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
       <div className="mt-6 flex flex-wrap gap-2">
-        <Button onClick={onDone} disabled={!done && nights.length > 0}>
-          {done ? "The card" : "Walking…"}
+        <Button variant="ghost" onClick={() => go(i - 1)} disabled={i === 0}>
+          Prev
         </Button>
+        <Button variant="ghost" onClick={() => go(i + 1)} disabled={done}>
+          Next
+        </Button>
+        <Button onClick={onDone}>{done ? "The card" : "Skip to recap"}</Button>
         {!done && (
           <Button
             variant="ghost"
             onClick={() => {
-              setI(nights.length - 1);
+              setTicker((on) => !on);
             }}
           >
-            Skip to recap
+            {ticker ? "Stop ticker" : "Play the ticker"}
           </Button>
         )}
       </div>
       <p className={cn("mt-8 max-w-xl text-sm text-subtle")}>
-        Seeded walk. Not a sportsbook. Not a broadcast. The Gym scorebug, attached to a season that lives on this
-        device.
+        Same walk. Scrub the dots. Skip is still honest.
       </p>
     </section>
   );

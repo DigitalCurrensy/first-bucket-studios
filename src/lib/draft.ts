@@ -1,4 +1,4 @@
-import type { Pos } from "./nba.ts";
+import { dealCornersPack, dealFrom, type Player, type Pos } from "./nba.ts";
 
 export type PosFilter = "ALL" | Pos;
 
@@ -14,3 +14,5 @@ export function filterPack<T extends { name: string; pos: string }>(
     return p.name.toLowerCase().includes(q);
   });
 }
+
+export { dealCornersPack, dealFrom };

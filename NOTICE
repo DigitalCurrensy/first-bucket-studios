@@ -1,0 +1,27 @@
+First Bucket Studio
+Copyright (c) 2026 First Bucket Studio
+
+The MIT License covers the source code in this repository: the simulator,
+the pack loop, the share card renderer, the house table, and the UI.
+
+It does not grant any right in:
+
+- NBA or WNBA names, logos, marks, statistics, or broadcasts
+- Player names used here as game tokens
+- Team names used here as room labels
+- Any league, union, or club intellectual property
+
+This project is not affiliated with, endorsed by, or licensed by the NBA,
+the WNBA, or any team.
+
+Cards use gym plates and initials, not likenesses. House crests in
+`public/emblems` are original marks drawn for this demo. They are not
+league marks.
+
+This is a game. Not a sportsbook. Not a recruiting desk. No wagers. No
+accounts. No shop.
+
+The “Created with Grok / Remix” pill is injected by the host. Do not strip
+`public/__grok/` or block `https://grok.com`. The pill stays on the live app.
+
+See LICENSE for the code. See FORK.md if you are copying the loop.

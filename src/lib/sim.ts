@@ -1,8 +1,9 @@
 import { luckShift } from "./luck.ts";
-import { clubAbbr, hashSeed, mulberry32, playoffWins, projectWins, type Player } from "./nba.ts";
+import { clubAbbr, rngFrom, playoffWins, projectWins, WNBA_FRANCHISES, type Player } from "./nba.ts";
 import { seasonSkeleton, sitSet } from "./schedule.ts";
 
 export const PLAYOFF_ROUNDS = ["First round", "Second round", "Conference finals", "Finals"] as const;
+export const WNBA_NIGHTS = 40;
 
 export type Night = {
   n: number;
@@ -37,14 +38,22 @@ function seedKey(roster: Player[]) {
   return [...roster.map((r) => r.id)].sort().join(",");
 }
 
-export function seasonWalk(team: string, era: string, roster: Player[], luck = "Even") {
-  const projected = projectWins(roster, era);
+function walkNights(
+  team: string,
+  era: string,
+  roster: Player[],
+  luck: string,
+  of: number,
+  clubs?: readonly string[],
+  tag = "season",
+) {
+  const projected = projectWins(roster, era, of);
   const key = seedKey(roster);
-  const rng = mulberry32(hashSeed(`season:${team}:${era}:${luck}:${key}`));
-  const slots = seasonSkeleton(team, era);
-  const sits = sitSet(team, era, luck, key);
+  const rng = rngFrom(`${tag}:${team}:${era}:${luck}:${key}`);
+  const slots = seasonSkeleton(team, era, of, clubs);
+  const sits = sitSet(team, era, luck, key, of);
   const us = clubAbbr(team);
-  const base = projected / 82 + luckShift(luck);
+  const base = projected / of + luckShift(luck);
   const nights: Night[] = [];
   let wins = 0;
   let run = 0;
@@ -70,7 +79,16 @@ export function seasonWalk(team: string, era: string, roster: Player[], luck = "
       sit,
     });
   }
-  return { projected, p: base, nights, wins, us };
+  return { projected, p: base, nights, wins, us, of };
+}
+
+export function seasonWalk(team: string, era: string, roster: Player[], luck = "Even") {
+  return walkNights(team, era, roster, luck, 82, undefined, "season");
+}
+
+/** Forty nights. Honest WNBA length. Not an 82 in a different jersey. */
+export function wnbaWalk(team: string, era: string, roster: Player[], luck = "Even") {
+  return walkNights(team, era, roster, luck, WNBA_NIGHTS, WNBA_FRANCHISES, "wnba");
 }
 
 function seriesHome(gameInSeries: number) {
@@ -78,10 +96,10 @@ function seriesHome(gameInSeries: number) {
 }
 
 export function playoffWalk(team: string, era: string, roster: Player[], luck = "Even") {
-  const projected = playoffWins(roster);
+  const projected = playoffWins(roster, era);
   const key = seedKey(roster);
   const p = Math.max(0.2, Math.min(0.8, 0.28 + projected * 0.03 + luckShift(luck)));
-  const rng = mulberry32(hashSeed(`playoff:${team}:${era}:${luck}:${key}`));
+  const rng = rngFrom(`playoff:${team}:${era}:${luck}:${key}`);
   const us = clubAbbr(team);
   const bag = seasonSkeleton(team, era).map((s) => s.opp);
   const nights: Night[] = [];
@@ -113,5 +131,5 @@ export function playoffWalk(team: string, era: string, roster: Player[], luck = 
     rounds.push({ round, taken, wins: w, losses: l });
     if (!taken) break;
   }
-  return { projected, p, nights, wins: total, rounds, us };
+  return { projected, p, nights, wins: total, rounds, us, of: 16 };
 }

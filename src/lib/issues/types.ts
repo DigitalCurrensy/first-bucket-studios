@@ -1,7 +1,7 @@
 export type IssueNote = { name: string; note: string };
 
 export type Issue = {
-  id: "001" | "002" | "003";
+  id: string;
   week: string;
   date: string;
   kicker: string;

@@ -1,13 +1,17 @@
-import { houseWalk } from "./walk.ts";
-import { issueFor, type Issue } from "./issues/index.ts";
+import { houseWalk, houseWalkWnba } from "./walk.ts";
+import { issueById, issueFor, type Issue } from "./issues/index.ts";
 import { todayKey, weekKey } from "./studio-save.ts";
 import { recordLine } from "./nba.ts";
 import { hateOf, loveOf, weekRows, type WeekRow } from "./week.ts";
+
+export type BriefLeague = "nba" | "wnba";
 
 export type BriefView = Issue & {
   start: WeekRow[];
   sit: WeekRow[];
   stream: WeekRow[];
+  live: boolean;
+  league: BriefLeague;
   house: {
     id: string;
     line: string;
@@ -15,35 +19,47 @@ export type BriefView = Issue & {
     era: string;
     wins: number;
     names: string[];
+    ids: string[];
   };
 };
 
-export function buildBrief(week = weekKey(), date = todayKey()): BriefView {
-  const issue = issueFor(week);
+export function buildBrief(
+  week = weekKey(),
+  date = todayKey(),
+  issueId?: string,
+  league: BriefLeague = "nba",
+): BriefView {
+  const liveIssue = issueFor(week);
+  const issue = issueId ? issueById(issueId) : liveIssue;
+  const live = issue.id === liveIssue.id && issue.week === liveIssue.week;
   const rows = weekRows(week);
-  const house = houseWalk(date);
+  const house = league === "wnba" ? houseWalkWnba(date) : houseWalk(date);
+  const of = league === "wnba" ? 40 : 82;
   return {
     ...issue,
-    love: issue.love.length ? issue.love : loveOf(week),
-    hate: issue.hate.length ? issue.hate : hateOf(week),
+    live,
+    league,
+    love: live ? loveOf(week) : issue.love,
+    hate: live ? hateOf(week) : issue.hate,
     start: rows.filter((r) => r.call === "START").slice(0, 3),
     sit: rows.filter((r) => r.call === "SIT").slice(0, 3),
     stream: rows.filter((r) => r.call === "STREAM").slice(0, 3),
     house: {
       id: house.id,
-      line: `${house.room.team} ${recordLine(house.walk.wins)} · ${house.room.era} · ${house.room.luck}`,
+      line: `${house.room.team} ${recordLine(house.walk.wins, of)} · ${house.room.era} · ${house.room.luck}`,
       team: house.room.team,
       era: house.room.era,
       wins: house.walk.wins,
       names: house.five.map((p) => p.name),
+      ids: house.five.map((p) => p.id),
     },
   };
 }
 
 export const BRIEF = buildBrief("2026-W35", "2026-08-29");
 
-export function briefText(week = weekKey(), date = todayKey()) {
-  const brief = buildBrief(week, date);
+export function briefText(week = weekKey(), date = todayKey(), issueId?: string, league: BriefLeague = "nba") {
+  const brief = buildBrief(week, date, issueId, league);
   const lines = [
     `${brief.kicker}`,
     brief.title,

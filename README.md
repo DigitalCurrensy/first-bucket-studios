@@ -1,40 +1,112 @@
 # First Bucket Studio
 
-Games + basketball tools. A Digital Currensy house.
+**Rip a pack. Five names. Eighty-two nights. Send the card.**
 
-Editorial. Not a sportsbook. Not a recruiting desk. Not THE HUB, Proseasons, Sideline Stack, Brandular, or NIL MIXTAPE.
+A browser basketball pack. Not a shop. Not a sportsbook. Not the NBA.
 
-Saves live on this device. Export a studio file. No account.
+[MIT](LICENSE). Forks on. [How to copy the loop →](FORK.md)
 
-## What ships
+> Play the live build, then paste the URL at the top of this file before you flip the repo public.
 
-**Play**
-- Build an 82-0 — spin a franchise, draft five, walk 82 nights. The card is a URL.
-- Daily Bucket — the date pulls the room. Same five for the house.
-- Four corners — start G/G/F/F/C. Then the season walks.
-- GOAT Five — five names from the book. Score the circle.
-- Build a 16-0 — four series, 2-2-1-1-1. Lose one, the run is over.
+---
 
-**Tape**
-- The Tape — UP / FLAT / DOWN. The week is the print.
-- Brief Desk — weekly issue plus the house walk. No signup.
-- The Slate — this week’s board. Start / sit / stream.
+## How to play
 
-**Cards**
-- Card Shop — locked posters. Save the PNG. Export the studio.
-- The Wall — walks on this device. Share the URL.
-- The Gym — scorebug and lower-third. Export the PNG.
+About ninety seconds.
 
-**Desk** (linked, not featured)
-- Market Board — density, not a total. Six counting cats.
-- Trade Desk — grade the deal. Keepers warn.
-- Mock Lab — four-seat snake. Current book. Need-first rooms.
-- Keeper Desk — Keep / Trade / Cut.
+**1. Rip the pack.** A franchise, an era, and a luck lane land. No two pulls match.
+
+![Home](docs/stills/01-home.jpg)
+
+**2. Tear the foil.** Ten cards, face down.
+
+![Foil](docs/stills/02-foil.jpg)
+
+**3. Lock five.** The season walks. The number on the card is that walk.
+
+![The card](docs/stills/03-result.jpg)
+
+**4. Send the card.** Save the PNG. Copy the walk. The URL is the certificate.
+
+![Send](docs/stills/04-tray.jpg)
+
+Tape of one pull: [docs/tape/demo.mp4](docs/tape/demo.mp4)
+
+### The buttons, in order
+
+| You click | What it does |
+| --- | --- |
+| **Rip the pack** | Deals a new room. New ten. |
+| **Lock five** | Walks 82 nights from those names. |
+| **Send the card** | Opens the tray. |
+| **Save the card** | Downloads `first-bucket-{team}-{wins}.png`. |
+| **Copy the walk** | Copies `/walk/v1.…` — paste it anywhere. |
+| **Open the walk** | Same five, same nights, forever. |
+
+There is no “copy image.” The file is the card. The URL is the walk.
+
+### House job (optional)
+
+Thunder · Positionless · Even is pinned as a known certificate:
+
+```
+/walk/v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga
+```
+
+51–31. Playoff lock. Same five every time. It hangs on [The Wall](/wall). The main pack is live.
+
+---
+
+## What this is
+
+A single loop you can fork.
+
+- **Live packs** shuffle (Fisher–Yates + mulberry32). New franchise, new ten, new walk.
+- **House pack** is a table, not a shuffle. [`src/lib/house-pack.ts`](src/lib/house-pack.ts).
+- Nights recompute from ids. The walk URL is the certificate, not a replay file.
+- Saves live on this device. Export a studio file if you want the desk to travel.
+
+## What this is not
+
+| It is not | Why |
+| --- | --- |
+| A company | No shop. No raise. No accounts. |
+| An NBA product | [NOTICE](NOTICE). MIT is the code, not the names. |
+| A sportsbook | Games and tools only. |
+| A sports-card marketplace | One pack. One PNG. One URL. |
+
+## Run it
+
+```bash
+npm install
+npm run dev
+```
+
+Node 22. Auth off. Database unused.
+
+```bash
+npm run typecheck
+node --experimental-strip-types --test src/lib/house-pack.test.ts src/lib/nba.test.ts src/lib/walk.test.ts
+```
+
+The house pin must stay green:
+
+```
+v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga
+```
 
 ## Stack
 
-TanStack Start, React 19, Tailwind. Auth and database are off. Demo mode.
+TanStack Start · React 19 · Tailwind v4. Foil is a small WebGL layer. Share is the Web Share API with a file tray fallback.
+
+## Legal
+
+Read [NOTICE](NOTICE) before you ship a fork with names on it.
+
+Plates, initials, and house crests are mitigations. They are not a license.
+
+Built with Grok. Leave `public/__grok/` in place.
 
 ## License
 
-Private. All rights reserved. Digital Currensy Inc.
+[MIT](LICENSE). Invite the rip — [FORK.md](FORK.md).

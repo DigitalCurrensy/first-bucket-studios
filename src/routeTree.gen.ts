@@ -17,7 +17,7 @@ import { Route as ChangelogRouteImport } from './routes/changelog'
 import { Route as FantasyRouteImport } from './routes/fantasy'
 import { Route as GymRouteImport } from './routes/gym'
 import { Route as KeepersRouteImport } from './routes/keepers'
-import { Route as MockRouteImport } from './routes/mock'
+import { Route as ScoreRouteImport } from './routes/score'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SlateRouteImport } from './routes/slate'
 import { Route as TapeRouteImport } from './routes/tape'
@@ -28,6 +28,7 @@ import { Route as Games820RouteImport } from './routes/games.82-0'
 import { Route as GamesCornersRouteImport } from './routes/games.corners'
 import { Route as GamesDailyRouteImport } from './routes/games.daily'
 import { Route as GamesGoatRouteImport } from './routes/games.goat'
+import { Route as GamesWnbaRouteImport } from './routes/games.wnba'
 import { Route as WalkIdRouteImport } from './routes/walk.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -70,9 +71,9 @@ const KeepersRoute = KeepersRouteImport.update({
   path: '/keepers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MockRoute = MockRouteImport.update({
-  id: '/mock',
-  path: '/mock',
+const ScoreRoute = ScoreRouteImport.update({
+  id: '/score',
+  path: '/score',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopRoute = ShopRouteImport.update({
@@ -125,6 +126,11 @@ const GamesGoatRoute = GamesGoatRouteImport.update({
   path: '/games/goat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesWnbaRoute = GamesWnbaRouteImport.update({
+  id: '/games/wnba',
+  path: '/games/wnba',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WalkIdRoute = WalkIdRouteImport.update({
   id: '/walk/$id',
   path: '/walk/$id',
@@ -140,7 +146,7 @@ export interface FileRoutesByFullPath {
   '/fantasy': typeof FantasyRoute
   '/gym': typeof GymRoute
   '/keepers': typeof KeepersRoute
-  '/mock': typeof MockRoute
+  '/score': typeof ScoreRoute
   '/shop': typeof ShopRoute
   '/slate': typeof SlateRoute
   '/tape': typeof TapeRoute
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/games/corners': typeof GamesCornersRoute
   '/games/daily': typeof GamesDailyRoute
   '/games/goat': typeof GamesGoatRoute
+  '/games/wnba': typeof GamesWnbaRoute
   '/walk/$id': typeof WalkIdRoute
 }
 export interface FileRoutesByTo {
@@ -162,7 +169,7 @@ export interface FileRoutesByTo {
   '/fantasy': typeof FantasyRoute
   '/gym': typeof GymRoute
   '/keepers': typeof KeepersRoute
-  '/mock': typeof MockRoute
+  '/score': typeof ScoreRoute
   '/shop': typeof ShopRoute
   '/slate': typeof SlateRoute
   '/tape': typeof TapeRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/games/corners': typeof GamesCornersRoute
   '/games/daily': typeof GamesDailyRoute
   '/games/goat': typeof GamesGoatRoute
+  '/games/wnba': typeof GamesWnbaRoute
   '/walk/$id': typeof WalkIdRoute
 }
 export interface FileRoutesById {
@@ -185,7 +193,7 @@ export interface FileRoutesById {
   '/fantasy': typeof FantasyRoute
   '/gym': typeof GymRoute
   '/keepers': typeof KeepersRoute
-  '/mock': typeof MockRoute
+  '/score': typeof ScoreRoute
   '/shop': typeof ShopRoute
   '/slate': typeof SlateRoute
   '/tape': typeof TapeRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/games/corners': typeof GamesCornersRoute
   '/games/daily': typeof GamesDailyRoute
   '/games/goat': typeof GamesGoatRoute
+  '/games/wnba': typeof GamesWnbaRoute
   '/walk/$id': typeof WalkIdRoute
 }
 export interface FileRouteTypes {
@@ -209,7 +218,7 @@ export interface FileRouteTypes {
     | '/fantasy'
     | '/gym'
     | '/keepers'
-    | '/mock'
+    | '/score'
     | '/shop'
     | '/slate'
     | '/tape'
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/games/corners'
     | '/games/daily'
     | '/games/goat'
+    | '/games/wnba'
     | '/walk/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -231,7 +241,7 @@ export interface FileRouteTypes {
     | '/fantasy'
     | '/gym'
     | '/keepers'
-    | '/mock'
+    | '/score'
     | '/shop'
     | '/slate'
     | '/tape'
@@ -242,6 +252,7 @@ export interface FileRouteTypes {
     | '/games/corners'
     | '/games/daily'
     | '/games/goat'
+    | '/games/wnba'
     | '/walk/$id'
   id:
     | '__root__'
@@ -253,7 +264,7 @@ export interface FileRouteTypes {
     | '/fantasy'
     | '/gym'
     | '/keepers'
-    | '/mock'
+    | '/score'
     | '/shop'
     | '/slate'
     | '/tape'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/games/corners'
     | '/games/daily'
     | '/games/goat'
+    | '/games/wnba'
     | '/walk/$id'
   fileRoutesById: FileRoutesById
 }
@@ -276,7 +288,7 @@ export interface RootRouteChildren {
   FantasyRoute: typeof FantasyRoute
   GymRoute: typeof GymRoute
   KeepersRoute: typeof KeepersRoute
-  MockRoute: typeof MockRoute
+  ScoreRoute: typeof ScoreRoute
   ShopRoute: typeof ShopRoute
   SlateRoute: typeof SlateRoute
   TapeRoute: typeof TapeRoute
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   GamesCornersRoute: typeof GamesCornersRoute
   GamesDailyRoute: typeof GamesDailyRoute
   GamesGoatRoute: typeof GamesGoatRoute
+  GamesWnbaRoute: typeof GamesWnbaRoute
   WalkIdRoute: typeof WalkIdRoute
 }
 
@@ -348,11 +361,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KeepersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/mock': {
-      id: '/mock'
-      path: '/mock'
-      fullPath: '/mock'
-      preLoaderRoute: typeof MockRouteImport
+    '/score': {
+      id: '/score'
+      path: '/score'
+      fullPath: '/score'
+      preLoaderRoute: typeof ScoreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop': {
@@ -425,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GamesGoatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/wnba': {
+      id: '/games/wnba'
+      path: '/games/wnba'
+      fullPath: '/games/wnba'
+      preLoaderRoute: typeof GamesWnbaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/walk/$id': {
       id: '/walk/$id'
       path: '/walk/$id'
@@ -444,7 +464,7 @@ const rootRouteChildren: RootRouteChildren = {
   FantasyRoute: FantasyRoute,
   GymRoute: GymRoute,
   KeepersRoute: KeepersRoute,
-  MockRoute: MockRoute,
+  ScoreRoute: ScoreRoute,
   ShopRoute: ShopRoute,
   SlateRoute: SlateRoute,
   TapeRoute: TapeRoute,
@@ -455,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamesCornersRoute: GamesCornersRoute,
   GamesDailyRoute: GamesDailyRoute,
   GamesGoatRoute: GamesGoatRoute,
+  GamesWnbaRoute: GamesWnbaRoute,
   WalkIdRoute: WalkIdRoute,
 }
 export const routeTree = rootRouteImport

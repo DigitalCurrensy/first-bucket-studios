@@ -1,4 +1,4 @@
-import { currentBook, dealFrom, hashSeed, mulberry32, PLAYERS_BY_ID, type Player } from "./nba.ts";
+import { currentBook, dealFrom, rngFrom, PLAYERS_BY_ID, type Player } from "./nba.ts";
 import { weekDensity } from "./schedule.ts";
 import { weekKey } from "./studio-save.ts";
 
@@ -49,7 +49,7 @@ function whyFor(player: Player, call: Call, games: number, b2b: boolean, home: n
 
 export function weekRows(week = weekKey()): WeekRow[] {
   const dens = densityFor(week);
-  const rng = mulberry32(hashSeed(`weekrows:${week}`));
+  const rng = rngFrom(`weekrows:${week}`);
   const locked = [...LOCK_START, ...LOCK_SIT, ...LOCK_STREAM, ...LOCK_CUT]
     .map((id) => PLAYERS_BY_ID[id])
     .filter((p): p is Player => Boolean(p));
