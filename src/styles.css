@@ -579,6 +579,11 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+.share-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
 
 .studio-grain,
 .studio-mesh { pointer-events: none; position: fixed; inset: 0; z-index: 0; }
@@ -674,8 +679,10 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
 }
 .glass-sheet {
   isolation: isolate;
-  background: color-mix(in oklab, var(--color-paper) 64%, transparent);
+  background: color-mix(in oklab, var(--color-paper) 58%, transparent);
   box-shadow: 0 24px 60px color-mix(in oklab, var(--color-night) 45%, transparent), inset 0 1px 0 color-mix(in oklab, var(--color-fg) 18%, transparent);
+  backdrop-filter: saturate(1.55) blur(28px);
+  -webkit-backdrop-filter: saturate(1.55) blur(28px);
   animation: sheet-up 420ms var(--ease-studio) both;
 }
 .glass-scrim {
@@ -745,4 +752,7 @@ html[data-theme="light"] .v-tertiary { mix-blend-mode: plus-darker; }
   .rip-pack-body, .rip-pack:hover .rip-pack-body { transform: none; }
   .tray-actions { grid-template-columns: 1fr 1fr; }
   .step-rail { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 40rem) {
+  .share-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }

@@ -3,7 +3,6 @@ import { PageIntro } from "@/components/page-intro";
 import { LithographLoader } from "@/components/lithograph-loader";
 import { WalkCard } from "@/components/walk-card";
 import { useMounted } from "@/lib/hooks";
-import { HOUSE_WALK_ID } from "@/lib/house-pack";
 import { loadSave } from "@/lib/studio-save";
 
 export const Route = createFileRoute("/wall")({ component: WallPage });
@@ -13,7 +12,7 @@ function WallPage() {
   const save = mounted ? loadSave() : null;
   const local = Array.from(
     new Set([
-      HOUSE_WALK_ID,
+      ...(save?.pins ?? []),
       ...(save?.walks ?? []),
       ...((save?.runs.map((r) => r.walk).filter(Boolean) as string[]) ?? []),
     ]),
@@ -23,13 +22,15 @@ function WallPage() {
     <div>
       <PageIntro
         kicker="The Wall"
-        title="The house card hangs here."
-        lead="Thunder. 51–31. Walks you send sit under it."
+        title="Walks you send hang here."
+        lead="Pin one to keep it on the rail. Nothing is pinned until you pin it."
         mark="wall"
       />
 
       {!mounted ? (
         <LithographLoader label="The wall is on press." />
+      ) : local.length === 0 ? (
+        <p className="max-w-md text-muted">Rip a pack. Send a card. It lands here.</p>
       ) : (
         <ul className="grid gap-6 sm:grid-cols-2">
           {local.slice(0, 48).map((id) => (

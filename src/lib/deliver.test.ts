@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { asShareFile, canUseSavePicker, facebookIntent, shareAttempts, shareSheetOk, threadsIntent, tweetIntent } from "./deliver.ts";
+import { asShareFile, canUseSavePicker, discordCopy, facebookIntent, redditIntent, shareAttempts, shareSheetOk, threadsIntent, tweetIntent } from "./deliver.ts";
 
 test("share attempts send the file, never files plus url, never text as the card", () => {
   const file = new File(["png"], "first-bucket-thunder-58.png", { type: "image/png" });
@@ -51,9 +51,27 @@ test("tweet intent carries text and an https walk, never a relative path", () =>
   assert.equal(relative.includes("url="), false);
 });
 
-test("threads and facebook intents need a public walk", () => {
+test("threads, facebook, and reddit intents need a public walk", () => {
   const walk = "https://first-bucket-studios.vercel.app/walk/v1.OKC";
   assert.match(threadsIntent("51–31 Thunder · First Bucket Studio", walk), /threads\.net\/intent\/post/);
   assert.match(facebookIntent(walk), /facebook\.com\/sharer/);
+  assert.match(redditIntent(walk, "51–31 Thunder"), /reddit\.com\/submit/);
   assert.equal(facebookIntent("/walk/v1.OKC").includes("u="), false);
+});
+
+test("share attempts add a link pass for apps that cannot take files", () => {
+  const file = new File(["png"], "first-bucket-thunder-51.png", { type: "image/png" });
+  const url = "https://first-bucket-studios.vercel.app/walk/v1.OKC";
+  const attempts = shareAttempts(file, "51–31 Thunder · First Bucket Studio", url);
+  assert.equal(attempts.length, 3);
+  assert.equal(attempts[0]?.url, undefined);
+  assert.equal(attempts[1]?.url, undefined);
+  assert.equal(attempts[2]?.files, undefined);
+  assert.equal(attempts[2]?.url, url);
+});
+
+test("discord copy is caption plus the public walk", () => {
+  const text = discordCopy("51–31 Thunder · First Bucket Studio", "https://first-bucket-studios.vercel.app/walk/v1.OKC");
+  assert.match(text, /Thunder/);
+  assert.match(text, /first-bucket-studios\.vercel\.app\/walk/);
 });

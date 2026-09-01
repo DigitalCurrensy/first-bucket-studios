@@ -135,7 +135,7 @@ export function SeasonWalk({
         <Button variant="ghost" onClick={() => go(i + 1)} disabled={done}>
           Next
         </Button>
-        <Button onClick={onDone}>{done ? "The card" : "Skip to recap"}</Button>
+        <Button onClick={onDone}>{done ? "The card" : "Skip to the card"}</Button>
         {!done && (
           <Button
             variant="ghost"
@@ -143,13 +143,10 @@ export function SeasonWalk({
               setTicker((on) => !on);
             }}
           >
-            {ticker ? "Stop ticker" : "Play the ticker"}
+            {ticker ? "Pause" : "Play"}
           </Button>
         )}
       </div>
-      <p className={cn("mt-8 max-w-xl text-sm text-subtle")}>
-        Same walk. Scrub the dots. Skip is still honest.
-      </p>
     </section>
   );
 }

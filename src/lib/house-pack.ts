@@ -28,7 +28,7 @@ export const HOUSE_TEN_IDS = [
 /** The marked five. The live room always walks these names. */
 export const HOUSE_FIVE_IDS = ["sga", "jalenw", "chet", "dort", "hartenstein"] as const;
 
-/** Locked certificate. The Wall hangs this even before anyone rips. */
+/** Locked walk. Optional demo via ?pack=house — never auto-pinned. */
 export const HOUSE_WALK_ID = encodeWalk({
   team: HOUSE_PACK.team,
   era: HOUSE_PACK.era,

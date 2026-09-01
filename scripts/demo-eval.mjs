@@ -91,8 +91,11 @@ try {
     if ((await card.getAttribute("aria-pressed")) !== "true") await card.click();
   }
   await page.getByRole("button", { name: "Lock five" }).click();
+  const skip = page.getByRole("button", { name: /Skip to the card|The card/ });
+  if (await skip.first().isVisible().catch(() => false)) await skip.first().click();
   await page.getByRole("link", { name: "Save the card" }).waitFor();
-  await page.getByRole("link", { name: "Post to X" }).waitFor();
+  await page.getByRole("button", { name: "Share" }).waitFor();
+  await page.getByRole("button", { name: "Pin this walk" }).waitFor();
   await flushBeats();
   const walk = (await page.locator("text=/\\/walk\\/v1\\./").first().textContent()) ?? "";
   const id = walk.replace(/^[\s\S]*\/walk\//, "").trim();
@@ -103,12 +106,14 @@ try {
   const href = await save.getAttribute("href");
   if (!href?.startsWith("data:image/png")) throw new Error(`save is not a png data url: ${href?.slice(0, 40)}`);
   if (!(await save.getAttribute("download"))?.endsWith(".png")) throw new Error("save has no png download name");
-  const post = page.getByRole("link", { name: "Post to X" });
-  const tweet = await post.getAttribute("href");
-  if (!tweet?.includes("x.com/intent/tweet")) throw new Error(`post to x is not an intent: ${tweet}`);
-  await page.getByRole("button", { name: "More ways to send" }).click();
+  await page.getByRole("button", { name: "Share" }).click();
   await page.getByRole("link", { name: "Save the card" }).nth(1).waitFor();
-  await page.getByRole("button", { name: "Copy the walk" }).click();
+  await page.getByRole("link", { name: "X" }).waitFor();
+  await page.getByRole("link", { name: "Reddit" }).waitFor();
+  await page.getByRole("button", { name: "TikTok" }).waitFor();
+  await page.getByRole("button", { name: "Snapchat" }).waitFor();
+  await page.getByRole("button", { name: "Discord" }).waitFor();
+  await page.getByRole("button", { name: "Copy walk" }).click();
   await page.waitForTimeout(250);
   const demo = await flushBeats();
   const funnel = demo?.funnel;

@@ -9,20 +9,16 @@ export function ExportStudioButton({
   variant?: "primary" | "ghost";
   loud?: boolean;
 }) {
-  const [note, setNote] = useState("");
   const tone = loud ? "primary" : variant;
   return (
-    <>
-      <Button
-        variant={tone === "ghost" ? "ghost" : "primary"}
-        onClick={() => {
-          downloadStudioFile();
-          setNote("Studio file saved.");
-        }}
-      >
-        {note || (loud ? "Export the file" : "Export studio")}
-      </Button>
-    </>
+    <Button
+      variant={tone === "ghost" ? "ghost" : "primary"}
+      onClick={() => {
+        downloadStudioFile();
+      }}
+    >
+      {loud ? "Export the desk" : "Export desk"}
+    </Button>
   );
 }
 
@@ -48,7 +44,7 @@ export function ImportStudioButton({ onLoaded }: { onLoaded?: () => void }) {
   return (
     <>
       <Button variant="ghost" onClick={() => fileRef.current?.click()}>
-        {note || "Import studio"}
+        {note || "Load desk"}
       </Button>
       <input
         ref={fileRef}
@@ -63,10 +59,10 @@ export function ImportStudioButton({ onLoaded }: { onLoaded?: () => void }) {
           void file.text().then((text) => {
             try {
               importStudio(text);
-              setNote("Studio file loaded.");
+              setNote("Desk loaded.");
               onLoaded?.();
             } catch {
-              setNote("Not a studio file.");
+              setNote("Not a desk file.");
             }
           });
         }}

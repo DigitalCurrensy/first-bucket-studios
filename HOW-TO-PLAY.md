@@ -10,7 +10,7 @@ Live booth: [first-bucket-studios.vercel.app](https://first-bucket-studios.verce
 1. **Rip the pack.** A franchise, an era, and a luck lane land. New every time.
 2. **Tear the foil.** Ten cards flip. Tap five.
 3. **Lock five.** Eighty-two nights walk from those names. The number on the card is that walk.
-4. **Send the card.** Save the PNG. Post to X. Copy the walk. The URL is the certificate.
+4. **Send the card.** Save the PNG. Share it. Pin it if you want it on the rail. The URL is the walk.
 
 ![Home](docs/stills/01-home.jpg)
 
@@ -30,9 +30,11 @@ One pull on tape: [docs/tape/demo.mp4](docs/tape/demo.mp4)
 | **Rip pack** / tap the foil | Tears it. The ten turn. |
 | **Lock five** | Walks 82 nights. |
 | **Save the card** | Downloads `first-bucket-{team}-{wins}.png`. |
-| **Post to X** | Opens X with the walk. Attach the PNG if you want the plate in the post. |
-| **Threads / Facebook** | In **More ways to send**. Same walk URL. |
-| **More ways to send** | Opens the tray: story frame, native share, copy. |
+| **Share** | Phone: the system share sheet (Messages, TikTok, Snapchat, Discord). Desktop: the tray. |
+| **Pin this walk** | Keeps it on the rail. Unpin anytime. Nothing is pinned until you pin it. |
+| **X / Threads / Reddit / Facebook** | Open those apps with the walk. |
+| **TikTok / Snapchat** | Saves a 9:16 plate. Open the app and post it. |
+| **Discord** | Copies the walk for paste. |
 | **Copy the walk** | Copies the public walk URL so you can paste it. |
 | **Open the walk** | Same five, same nights, forever. |
 
@@ -42,13 +44,13 @@ Save needs a top-level tab. Inside a preview iframe the host may swallow the dow
 
 ## House job (optional)
 
-Thunder · Positionless · Even is pinned so one walk never moves:
+Thunder 51–31 is a staged demo (`?pack=house`). It is not pinned on anyone’s rail. Same five every time, for people who want one walk that never moves:
 
 ```
 /walk/v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga
 ```
 
-51–31. Playoff lock. Same five every time. It hangs on The Wall. The door is the live pack.
+The door is still the live pack.
 
 ## What you are sending
 

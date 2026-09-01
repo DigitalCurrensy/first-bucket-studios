@@ -8,10 +8,10 @@ const BEATS = {
     { n: "04", title: "Send", body: "The card leaves. The walk hangs." },
   ],
   machine: [
-    { n: "01", title: "Pull", body: "Franchise, era, luck. One pull sets the room." },
-    { n: "02", title: "Rip", body: "Tear the foil. Ten carbon backs. Turn five. Lock the five." },
-    { n: "03", title: "Walk", body: "82 nights. Same five, same walk." },
-    { n: "04", title: "Send", body: "The serial is the plate. The URL is the certificate." },
+    { n: "01", title: "Rip", body: "A franchise lands. New pack every time." },
+    { n: "02", title: "Tear", body: "Ten plates. Pick five." },
+    { n: "03", title: "Walk", body: "Eighty-two nights from those names." },
+    { n: "04", title: "Send", body: "Save the plate. Share the walk." },
   ],
   daily: [
     { n: "01", title: "Same pack", body: "The date pulls the room. Everyone that day." },

@@ -4,7 +4,9 @@ import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel } from "./nb
 import { storeGet, storeSet } from "./safe-store.ts";
 
 const KEY = "fbs.v1";
-const VERSION = 6;
+const VERSION = 7;
+const SAVE_EVENT = "fbs-save";
+const PIN_CAP = 6;
 
 export type SavedNight = { win: boolean; us?: number; them?: number; opp?: string; home?: boolean };
 
@@ -51,6 +53,7 @@ export type StudioSave = {
   bestWins: number;
   runs: SavedRun[];
   walks: string[];
+  pins: string[];
   boardTiers: Record<string, 1 | 2 | 3>;
   keepers: Record<string, "KEEP" | "TRADE" | "CUT">;
   tapePins: string[];
@@ -70,6 +73,7 @@ export const emptySave = (): StudioSave => ({
   bestWins: 0,
   runs: [],
   walks: [],
+  pins: [],
   boardTiers: {},
   keepers: {},
   tapePins: [],
@@ -85,6 +89,7 @@ function migrate(raw: StudioSave): StudioSave {
   const next = { ...emptySave(), ...raw, version: VERSION };
   if ((raw.version ?? 0) < 2) next.theme = "night";
   if (!Array.isArray(next.walks)) next.walks = [];
+  if (!Array.isArray(next.pins)) next.pins = [];
   if (!next.mock) next.mock = null;
   if (!next.lastTrade) next.lastTrade = null;
   if (typeof next.capNote !== "string") next.capNote = "";
@@ -110,9 +115,16 @@ export function writeSave(next: StudioSave) {
     storeSet(KEY, blob);
     storeSet(`${KEY}.bak`, blob);
     void persistStudio();
+    if (typeof window !== "undefined") window.dispatchEvent(new Event(SAVE_EVENT));
   } catch {
     /* private mode */
   }
+}
+
+export function onSaveChange(fn: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(SAVE_EVENT, fn);
+  return () => window.removeEventListener(SAVE_EVENT, fn);
 }
 
 let persistAsked = false;
@@ -204,6 +216,31 @@ export function rememberWalk(id: string) {
   const next = { ...save, walks, capNote: dropped ? "Oldest 49th walk dropped." : save.capNote };
   writeSave(next);
   return next;
+}
+
+export function isPinned(id: string) {
+  if (!id) return false;
+  return loadSave().pins.includes(id);
+}
+
+export function pinWalk(id: string) {
+  if (!id) return loadSave();
+  const save = loadSave();
+  const pins = [id, ...save.pins.filter((item) => item !== id)].slice(0, PIN_CAP);
+  const next = { ...save, pins };
+  writeSave(next);
+  return next;
+}
+
+export function unpinWalk(id: string) {
+  const save = loadSave();
+  const next = { ...save, pins: save.pins.filter((item) => item !== id) };
+  writeSave(next);
+  return next;
+}
+
+export function togglePin(id: string) {
+  return isPinned(id) ? unpinWalk(id) : pinWalk(id);
 }
 
 export function writeKeepers(keepers: StudioSave["keepers"]) {

@@ -63,13 +63,15 @@ for (let i = 0; i < Math.min(5, n); i++) {
 }
 
 await page.getByRole("button", { name: "Lock five" }).click();
+const skip = page.getByRole("button", { name: /Skip to the card|The card/ });
+if (await skip.first().isVisible().catch(() => false)) await skip.first().click();
 await page.waitForSelector("text=Save the card");
-await page.waitForSelector("text=Post to X");
+await page.waitForSelector("text=Share");
 await page.waitForTimeout(400);
 await shot("03-result.jpg");
 
-await page.getByRole("button", { name: "More ways to send" }).click();
-await page.waitForSelector("text=Save the PNG");
+await page.getByRole("button", { name: "Share" }).click();
+await page.waitForSelector("text=TikTok");
 await page.waitForTimeout(400);
 await shot("04-tray.jpg");
 

@@ -3,6 +3,7 @@ import { Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { DeskMark, markForHref } from "@/components/desk-mark";
 import { HouseMark } from "@/components/house-mark";
+import { PinnedRail } from "@/components/pinned-rail";
 import { useSpecular } from "@/lib/hooks";
 import { loadSave, writeSave } from "@/lib/studio-save";
 import { cn } from "@/lib/utils";
@@ -75,13 +76,7 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
             </Link>
             {nav}
             <div className="mt-auto pt-10">
-              <Link to="/games/82-0" search={{ pack: "house" }} className="widget block">
-                <p className="v-tertiary text-micro font-medium uppercase tracking-label">Pinned walk</p>
-                <p className="mt-2 font-display text-base font-semibold">Thunder</p>
-                <p className="v-secondary mt-1 text-sm">Positionless · Even</p>
-                <span className="v-separator" />
-                <p className="plate-stamp v-label text-accent">51–31 · House</p>
-              </Link>
+              <PinnedRail />
               <button
                 type="button"
                 onClick={toggleTheme}
@@ -108,7 +103,14 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </header>
-          {open && <div className="glass-chrome border-b border-line px-4 py-4 lg:hidden">{nav}</div>}
+          {open && (
+            <div className="glass-chrome border-b border-line px-4 py-4 lg:hidden">
+              {nav}
+              <div className="mt-4">
+                <PinnedRail />
+              </div>
+            </div>
+          )}
           <main className="px-4 py-8 sm:px-8 lg:px-12 lg:py-12">{children}</main>
           <footer className="overflow-x-clip px-4 pb-10 sm:px-8 lg:px-12">
             <p className="press-slug">

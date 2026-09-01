@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { attemptsFor, bestFrom, nextTuesdayLabel, streakStrip, tuesdayIcs, weekKey, type SavedRun } from "./studio-save.ts";
+import { attemptsFor, bestFrom, emptySave, isPinned, loadSave, nextTuesdayLabel, pinWalk, streakStrip, tuesdayIcs, unpinWalk, weekKey, writeSave, type SavedRun } from "./studio-save.ts";
+import { HOUSE_WALK_ID } from "./house-pack.ts";
 
 const runs: SavedRun[] = [
   {
@@ -76,4 +77,15 @@ test("streakStrip is seven holes from lastDaily", () => {
   assert.equal(holes[4]!.state, "played");
   assert.equal(holes[3]!.state, "played");
   assert.equal(holes[2]!.state, "missed");
+});
+
+test("pins stay empty until the user pins, house is not auto-pinned", () => {
+  writeSave(emptySave());
+  assert.deepEqual(loadSave().pins, []);
+  assert.equal(isPinned(HOUSE_WALK_ID), false);
+  pinWalk(HOUSE_WALK_ID);
+  assert.equal(isPinned(HOUSE_WALK_ID), true);
+  assert.equal(loadSave().pins[0], HOUSE_WALK_ID);
+  unpinWalk(HOUSE_WALK_ID);
+  assert.equal(isPinned(HOUSE_WALK_ID), false);
 });

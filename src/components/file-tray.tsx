@@ -3,10 +3,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import {
   copyText,
+  discordCopy,
   facebookIntent,
   nativeShare,
   objectUrl,
+  redditIntent,
   registerProofOpener,
+  saveCardFile,
   shareSheetOk,
   threadsIntent,
   tweetIntent,
@@ -14,6 +17,7 @@ import {
 } from "@/lib/deliver";
 import { ASPECTS, lastShareOpts, renderShareCard, type CardAspect } from "@/lib/share-card";
 import { rememberWalk } from "@/lib/studio-save";
+import { PinWalkButton } from "@/components/pin-walk-button";
 import { markDemo } from "@/lib/demo-funnel";
 import { publicWalkUrl, walkHref, walkIdFromHref } from "@/lib/walk";
 import { useSpecular } from "@/lib/hooks";
@@ -112,15 +116,40 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
   }
 
   async function onShare() {
-    const result = await nativeShare(sheet, proof.name, proof.caption, walkPath);
+    const result = await nativeShare(sheet, proof.name, proof.caption, shareHref || undefined);
     if (result === "shared") {
-      setNote("Sent.");
-      toast("Sent.");
+      setNote("Shared.");
       markDemo("save", "share");
       return;
     }
     if (result === "abort") return;
     await onCopyWalk();
+  }
+
+  async function shareStory(app: "tiktok" | "snap") {
+    markDemo("save", app);
+    if (canShare) {
+      const result = await nativeShare(sheet, proof.name, proof.caption, shareHref || undefined);
+      if (result === "shared" || result === "abort") return;
+    }
+    if (proof.kind === "image" && aspect !== "story") await onAspect("story");
+    try {
+      await saveCardFile(sheet, proof.name.replace(/\.png$/i, "") + "-story.png");
+      await copyText([postText, shareHref].filter(Boolean).join("\n"));
+      setNote(app === "tiktok" ? "9:16 plate saved. Open TikTok and post it." : "9:16 plate saved. Open Snapchat and post it.");
+    } catch {
+      setNote("Save the plate, then open the app.");
+    }
+  }
+
+  async function onDiscord() {
+    markDemo("save", "discord");
+    if (canShare) {
+      const result = await nativeShare(sheet, proof.name, proof.caption, shareHref || undefined);
+      if (result === "shared" || result === "abort") return;
+    }
+    const ok = await copyText(discordCopy(postText, shareHref));
+    setNote(ok ? "Copied for Discord. Paste it in a chat." : "Copy the walk, then paste in Discord.");
   }
 
   function onOpenWalk() {
@@ -147,9 +176,11 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
         <div className="sheet-grabber sm:hidden" aria-hidden="true" />
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="v-tertiary text-micro font-medium uppercase tracking-label">The card</p>
+            <p className="v-tertiary text-micro font-medium uppercase tracking-label">
+              {proof.kind === "image" ? "The card" : "Desk file"}
+            </p>
             <h2 id={titleId} className="opsz-hero mt-1 font-display text-2xl font-semibold">
-              Ready to send.
+              {proof.kind === "image" ? "Ready to send." : "Ready to move."}
             </h2>
             <p className="v-secondary mt-1 text-sm">
               {proof.name} · {kb} KB
@@ -214,72 +245,111 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
 
         {note ? <p className="mt-3 text-sm text-fg">{note}</p> : null}
 
-        <p className="v-secondary mt-4 text-sm">
-          Save the PNG. Post the walk on X. Story frame is for Instagram — save, then upload.
-        </p>
-
-        <div className="tray-actions mt-5">
-          {fileHref ? (
-            <a
-              className="tray-btn tray-btn-primary"
-              href={fileHref}
-              download={proof.name}
-              onClick={() => markDemo("save", proof.name)}
-            >
-              Save the card
-            </a>
-          ) : (
-            <span className="tray-btn tray-btn-primary opacity-40">Save the card</span>
-          )}
-          {shareHref ? (
-            <a
-              className="tray-btn tray-btn-primary"
-              href={tweetIntent(postText, shareHref)}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => markDemo("save", "x")}
-            >
-              Post to X
-            </a>
-          ) : null}
-          {walkPath ? (
-            <button type="button" className="tray-btn" onClick={() => void onCopyWalk()}>
-              Copy the walk
-            </button>
-          ) : null}
-          {shareHref ? (
-            <a
-              className="tray-btn"
-              href={threadsIntent(postText, shareHref)}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => markDemo("save", "threads")}
-            >
-              Threads
-            </a>
-          ) : null}
-          {shareHref ? (
-            <a
-              className="tray-btn"
-              href={facebookIntent(shareHref)}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => markDemo("save", "facebook")}
-            >
-              Facebook
-            </a>
-          ) : null}
-          {canShare ? (
-            <button type="button" className="tray-btn" onClick={() => void onShare()}>
-              Send to apps
-            </button>
-          ) : null}
-          {walkId ? (
-            <button type="button" className="tray-btn" onClick={onOpenWalk}>
-              Open the walk
-            </button>
-          ) : null}
-        </div>
+        {proof.kind === "image" ? (
+          <>
+            <div className="tray-actions mt-5">
+              {fileHref ? (
+                <a
+                  className="tray-btn tray-btn-primary"
+                  href={fileHref}
+                  download={proof.name}
+                  onClick={() => markDemo("save", proof.name)}
+                >
+                  Save the card
+                </a>
+              ) : (
+                <span className="tray-btn tray-btn-primary opacity-40">Save the card</span>
+              )}
+              <button type="button" className="tray-btn tray-btn-primary" onClick={() => void onShare()}>
+                Share
+              </button>
+            </div>
+            <p className="v-tertiary mt-5 text-micro font-medium uppercase tracking-label">Post</p>
+            <div className="share-grid mt-2">
+              {shareHref ? (
+                <a
+                  className="tray-btn"
+                  href={tweetIntent(postText, shareHref)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => markDemo("save", "x")}
+                >
+                  X
+                </a>
+              ) : null}
+              {shareHref ? (
+                <a
+                  className="tray-btn"
+                  href={threadsIntent(postText, shareHref)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => markDemo("save", "threads")}
+                >
+                  Threads
+                </a>
+              ) : null}
+              {shareHref ? (
+                <a
+                  className="tray-btn"
+                  href={redditIntent(shareHref, postText)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => markDemo("save", "reddit")}
+                >
+                  Reddit
+                </a>
+              ) : null}
+              {shareHref ? (
+                <a
+                  className="tray-btn"
+                  href={facebookIntent(shareHref)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => markDemo("save", "facebook")}
+                >
+                  Facebook
+                </a>
+              ) : null}
+              <button type="button" className="tray-btn" onClick={() => void shareStory("tiktok")}>
+                TikTok
+              </button>
+              <button type="button" className="tray-btn" onClick={() => void shareStory("snap")}>
+                Snapchat
+              </button>
+              <button type="button" className="tray-btn" onClick={() => void onDiscord()}>
+                Discord
+              </button>
+              {walkPath ? (
+                <button type="button" className="tray-btn" onClick={() => void onCopyWalk()}>
+                  Copy walk
+                </button>
+              ) : null}
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {walkId ? <PinWalkButton id={walkId} /> : null}
+              {walkId ? (
+                <button type="button" className="tray-btn" onClick={onOpenWalk}>
+                  Open the walk
+                </button>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <div className="tray-actions mt-5">
+            {fileHref ? (
+              <a
+                className="tray-btn tray-btn-primary"
+                href={fileHref}
+                download={proof.name}
+                onClick={() => markDemo("save", proof.name)}
+              >
+                Save the file
+              </a>
+            ) : (
+              <span className="tray-btn tray-btn-primary opacity-40">Save the file</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

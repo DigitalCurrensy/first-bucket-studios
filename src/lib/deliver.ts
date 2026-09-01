@@ -179,12 +179,11 @@ function payloadCanShare(nav: Navigator & { canShare?: (data: ShareData) => bool
   }
 }
 
-export async function nativeShare(blob: Blob, name: string, text?: string, _url?: string) {
-  void _url;
+export async function nativeShare(blob: Blob, name: string, text?: string, url?: string) {
   if (!shareSheetOk()) return "none" as const;
   const file = asShareFile(blob, name);
   const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
-  for (const payload of shareAttempts(file, text)) {
+  for (const payload of shareAttempts(file, text, url)) {
     if (!payloadCanShare(nav, payload)) continue;
     try {
       await nav.share(payload);
@@ -199,13 +198,18 @@ export async function nativeShare(blob: Blob, name: string, text?: string, _url?
 
 /**
  * The card is the file. Files + caption, then files only.
- * Never files+url (Safari drops the sheet). Never text-only (that is not the card).
+ * Then text + url for apps (Discord, iMessage) that will not take a PNG.
+ * Never files+url — Safari drops the sheet.
  */
-export function shareAttempts(file: File, text?: string): ShareData[] {
+export function shareAttempts(file: File, text?: string, url?: string): ShareData[] {
   const title = (text?.split(" at ")[0] || "First Bucket Studio").slice(0, 80);
   const files = [file];
   const attempts: ShareData[] = [{ title, text, files }];
   attempts.push({ title, files });
+  const absolute = url && /^https?:\/\//i.test(url) ? url : "";
+  if (absolute) {
+    attempts.push({ title, text: text ? `${text}\n${absolute}` : absolute, url: absolute });
+  }
   return attempts;
 }
 
@@ -258,4 +262,17 @@ export function facebookIntent(url: string) {
   const absolute = absoluteHttp(url);
   if (absolute) href.searchParams.set("u", absolute);
   return href.toString();
+}
+
+export function redditIntent(url: string, title: string) {
+  const href = new URL("https://www.reddit.com/submit");
+  const absolute = absoluteHttp(url);
+  if (absolute) href.searchParams.set("url", absolute);
+  if (title) href.searchParams.set("title", title);
+  return href.toString();
+}
+
+export function discordCopy(text: string, url?: string) {
+  const absolute = absoluteHttp(url);
+  return absolute ? `${text}\n${absolute}` : text;
 }

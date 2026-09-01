@@ -15,20 +15,17 @@ function AboutPage() {
         lead="Rip the pack. Send the card. The walk is a URL."
         mark="about"
       />
-      <HowItWorks kind="house" />
-      <JobTicket kicker="House rules" className="max-w-2xl">
+      <HowItWorks kind="machine" />
+      <JobTicket kicker="The desk" className="max-w-2xl">
         <div className="mt-3 space-y-5 text-muted">
           <p>
-            One pack. Ten cards. Five names. Eighty-two nights. The poster leaves as a file. The URL is the
-            certificate.
+            One pack. Ten cards. Five names. Eighty-two nights. The plate is a PNG. The walk is a URL — anyone with it
+            sees the same five and the same nights.
           </p>
+          <p>Public names. Plates and initials, not likenesses. House crests, not league marks. Games and tools only.</p>
           <p>
-            Public names in the games. Plates and initials, not likenesses. House crests, not league marks. Games and
-            tools only.
-          </p>
-          <p>
-            Walks live on this device. Export the studio file if you want the desk to travel. No account. If you clear
-            the browser, the streak goes with it. The walk URL still opens.
+            Walks live on this device. Pin the ones you want on the rail. Export the desk file if you want to move
+            desks. No account.
           </p>
         </div>
       </JobTicket>

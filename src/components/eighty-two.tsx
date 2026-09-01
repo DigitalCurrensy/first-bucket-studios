@@ -41,7 +41,7 @@ import { recapOf, type Recap } from "@/lib/recap";
 import { deltaVsBest } from "@/lib/ledger";
 import { seasonTelemetry } from "@/lib/telemetry";
 import { seasonWalk, wnbaWalk, type Night } from "@/lib/sim";
-import { bestFrom, justFiled, loadSave, needsExportNag, recordRun, todayKey, yesterdayKey } from "@/lib/studio-save";
+import { bestFrom, loadSave, needsExportNag, recordRun, todayKey, yesterdayKey } from "@/lib/studio-save";
 import { ripTick } from "@/lib/tick";
 import { dailyRoom, encodeChallengeIds, encodeWalk, encodeWnbaWalk, houseWalk, playersOf, publicWalkUrl } from "@/lib/walk";
 import { cn } from "@/lib/utils";
@@ -558,20 +558,12 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
                 />
               </div>
             )}
-            {daily && already && <p className="mt-3 text-sm text-subtle">Replay logged. Streak already counted today.</p>}
+            {daily && already && <p className="mt-3 text-sm text-subtle">Already counted today.</p>}
             {daily && !already && streak > 0 && <p className="mt-3 text-sm text-fg">Streak {streak}.</p>}
-            {mode !== "82-0" && !cue && justFiled() && <p className="mt-3 text-sm text-fg">Studio file saved. The house is the file.</p>}
-            {daily && justFiled() && <p className="mt-2 text-sm text-muted">The streak is in the file.</p>}
             {daily && (
               <div className="mt-4">
                 <StreakStrip today={stamp} lastDaily={save.lastDaily} streak={streak || save.streak} />
               </div>
-            )}
-            {mode !== "82-0" && !cue && (
-              <p className="mt-3 text-sm text-muted">This room, this device, best {bestFrom(save.runs, mode) || wins}.</p>
-            )}
-            {mode !== "82-0" && !cue && ((daily && streak >= 2 && !save.exportedAt) || needsExportNag(save)) && (
-              <p className="mt-3 text-sm text-fg">The streak dies with this browser. Export the file.</p>
             )}
             {walkId ? (
                 <p className="mt-4 break-all font-mono text-micro text-subtle">/walk/{walkId}</p>

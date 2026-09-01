@@ -24,8 +24,9 @@ GitHub Action **Pin** runs layers 1 and 3 on every push to `main`. Layer 4 needs
 | Live 82-0 pack | Ready | Random franchise. Tear. Ten plates. Not Thunder every time. |
 | Player cards | Ready | One 5×7 face. Night plate. Pick five. Court back only when face-down. |
 | House pin | Ready | Thunder 51–31, same walk every time. Optional. |
-| Send PNG | Ready in a top-level tab | **Save the card** is a real `<a download>`. **Post to X** is `x.com/intent/tweet`. |
-| Social | Ready | X on the card. Threads + Facebook + native share in the tray. |
+| Send PNG | Ready in a top-level tab | **Save the card** is a real `<a download>`. **Share** is Web Share, then the tray. |
+| Social | Ready | X, Threads, Reddit, Facebook, TikTok, Snapchat, Discord. |
+| Pins | Ready | Empty until the user pins. Thunder is not auto-pinned. |
 | Pin tests | Must stay green | `npm run test:pin` then `npm run test:vl` |
 | Public URL | Ready | [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app). GitHub stays private. Domain later. |
 

@@ -22,7 +22,13 @@ Save is a native file link (`<a download>` with a PNG data URL). A nested previe
 
 ## Share on social did nothing
 
-**Post to X** is a real X intent. It posts the walk URL. The PNG is a separate file — Save it, then attach it on X if you want the plate in the post. Instagram has no web share target; pick **9:16 studio** in More ways to send, Save, then upload.
+**Share** is the system sheet on a phone (Messages, TikTok, Snapchat, Discord). On a desktop it opens the tray: X, Threads, Reddit, Facebook, TikTok, Snapchat, Discord.
+
+TikTok and Snapchat have no web post button. Those buttons save a 9:16 plate and copy the caption — then you post in the app.
+
+## Thunder is pinned and I never pinned it
+
+That was a bug. The house demo is no longer auto-pinned. **Pin this walk** on a card you actually sent. The X on the rail unpins it.
 
 ## Every pack is Thunder 51
 

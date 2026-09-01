@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { PinWalkButton } from "@/components/pin-walk-button";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { blobToDataUrl, presentFile, saveCardFile, tweetIntent } from "@/lib/deliver";
+import { blobToDataUrl, nativeShare, presentFile, saveCardFile, shareSheetOk } from "@/lib/deliver";
 import { markDemo } from "@/lib/demo-funnel";
-import { cardCaption, cardFileName, renderShareCard, tweetLine, type CardKind } from "@/lib/share-card";
+import { cardCaption, cardFileName, renderShareCard, type CardKind } from "@/lib/share-card";
 import { rememberWalk } from "@/lib/studio-save";
 import { encodeGoatWalk, encodePlayoffWalk, encodeWalk, encodeWnbaWalk, publicWalkUrl } from "@/lib/walk";
 import { cn } from "@/lib/utils";
@@ -47,14 +48,12 @@ export function ShareCardButton({
 }) {
   const [saveHref, setSaveHref] = useState("");
   const [saveName, setSaveName] = useState("");
-  const [state, setState] = useState<"idle" | "busy" | "saved" | "fail">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "saved" | "shared" | "fail">("idle");
   const ready = useRef<Blob | null>(null);
   const rosterKey = roster.map((p) => p.id).join("~");
   const walk = walkOf({ team, era, wins, roster, kind, luck });
   const publicHref = walk ? publicWalkUrl(walk) : "";
   const caption = cardCaption({ team, era, wins, roster, kind, luck, walk, beat });
-  const post = tweetLine({ team, era, wins, kind });
-  const xHref = tweetIntent(post, publicHref);
 
   useEffect(() => {
     if (roster.length === 0) return;
@@ -102,12 +101,21 @@ export function ShareCardButton({
     }
   }
 
-  async function onTray() {
+  async function onShare() {
     if (roster.length === 0) return;
     try {
       const blob = await printCard();
       const name = saveName || cardFileName(team, wins);
       if (walk) rememberWalk(walk);
+      if (shareSheetOk()) {
+        const result = await nativeShare(blob, name, caption, publicHref || undefined);
+        if (result === "shared") {
+          markDemo("save", "share");
+          setState("shared");
+          return;
+        }
+        if (result === "abort") return;
+      }
       presentFile(blob, name, caption, publicHref || undefined);
     } catch {
       setState("fail");
@@ -136,23 +144,10 @@ export function ShareCardButton({
           {state === "busy" ? "Printing…" : state === "fail" ? "Couldn’t save" : "Printing…"}
         </Button>
       )}
-      {walk ? (
-        <a
-          className={cn(buttonVariants({ variant: "bronze" }))}
-          href={xHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => {
-            if (walk) rememberWalk(walk);
-            markDemo("save", "x");
-          }}
-        >
-          Post to X
-        </a>
-      ) : null}
-      <Button variant="ghost" onClick={() => void onTray()} disabled={empty}>
-        More ways to send
+      <Button variant="bronze" onClick={() => void onShare()} disabled={empty}>
+        {state === "shared" ? "Shared" : "Share"}
       </Button>
+      {walk ? <PinWalkButton id={walk} /> : null}
     </>
   );
 }
