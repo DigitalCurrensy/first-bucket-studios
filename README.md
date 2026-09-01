@@ -1,24 +1,28 @@
-# First Bucket Studio
+# First Bucket Studios
 
 **Rip a pack. Five names. Eighty-two nights. Send the card.**
 
+Private repo (log in as DigitalCurrensy):
+
+**https://github.com/DigitalCurrensy/first-bucket-studios**
+
+Not the older `first-bucket-studio` (no *s*). This one.
+
 A browser basketball pack. Not a shop. Not a sportsbook. Not the NBA.
 
-[MIT](LICENSE). Forks on. [How to copy the loop →](FORK.md)
-
-> Play the live build, then paste the URL at the top of this file before you flip the repo public.
+[MIT](LICENSE) · [How to play](HOW-TO-PLAY.md) · [Fork the loop](FORK.md)
 
 ---
 
 ## How to play
 
-About ninety seconds.
+About ninety seconds. Full sheet: [HOW-TO-PLAY.md](HOW-TO-PLAY.md).
 
 **1. Rip the pack.** A franchise, an era, and a luck lane land. No two pulls match.
 
 ![Home](docs/stills/01-home.jpg)
 
-**2. Tear the foil.** Ten cards, face down.
+**2. Tear the foil.** Ten cards. Tap five.
 
 ![Foil](docs/stills/02-foil.jpg)
 
@@ -32,7 +36,7 @@ About ninety seconds.
 
 Tape of one pull: [docs/tape/demo.mp4](docs/tape/demo.mp4)
 
-### The buttons, in order
+### The buttons
 
 | You click | What it does |
 | --- | --- |
@@ -53,7 +57,7 @@ Thunder · Positionless · Even is pinned as a known certificate:
 /walk/v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga
 ```
 
-51–31. Playoff lock. Same five every time. It hangs on [The Wall](/wall). The main pack is live.
+51–31. Playoff lock. Same five every time. It hangs on The Wall. The main pack is live.
 
 ---
 

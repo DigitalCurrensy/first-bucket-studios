@@ -195,6 +195,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
     if (ripping || ripped) return;
     setRipping(true);
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const ids = activePack.map((p) => p.id);
     window.setTimeout(() => {
       setRipped(true);
       setRipping(false);
@@ -203,7 +204,17 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
         setOpen(staged.ten.map((p) => p.id));
         setPicks(staged.five.map((p) => p.id));
         commitWalk(staged.five, staged.walked);
+        return;
       }
+      ids.forEach((id, i) => {
+        window.setTimeout(
+          () => {
+            setOpen((cur) => (cur.includes(id) ? cur : [...cur, id]));
+            ripTick();
+          },
+          reduce ? 0 : i * 70,
+        );
+      });
     }, reduce ? 0 : 480);
   }
 
@@ -317,7 +328,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
         ? "Start the corners."
         : wnba
           ? "Forty nights."
-          : "Pull the room. Rip the pack.";
+          : "Rip the pack. Send the card.";
   const lead = cue
     ? "Thunder. Positionless. Tear the foil. Send the card."
     : daily
@@ -326,14 +337,12 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
         ? "The pack deals G/G/F/F/C. The corners have to hold. Then the season walks."
         : wnba
           ? "One pull. A W club, era, luck. Ten face-down. Forty nights. Honest length."
-          : "Pull a franchise, era, and luck. Rip ten face-down. Turn five. Then 82 nights play.";
-
-  const beatHref = wnba ? "/games/wnba" : corners ? "/games/corners" : "/games/82-0";
+          : "A franchise lands. Ten cards. Five names. Eighty-two nights. No two walks match.";
 
   return (
     <div>
       <PageIntro
-        kicker={cue ? "House pack" : daily ? "Daily Bucket" : corners ? "Four corners" : wnba ? "WNBA walk" : "Build an 82-0"}
+        kicker={cue ? "House pack" : daily ? "Daily Bucket" : corners ? "Four corners" : wnba ? "WNBA walk" : "Prospect pack"}
         title={title}
         lead={lead}
         mark={daily ? "daily" : corners ? "corners" : wnba ? "wnba" : "machine"}
@@ -586,12 +595,12 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
               <Button variant="ghost" onClick={copyWalk}>
                 {walkCopied ? "Walk copied" : "Copy walk"}
               </Button>
-              {!cue && (
+              {mode !== "82-0" && !cue && (
                 <Button variant="ghost" onClick={copyLine}>
                   {copied ? "Copied" : "Copy line"}
                 </Button>
               )}
-              {!cue && (
+              {mode !== "82-0" && !cue && (
                 <Button variant="ghost" onClick={copyChallenge}>
                   {challengeCopied ? "Challenge copied" : "Beat it"}
                 </Button>
@@ -600,14 +609,6 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
                 <Button variant="ghost" onClick={reset}>
                   {cue ? "Rip again" : "Pull again"}
                 </Button>
-              )}
-              {!cue && (
-                <Link
-                  to={beatHref === "/games/82-0" ? "/games/daily" : "/games/82-0"}
-                  className={cn("inline-flex min-h-11 items-center px-4 text-sm text-muted")}
-                >
-                  {mode === "82-0" ? "Daily Bucket" : "Free build"}
-                </Link>
               )}
             </div>
           </JobTicket>
