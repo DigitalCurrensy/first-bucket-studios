@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { RipPack } from "@/components/rip-pack";
 import { useSpecular } from "@/lib/hooks";
+import { markDemo } from "@/lib/demo-funnel";
 import { cn } from "@/lib/utils";
 
 export function PressStage({
@@ -117,6 +118,7 @@ export function PackHero() {
   function go() {
     if (ripping) return;
     setRipping(true);
+    markDemo("rip");
     const reduce =
       typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.setTimeout(

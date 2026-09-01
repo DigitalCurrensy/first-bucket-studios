@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: How to play
+    url: https://github.com/DigitalCurrensy/first-bucket-studios/blob/main/HOW-TO-PLAY.md
+    about: Ninety seconds. Rip, lock five, send the card.
+  - name: Q&A and ideas
+    url: https://github.com/DigitalCurrensy/first-bucket-studios/discussions
+    about: Setup help, proposals, show and tell. Not bugs.
+  - name: Security
+    url: https://github.com/DigitalCurrensy/first-bucket-studios/security/advisories/new
+    about: Private reports only. Never a public thread.

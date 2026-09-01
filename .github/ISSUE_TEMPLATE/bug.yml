@@ -1,0 +1,54 @@
+name: Bug
+description: The loop lied. A button, a walk, a card.
+title: "[loop] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Play it first. If this is a question, use Discussions → Q&A.
+  - type: textarea
+    id: walk
+    attributes:
+      label: Walk URL
+      description: Paste `/walk/v1.…` if you have one. House pin is Thunder 51.
+      placeholder: /walk/v1.HOU.90s-east.grit.22.…
+    validations:
+      required: false
+  - type: dropdown
+    id: host
+    attributes:
+      label: Where did you play
+      options:
+        - Top-level tab
+        - Nested preview / iframe
+        - npm run dev
+        - Fork
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+      placeholder: Safari 18 · iPhone, Chrome · macOS
+    validations:
+      required: true
+  - type: textarea
+    id: clicks
+    attributes:
+      label: What you clicked, in order
+      placeholder: Rip the pack → foil → five names → Lock five → Send the card → Save
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened
+    validations:
+      required: true
+  - type: textarea
+    id: got
+    attributes:
+      label: What happened
+    validations:
+      required: true

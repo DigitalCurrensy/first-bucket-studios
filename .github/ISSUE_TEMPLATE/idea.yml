@@ -1,0 +1,32 @@
+name: Idea
+description: Prefer Discussions → Ideas. Use this only if you already have a patch in mind.
+title: "[idea] "
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Talk first in Discussions if you can. A PR that changes the mixer will be closed.
+  - type: textarea
+    id: loop
+    attributes:
+      label: Which beat
+      description: home, rip, room, foil, lock, card, tray, save, copy, open
+      placeholder: tray
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why the loop needs this
+    validations:
+      required: true
+  - type: checkboxes
+    id: pin
+    attributes:
+      label: Pin
+      options:
+        - label: I will not retune mulberry32 or the house table.
+          required: true
+        - label: I read NOTICE if this touches names, plates, or crests.
+          required: true

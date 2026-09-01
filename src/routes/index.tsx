@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { LastWalkSlip, PackHero, PressStage, StepRail } from "@/components/press-furniture";
+import { markDemo } from "@/lib/demo-funnel";
 import { useMounted } from "@/lib/hooks";
 import { PLAYERS_BY_ID } from "@/lib/nba";
 import { formatRun, loadSave } from "@/lib/studio-save";
@@ -20,6 +22,10 @@ function Home() {
   const latest = save?.runs[0];
   const latestNames = latest?.roster.map((id) => PLAYERS_BY_ID[id]?.name).filter(Boolean) ?? [];
 
+  useEffect(() => {
+    markDemo("home");
+  }, []);
+
   return (
     <div className="flex flex-col gap-12 lg:gap-16">
       <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -33,6 +39,7 @@ function Home() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/games/82-0"
+              onClick={() => markDemo("rip")}
               className="inline-flex min-h-11 items-center rounded-full bg-fg px-5 text-sm font-medium text-paper transition-transform duration-150 ease-studio active:scale-press"
             >
               Rip the pack

@@ -11,6 +11,7 @@ import {
 } from "@/lib/deliver";
 import { ASPECTS, lastShareOpts, renderShareCard, type CardAspect } from "@/lib/share-card";
 import { rememberWalk } from "@/lib/studio-save";
+import { markDemo } from "@/lib/demo-funnel";
 import { walkHref, walkIdFromHref } from "@/lib/walk";
 import { useSpecular } from "@/lib/hooks";
 import { toast } from "@/components/toast-host";
@@ -50,6 +51,7 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
       void proof.blob.text().then((text) => setPreview(text.slice(0, 2400)));
     }
     if (walkId) rememberWalk(walkId);
+    markDemo("tray", proof.name);
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
@@ -72,6 +74,7 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
 
   async function onCopyWalk() {
     if (!walkPath) return;
+    markDemo("copy", walkPath);
     const ok = await copyText(walkPath);
     setNote(ok ? "Walk copied." : "Select the walk and copy it.");
     if (ok) toast("Walk copied.");
@@ -101,6 +104,7 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
     if (result === "shared") {
       setNote("Sent.");
       toast("Sent.");
+      markDemo("save", "share");
       return;
     }
     if (result === "abort") return;
@@ -109,6 +113,7 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
 
   function onOpenWalk() {
     if (!walkId) return;
+    markDemo("open", walkId);
     onClose();
     void navigate({ to: "/walk/$id", params: { id: walkId } });
   }
@@ -199,7 +204,12 @@ function FileTray({ proof, onClose }: { proof: Proof; onClose: () => void }) {
 
         <div className="tray-actions mt-5">
           {fileHref ? (
-            <a className="tray-btn tray-btn-primary" href={fileHref} download={proof.name}>
+            <a
+              className="tray-btn tray-btn-primary"
+              href={fileHref}
+              download={proof.name}
+              onClick={() => markDemo("save", proof.name)}
+            >
               Save the card
             </a>
           ) : (

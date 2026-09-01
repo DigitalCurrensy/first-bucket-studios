@@ -36,6 +36,7 @@ import {
   type Era,
   type Player,
 } from "@/lib/nba";
+import { markDemo } from "@/lib/demo-funnel";
 import { recapOf, type Recap } from "@/lib/recap";
 import { deltaVsBest } from "@/lib/ledger";
 import { seasonTelemetry } from "@/lib/telemetry";
@@ -113,6 +114,10 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
   const [ripping, setRipping] = useState(false);
   const houseBoot = useRef(false);
 
+  useEffect(() => {
+    if (step === "result" && walkId) markDemo("card", walkId);
+  }, [step, walkId]);
+
   const activeTeam = daily ? (locked?.team ?? team) : team;
   const activeEra = daily ? (locked?.era ?? era) : era;
   const activeLuck = daily ? (locked?.luck ?? luck) : luck;
@@ -157,6 +162,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
       setRipped(false);
       setRipping(false);
       setStep("draft");
+      markDemo("room", `${nextTeam} · ${nextEra} · ${nextLuck}`);
     },
     [daily, locked, corners, wnba, challenge?.pack],
   );
@@ -194,6 +200,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
   function tearPack() {
     if (ripping || ripped) return;
     setRipping(true);
+    markDemo("foil");
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const ids = activePack.map((p) => p.id);
     window.setTimeout(() => {
@@ -247,6 +254,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
     setClub(walk.us);
     setWalkId(id);
     setStep(challenge?.pack === "house" ? "result" : "season");
+    markDemo("lock", id);
     const before = loadSave();
     const wasToday = Boolean(daily && before.lastDaily === stamp);
     const next = recordRun(
@@ -311,7 +319,9 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
 
   async function copyWalk() {
     const url = walkUrl(walkId);
-    setWalkCopied(await copyText(url));
+    const ok = await copyText(url);
+    setWalkCopied(ok);
+    if (ok) markDemo("copy", walkId);
   }
 
   const save = loadSave();
