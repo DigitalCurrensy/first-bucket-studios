@@ -44,7 +44,7 @@ Tape: [docs/tape/demo.mp4](docs/tape/demo.mp4)
 
 There is no “copy image.” The file is the card. The URL is the walk.
 
-House job (optional) is pinned Thunder 51–31. The door is the live pack.
+The pinned walk (optional) is Thunder 51–31. The door is the live pack.
 
 ```
 /walk/v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga

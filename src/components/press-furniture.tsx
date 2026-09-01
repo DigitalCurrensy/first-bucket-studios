@@ -137,8 +137,10 @@ export function PackHero() {
         onPointerMove={tilt}
         onPointerLeave={untilt}
       >
-        <div className="pack-tilt">
-          <RipPack lot="live:home" ripping={ripping} onRip={go} />
+        <div className="pack-float">
+          <div className="pack-tilt">
+            <RipPack lot="live:home" ripping={ripping} onRip={go} />
+          </div>
         </div>
       </div>
     </PressStage>

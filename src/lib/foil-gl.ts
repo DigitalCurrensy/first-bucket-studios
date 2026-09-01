@@ -14,7 +14,8 @@ import {
 
 export type { FoilHandle } from "./foil-shade.ts";
 
-const GL_ATTRS: WebGLContextAttributes = {
+/** Synced to the compositor. Desync tears inside a nested preview. */
+export const FOIL_GL_ATTRS: WebGLContextAttributes = {
   alpha: true,
   antialias: false,
   depth: false,
@@ -23,10 +24,24 @@ const GL_ATTRS: WebGLContextAttributes = {
   preserveDrawingBuffer: false,
   powerPreference: "low-power",
   failIfMajorPerformanceCaveat: true,
-  desynchronized: true,
+  desynchronized: false,
 };
 
 let probed: boolean | null = null;
+
+/** True when the studio is inside a host iframe. GPU probes stall and pop there. */
+export function foilNestedFrame() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+}
+
+export function foilGpuAllowed() {
+  return !foilNestedFrame() && foilGpuOffered();
+}
 
 export function foilGlSupported() {
   if (probed != null) return probed;
@@ -35,14 +50,14 @@ export function foilGlSupported() {
     probed = false;
     return false;
   }
-  if (foilGpuOffered()) {
+  if (foilGpuAllowed()) {
     probed = true;
     return true;
   }
   try {
     const canvas = document.createElement("canvas");
     const gl =
-      canvas.getContext("webgl2", GL_ATTRS) || canvas.getContext("webgl", GL_ATTRS);
+      canvas.getContext("webgl2", FOIL_GL_ATTRS) || canvas.getContext("webgl", FOIL_GL_ATTRS);
     probed = Boolean(gl);
     if (gl && typeof gl.getExtension === "function") {
       gl.getExtension("WEBGL_lose_context")?.loseContext();
@@ -93,9 +108,9 @@ function mountFoilGl(
   let gl: WebGL2RenderingContext | WebGLRenderingContext | null = null;
   let webgl2 = false;
   try {
-    gl = canvas.getContext("webgl2", GL_ATTRS) as WebGL2RenderingContext | null;
+    gl = canvas.getContext("webgl2", FOIL_GL_ATTRS) as WebGL2RenderingContext | null;
     webgl2 = Boolean(gl);
-    if (!gl) gl = canvas.getContext("webgl", GL_ATTRS);
+    if (!gl) gl = canvas.getContext("webgl", FOIL_GL_ATTRS);
   } catch {
     gl = null;
   }
@@ -131,6 +146,7 @@ function mountFoilGl(
   let inkRgb = hexRgb(ink);
   let raf = 0;
   let live = false;
+  let drawn = false;
   const quiet = reducedMotion();
 
   const draw = (time: number) => {
@@ -153,11 +169,17 @@ function mountFoilGl(
     gl.uniform3f(uFlare, flareRgb[0], flareRgb[1], flareRgb[2]);
     gl.uniform3f(uInk, inkRgb[0], inkRgb[1], inkRgb[2]);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    drawn = true;
   };
 
-  const tick = (time: number) => {
-    draw(time);
-    if (live && !quiet) raf = window.requestAnimationFrame(tick);
+  const requestDraw = () => {
+    if (!gl || !live) return;
+    if (raf) return;
+    raf = window.requestAnimationFrame((stamp) => {
+      raf = 0;
+      if (!live || !gl) return;
+      draw(quiet ? 0 : stamp);
+    });
   };
 
   const resize = () => {
@@ -167,9 +189,12 @@ function mountFoilGl(
     const dpr = Math.min(1.25, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
     const tw = Math.max(1, Math.round(w * dpr));
     const th = Math.max(1, Math.round(h * dpr));
-    if (canvas.width !== tw) canvas.width = tw;
-    if (canvas.height !== th) canvas.height = th;
-    if (!live) draw(0);
+    const resized = canvas.width !== tw || canvas.height !== th;
+    if (resized) {
+      canvas.width = tw;
+      canvas.height = th;
+    }
+    if (live && (resized || !drawn)) requestDraw();
   };
 
   const onLost = (event: Event) => {
@@ -184,22 +209,23 @@ function mountFoilGl(
     setTilt(x, y) {
       tiltX = clamp01(x, 0.5);
       tiltY = clamp01(y, 0.4);
+      requestDraw();
     },
     setColors(nextFoil, nextFlare, nextInk) {
       foilRgb = hexRgb(nextFoil);
       flareRgb = hexRgb(nextFlare);
       if (nextInk) inkRgb = hexRgb(nextInk);
+      requestDraw();
     },
     resize,
     start() {
-      if (live) return;
       live = true;
       resize();
       if (quiet) {
         draw(0);
         return;
       }
-      raf = window.requestAnimationFrame(tick);
+      requestDraw();
     },
     stop() {
       live = false;
@@ -228,11 +254,13 @@ export async function mountFoil(
   ink: string,
   getTilt?: () => { x: number; y: number },
 ): Promise<FoilHandle | null> {
-  try {
-    const gpu = await mountFoilGpu(canvas, foil, flare, ink, getTilt);
-    if (gpu) return gpu;
-  } catch {
-    /* WebGL next. Never leave a rejected GPU probe in the way. */
+  if (foilGpuAllowed()) {
+    try {
+      const gpu = await mountFoilGpu(canvas, foil, flare, ink, getTilt);
+      if (gpu) return gpu;
+    } catch {
+      /* WebGL next. Never leave a rejected GPU probe in the way. */
+    }
   }
   return mountFoilGl(canvas, foil, flare, ink, getTilt);
 }

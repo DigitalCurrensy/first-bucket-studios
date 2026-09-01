@@ -277,6 +277,9 @@ html[data-theme="light"] {
   .pack-tilt {
     animation: none;
   }
+  .pack-float {
+    animation: none;
+  }
 }
 
 .plate-stamp {
@@ -422,7 +425,7 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
     repeating-linear-gradient(125deg, transparent, transparent 2px, color-mix(in oklab, var(--color-fg) 5%, transparent) 3px),
     repeating-linear-gradient(55deg, transparent, transparent 2px, color-mix(in oklab, var(--color-night) 55%, transparent) 3px);
 }
-.rip-pack { perspective: 72rem; }
+.rip-pack { perspective: 72rem; align-self: start; }
 .rip-pack-foil {
   display: flex;
   align-items: center;
@@ -485,7 +488,8 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
 .foil-gyro .pack-holo { background-position: var(--foil-x) var(--foil-y); }
 .foil-gl { position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: color-dodge; width: 100%; height: 100%; display: block; }
 .rip-pack.has-foil-gl .pack-holo,
-.rip-pack.has-foil-gl .pack-holo-prism { display: none; }
+.rip-pack.has-foil-gl .pack-holo-prism,
+.rip-pack.has-foil-gl .rip-pack-shine { display: none; }
 .rip-pack.is-ripping .rip-pack-body { transform: rotateX(12deg) scale(0.96); }
 
 .pack-plate { display: grid; place-items: center; width: 100%; height: 100%; }
@@ -558,13 +562,15 @@ html[data-theme="light"] .stock-name::before { content: "Day stock"; }
   backdrop-filter: blur(22px) saturate(1.45) brightness(1.06);
   -webkit-backdrop-filter: blur(22px) saturate(1.45) brightness(1.06);
 }
+.pack-float {
+  animation: pack-idle 5.5s var(--ease-studio) infinite;
+}
 .pack-tilt {
   position: relative;
   z-index: 1;
   transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
   transform-style: preserve-3d;
   transition: transform 220ms var(--ease-studio);
-  animation: pack-idle 5.5s var(--ease-studio) infinite;
 }
 
 .glass-nav, .glass-chrome, .glass-sheet, .glass-control, .widget {
@@ -674,8 +680,8 @@ html[data-theme="light"] .v-tertiary { mix-blend-mode: plus-darker; }
 @keyframes pack-shine { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 @keyframes holo-shift { 0%, 100% { background-position: 20% 30%; } 50% { background-position: 80% 70%; } }
 @keyframes pack-idle {
-  0%, 100% { transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(0); }
-  50% { transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-7px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
 }
 
 @media (max-width: 40rem) {

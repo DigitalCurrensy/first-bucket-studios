@@ -1,6 +1,7 @@
 import { goatLabel, playoffLabel, playoffLine, recordLine, winLabel, eraLabel, type Player } from "./nba.ts";
 import { drawCrestOps } from "./crest-marks.ts";
 import { nativeShare, presentFile } from "./deliver.ts";
+import { HOUSE_WALK_ID } from "./house-pack.ts";
 import { houseInk } from "./house-ink.ts";
 import { initials, cardSerial } from "./plates.ts";
 import { acquireSheet, releaseSheet } from "./canvas-sheet.ts";
@@ -420,7 +421,7 @@ export async function renderShareCard(opts: {
     const walk = walkId({ team, era, wins, roster, kind, luck });
     ctx.fillStyle = "rgba(244, 239, 228, 0.38)";
     ctx.font = "500 15px 'Instrument Sans', sans-serif";
-    ctx.fillText("House job · night stock", x(64), h - 70);
+    ctx.fillText(walk === HOUSE_WALK_ID ? "House job · night stock" : "Prospect pack · night stock", x(64), h - 70);
     if (walk) {
       ctx.fillStyle = ACCENT;
       ctx.font = "500 14px ui-monospace, 'SF Mono', Menlo, monospace";

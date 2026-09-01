@@ -8,7 +8,7 @@ There is no staging account. There is no fake toast. A test that cannot fail is 
 
 | Layer | What it proves | Command |
 | --- | --- | --- |
-| **1. Pin** | House Thunder 51–31 never moves. Mixer still mulberry32. Walks still decode. Stream-JSON round-trips. | `npm run test:pin` |
+| **1. Pin** | House Thunder 51–31 never moves. Mixer still mulberry32. Walks still decode. Stream-JSON round-trips. Foil stays compositor-synced. | `npm run test:pin` |
 | **2. Funnel** | Beats fold in order. Save or copy counts as a send. | included in `test:pin` |
 | **3. Visual loop** | Stills + tape exist. Card is night stock, not cream paper. | `npm run test:vl` |
 | **4. Demo eval** | Playwright rips a **live** pack, not the house pin, and opens the tray. Prints Stream-JSON. | `npm run test:demo` |

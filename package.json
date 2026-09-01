@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
     "test": "node --test 'scripts/**/*.test.mjs' && node --experimental-strip-types --test src/lib/app-data/app-data.test.ts src/lib/auth/gate-identity.test.ts",
-    "test:pin": "node --experimental-strip-types --test src/lib/house-pack.test.ts src/lib/nba.test.ts src/lib/walk.test.ts src/lib/demo-funnel.test.ts src/lib/stream-json.test.ts",
+    "test:pin": "node --experimental-strip-types --test src/lib/house-pack.test.ts src/lib/nba.test.ts src/lib/walk.test.ts src/lib/demo-funnel.test.ts src/lib/stream-json.test.ts src/lib/foil-gl.test.ts",
     "test:demo": "node scripts/demo-eval.mjs",
     "test:vl": "node scripts/vl-bench.mjs",
     "capture": "node scripts/capture-demo.mjs",

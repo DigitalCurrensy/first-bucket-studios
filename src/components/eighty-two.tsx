@@ -358,7 +358,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
         mark={daily ? "daily" : corners ? "corners" : wnba ? "wnba" : "machine"}
       />
 
-      {!cue && <GameBar current={barFor(mode)} onNew={daily ? undefined : reset} />}
+      {mode !== "82-0" && !cue && <GameBar current={barFor(mode)} onNew={daily ? undefined : reset} />}
 
       {beat != null && Number.isFinite(beat) && (
         <p className="mb-6 rounded-xl bg-paper px-4 py-3 text-sm shadow-border">
@@ -475,7 +475,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
             </ul>
           )}
           {ripped && !cue && <DraftFilters query={query} onQuery={setQuery} pos={pos} onPos={setPos} />}
-          <div className="grid gap-6 lg:grid-cols-dashboard">
+          <div className="grid items-start gap-6 lg:grid-cols-dashboard">
             {!ripped ? (
               <RipPack
                 room={wnba ? "wnba" : "nba"}
@@ -550,7 +550,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
               </p>
             )}
             {recap && <SeasonRecap recap={recap} />}
-            {!cue && (
+            {mode !== "82-0" && !cue && (
               <div className="mt-4">
                 <MathSheet
                   telemetry={seasonTelemetry(roster, activeEra, of)}
@@ -561,17 +561,17 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
             )}
             {daily && already && <p className="mt-3 text-sm text-subtle">Replay logged. Streak already counted today.</p>}
             {daily && !already && streak > 0 && <p className="mt-3 text-sm text-fg">Streak {streak}.</p>}
-            {!cue && justFiled() && <p className="mt-3 text-sm text-fg">Studio file saved. The house is the file.</p>}
+            {mode !== "82-0" && !cue && justFiled() && <p className="mt-3 text-sm text-fg">Studio file saved. The house is the file.</p>}
             {daily && justFiled() && <p className="mt-2 text-sm text-muted">The streak is in the file.</p>}
             {daily && (
               <div className="mt-4">
                 <StreakStrip today={stamp} lastDaily={save.lastDaily} streak={streak || save.streak} />
               </div>
             )}
-            {!cue && (
+            {mode !== "82-0" && !cue && (
               <p className="mt-3 text-sm text-muted">This room, this device, best {bestFrom(save.runs, mode) || wins}.</p>
             )}
-            {!cue && ((daily && streak >= 2 && !save.exportedAt) || needsExportNag(save)) && (
+            {mode !== "82-0" && !cue && ((daily && streak >= 2 && !save.exportedAt) || needsExportNag(save)) && (
               <p className="mt-3 text-sm text-fg">The streak dies with this browser. Export the file.</p>
             )}
             {walkId ? (
@@ -589,7 +589,7 @@ export function EightyTwo({ mode, challenge }: { mode: Mode; challenge?: Challen
                 ghostNights={ghostNights}
                 beat={beat}
               />
-              {!cue && <ExportStudioButton loud={needsExportNag(save) || (daily && streak >= 2 && !save.exportedAt)} />}
+              {!cue && mode !== "82-0" && <ExportStudioButton loud={needsExportNag(save) || (daily && streak >= 2 && !save.exportedAt)} />}
               {walkId ? (
                 <Link
                   to="/walk/$id"

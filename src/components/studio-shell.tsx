@@ -76,11 +76,11 @@ export function StudioShell({ children }: { children: React.ReactNode }) {
             {nav}
             <div className="mt-auto pt-10">
               <Link to="/games/82-0" search={{ pack: "house" }} className="widget block">
-                <p className="v-tertiary text-micro font-medium uppercase tracking-label">House job</p>
+                <p className="v-tertiary text-micro font-medium uppercase tracking-label">Pinned walk</p>
                 <p className="mt-2 font-display text-base font-semibold">Thunder</p>
                 <p className="v-secondary mt-1 text-sm">Positionless · Even</p>
                 <span className="v-separator" />
-                <p className="plate-stamp v-label text-accent">51–31 · Lock</p>
+                <p className="plate-stamp v-label text-accent">51–31 · House</p>
               </Link>
               <button
                 type="button"

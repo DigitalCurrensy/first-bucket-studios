@@ -267,6 +267,7 @@ export async function mountFoilGpu(
   let inkRgb = hexRgb(ink);
   let raf = 0;
   let live = false;
+  let drawn = false;
   const quiet = reducedMotion();
 
   const packUniforms = (time: number) => {
@@ -316,11 +317,17 @@ export async function mountFoilGpu(
     pass.draw(3);
     pass.end();
     device.queue.submit([encoder.finish()]);
+    drawn = true;
   };
 
-  const tick = (stamp: number) => {
-    draw(stamp);
-    if (live && !quiet) raf = window.requestAnimationFrame(tick);
+  const requestDraw = () => {
+    if (!live) return;
+    if (raf) return;
+    raf = window.requestAnimationFrame((stamp) => {
+      raf = 0;
+      if (!live) return;
+      draw(quiet ? 0 : stamp);
+    });
   };
 
   const resize = () => {
@@ -330,7 +337,8 @@ export async function mountFoilGpu(
     const dpr = Math.min(1.25, typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1);
     const tw = Math.max(1, Math.round(w * dpr));
     const th = Math.max(1, Math.round(h * dpr));
-    if (canvas.width !== tw || canvas.height !== th) {
+    const resized = canvas.width !== tw || canvas.height !== th;
+    if (resized) {
       canvas.width = tw;
       canvas.height = th;
       try {
@@ -339,7 +347,7 @@ export async function mountFoilGpu(
         /* keep last config */
       }
     }
-    if (!live) draw(0);
+    if (live && (resized || !drawn)) requestDraw();
   };
 
   void device.lost.then(() => {
@@ -352,22 +360,23 @@ export async function mountFoilGpu(
     setTilt(x, y) {
       tiltX = clamp01(x, 0.5);
       tiltY = clamp01(y, 0.4);
+      requestDraw();
     },
     setColors(nextFoil, nextFlare, nextInk) {
       foilRgb = hexRgb(nextFoil);
       flareRgb = hexRgb(nextFlare);
       if (nextInk) inkRgb = hexRgb(nextInk);
+      requestDraw();
     },
     resize,
     start() {
-      if (live) return;
       live = true;
       resize();
       if (quiet) {
         draw(0);
         return;
       }
-      raf = window.requestAnimationFrame(tick);
+      requestDraw();
     },
     stop() {
       live = false;

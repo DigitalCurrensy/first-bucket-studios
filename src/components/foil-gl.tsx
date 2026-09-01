@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 import { foilGlSupported, mountFoil, type FoilHandle } from "@/lib/foil-gl";
+import { subscribeGyro } from "@/lib/gyro";
 import { cn } from "@/lib/utils";
 
-function tiltOf(el: HTMLElement) {
-  const styles = getComputedStyle(el);
-  const x = Number.parseFloat(styles.getPropertyValue("--foil-x")) / 100;
-  const y = Number.parseFloat(styles.getPropertyValue("--foil-y")) / 100;
+function tiltFromPointer(host: HTMLElement, event: PointerEvent) {
+  const box = host.getBoundingClientRect();
+  if (box.width < 1 || box.height < 1) return { x: 0.5, y: 0.4 };
   return {
-    x: Number.isFinite(x) ? x : 0.5,
-    y: Number.isFinite(y) ? y : 0.4,
+    x: Math.min(1, Math.max(0, (event.clientX - box.left) / box.width)),
+    y: Math.min(1, Math.max(0, (event.clientY - box.top) / box.height)),
   };
 }
 
@@ -36,10 +36,12 @@ export function FoilGl({
     const canvas = ref.current;
     if (!canvas || !foilGlSupported()) return;
     const parent = canvas.parentElement ?? canvas;
+    const host = (canvas.closest(".rip-pack") as HTMLElement | null) ?? parent;
     let io: IntersectionObserver | null = null;
     let ro: ResizeObserver | null = null;
     let dead = false;
     let next: FoilHandle | null = null;
+    let ungyro: (() => void) | null = null;
 
     const onVis = () => {
       if (!next) return;
@@ -47,8 +49,17 @@ export function FoilGl({
       else next.start();
     };
 
-    void mountFoil(canvas, colors.current.foil, colors.current.flare, colors.current.ink, () => tiltOf(parent)).then(
-      (mounted) => {
+    const onMove = (event: Event) => {
+      if (!next) return;
+      const pe = event as PointerEvent;
+      if (typeof pe.clientX !== "number") return;
+      const tilt = tiltFromPointer(host, pe);
+      next.setTilt(tilt.x, tilt.y);
+    };
+    const onLeave = () => next?.setTilt(0.5, 0.4);
+
+    void mountFoil(canvas, colors.current.foil, colors.current.flare, colors.current.ink)
+      .then((mounted) => {
         if (!mounted) return;
         if (dead) {
           mounted.dispose();
@@ -58,6 +69,9 @@ export function FoilGl({
         handle.current = mounted;
         ready.current?.();
         document.addEventListener("visibilitychange", onVis);
+        host.addEventListener("pointermove", onMove);
+        host.addEventListener("pointerleave", onLeave);
+        ungyro = subscribeGyro((x, y) => mounted.setTilt(x / 100, y / 100));
         if (typeof IntersectionObserver === "function") {
           io = new IntersectionObserver((entries) => {
             if (entries.some((row) => row.isIntersecting)) mounted.start();
@@ -69,14 +83,17 @@ export function FoilGl({
         if (ro) ro.observe(parent);
         mounted.resize();
         mounted.start();
-      },
-    ).catch(() => {
-      /* CSS hologram stays. */
-    });
+      })
+      .catch(() => {
+        /* CSS hologram stays. */
+      });
 
     return () => {
       dead = true;
       document.removeEventListener("visibilitychange", onVis);
+      host.removeEventListener("pointermove", onMove);
+      host.removeEventListener("pointerleave", onLeave);
+      ungyro?.();
       io?.disconnect();
       ro?.disconnect();
       next?.dispose();
