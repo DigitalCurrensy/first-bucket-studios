@@ -4,6 +4,9 @@
 
 A browser basketball pack you can fork. Not a shop. Not a sportsbook. Not the NBA.
 
+**Live booth:** [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app)  
+(GitHub stays private. Domain later.)
+
 [Play](HOW-TO-PLAY.md) · [Install](#install) · [Contribute](CONTRIBUTING.md) · [MIT](LICENSE)
 
 Private: [github.com/DigitalCurrensy/first-bucket-studios](https://github.com/DigitalCurrensy/first-bucket-studios)  
