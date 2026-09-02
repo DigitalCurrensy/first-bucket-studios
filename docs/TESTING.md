@@ -20,26 +20,20 @@ GitHub Action **Pin** runs layers 1 and 3 on every push to `main`. Layer 4 needs
 
 | Piece | Status | Notes |
 | --- | --- | --- |
-| Home pack | Ready | Night stock + emblem. CSS hologram in a nested preview. |
+| Home pack | Ready | Night stock + emblem. CSS hologram inside an iframe. |
 | Live 82-0 pack | Ready | Random franchise. Tear. Ten plates. Not Thunder every time. |
 | Player cards | Ready | One 5×7 face. Night plate. Pick five. Court back only when face-down. |
 | House pin | Ready | Thunder 51–31, same walk every time. Optional. |
 | Send PNG | Ready in a top-level tab | **Save the card** is a real `<a download>`. **Share** is Web Share, then the tray. |
-| Social | Ready | X, Threads, Reddit, Facebook, TikTok, Snapchat, Discord. |
+| Social | Ready | X, Threads, Reddit, Facebook, WhatsApp, Telegram, LinkedIn, Discord, TikTok, Snapchat, Instagram. |
 | Pins | Ready | Empty until the user pins. Thunder is not auto-pinned. |
 | Pin tests | Must stay green | `npm run test:pin` then `npm run test:vl` |
-| Public URL | Ready | [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app). GitHub stays private. Domain later. |
+| Public URL | Ready | [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app) |
 
 ### Host limits (not product bugs)
 
-- **Save inside this nested preview** can be swallowed by the host. Open the live booth, then Save.
-- **WebGL foil** stays off in a host iframe / sandbox so the pack is never a white rectangle. CSS hologram is the foil here. The live booth gets GL.
-
-### Still missing for a named booth
-
-1. A custom domain. The live URL is `first-bucket-studios.vercel.app` until you buy one.
-2. One rip, not two. Home poster then 82-0 foil is the current door.
-3. Save must be tested in a **top-level** tab (the live booth). Nested preview cannot prove the download.
+- **Save inside an iframe** can be swallowed by the host. Open the live booth in a real tab, then Save.
+- **WebGL foil** stays off in a nested iframe so the pack is never a white rectangle. CSS hologram is the foil there. The live booth gets GL.
 
 Do not ship a cream pack, a Thunder-only live pull, stacked card faces, or a tray that toasts instead of saving.
 
@@ -102,4 +96,4 @@ Rewrites `docs/stills/01-home.jpg` … `04-tray.jpg` and `docs/tape/demo.mp4`. C
 
 ## Filing a bug from a failed loop
 
-See [SUPPORT.md](../SUPPORT.md). Include the walk URL, browser, and whether you were in a nested preview.
+See [SUPPORT.md](../SUPPORT.md). Include the walk URL, browser, and whether you were in an iframe.

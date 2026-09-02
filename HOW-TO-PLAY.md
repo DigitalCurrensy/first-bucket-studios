@@ -2,7 +2,7 @@
 
 Ninety seconds. One pack. One card.
 
-Live booth: [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app) — a real tab, so Save works. This nested preview can swallow the download.
+Live booth: [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app) — open it in a real tab so Save works.
 
 
 ## The loop

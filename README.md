@@ -6,13 +6,9 @@ Basketball pack · NBA · WNBA · sports cards · holographic foil · WebGL · 8
 
 A browser basketball pack you can fork. Not a shop. Not a sportsbook. Not the NBA.
 
-**Live booth:** [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app)  
-(GitHub stays private. Domain later.)
+**Play:** [first-bucket-studios.vercel.app](https://first-bucket-studios.vercel.app)
 
-[Play](HOW-TO-PLAY.md) · [Install](#install) · [Contribute](CONTRIBUTING.md) · [MIT](LICENSE)
-
-Private: [github.com/DigitalCurrensy/first-bucket-studios](https://github.com/DigitalCurrensy/first-bucket-studios)  
-(log in as DigitalCurrensy — not the older `first-bucket-studio`, no *s*)
+[How to play](HOW-TO-PLAY.md) · [Fork it](FORK.md) · [Contribute](CONTRIBUTING.md) · [MIT](LICENSE)
 
 ---
 
@@ -43,18 +39,20 @@ Tape: [docs/tape/demo.mp4](docs/tape/demo.mp4)
 | **Rip the pack** | New room. New ten. |
 | **Lock five** | 82 nights from those names. |
 | **Save the card** | `first-bucket-{team}-{wins}.png` |
-| **Share** | System share sheet, or the tray on desktop. |
+| **Share** | Phone: system share sheet. Desktop: the tray. |
 | **Pin this walk** | Keeps it on the rail. Nothing is pinned until you pin it. |
-| **X / TikTok / Snapchat / Reddit / Discord** | In the share tray. |
+| **X / Threads / Reddit / Facebook / WhatsApp / Telegram / LinkedIn** | Opens that app with the walk. |
+| **Discord** | Copies the walk, then opens Discord. Paste it. |
+| **TikTok / Snapchat / Instagram** | Saves a 9:16 plate, copies the caption, opens the app. |
 | **Copy the walk** | Public `/walk/v1.…` — paste it anywhere. |
 | **Open the walk** | Same five, same nights, forever. |
 
 There is no “copy image.” The file is the card. The URL is the walk.
 
-The pinned walk (optional) is Thunder 51–31. The door is the live pack.
+House demo (optional, not pinned): Thunder 51–31.
 
 ```
-/walk/v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga
+https://first-bucket-studios.vercel.app/walk/v1.OKC.positionless.even.51.chet~dort~hartenstein~jalenw~sga
 ```
 
 ---
@@ -70,7 +68,7 @@ npm install
 npm run dev
 ```
 
-Then rip. If Save is swallowed, you are in a nested preview — open a top-level tab.
+Open a real browser tab so Save works. Some embeds swallow the download.
 
 ```bash
 npm run test:pin    # mixer lock + walk + stream-json
@@ -89,10 +87,10 @@ The house pin must stay green. That is the lock test.
 | [HOW-TO-PLAY.md](HOW-TO-PLAY.md) | The ninety seconds |
 | [docs/TESTING.md](docs/TESTING.md) | E2E layers |
 | [docs/STREAM-JSON.md](docs/STREAM-JSON.md) | NDJSON eval pipe |
-| [docs/BENCHMARKS.md](docs/BENCHMARKS.md) | Pin + visual loop (not VLMEvalKit) |
+| [docs/BENCHMARKS.md](docs/BENCHMARKS.md) | Pin + visual loop |
 | [docs/ANALYTICS.md](docs/ANALYTICS.md) | Booth funnel. Local. |
 | [docs/WALK.md](docs/WALK.md) | Walk certificate |
-| [docs/STUDIO.md](docs/STUDIO.md) | Rooms, themes, updates, performance |
+| [docs/STUDIO.md](docs/STUDIO.md) | Rooms, themes, performance |
 | [FORK.md](FORK.md) | Copy the loop. Swap the sport. |
 | [NOTICE](NOTICE) | MIT is the code, not the names |
 | [SUPPORT.md](SUPPORT.md) | How to ask |
@@ -103,19 +101,15 @@ The house pin must stay green. That is the lock test.
 
 **Themes.** Night arena (default) or light studio. Rail toggle. Reduced motion skips the ticker.
 
-**Stream-JSON.** One object per line on stdout from `npm run test:demo`. Beats, then a walk, then a result. Same *pipe* as Claude’s stream-json. Different *types*. [docs/STREAM-JSON.md](docs/STREAM-JSON.md).
-
-**Specialists.** Live pack, house pack, walk, foil, lithograph, tray, plates. One room per PR.
+**Stream-JSON.** One object per line on stdout from `npm run test:demo`. Beats, then a walk, then a result.
 
 **GitHub Action.** [`.github/workflows/pin.yml`](.github/workflows/pin.yml) runs `test:pin` and `test:vl` on every push.
-
-**Benchmarks.** Pin = Thunder 51–31. Visual loop = stills stay night stock (Y < 80). We do not run MMBench. [docs/BENCHMARKS.md](docs/BENCHMARKS.md).
 
 ---
 
 ## Community
 
-Talk happens in **[GitHub Discussions](https://github.com/DigitalCurrensy/first-bucket-studios/discussions)**. There is no Discord.
+Talk happens in **[GitHub Discussions](https://github.com/DigitalCurrensy/first-bucket-studios/discussions)**.
 
 | Category | Use it for |
 | --- | --- |
@@ -124,7 +118,7 @@ Talk happens in **[GitHub Discussions](https://github.com/DigitalCurrensy/first-
 | **Show and tell** | Forks, other sports, stills |
 | **Announcements** | Releases from the maintainers |
 
-For a good Q&A answer fast, include the walk URL if you have one, your OS and browser, how you ran it, and whether Save was in a top-level tab or a nested preview. See [SUPPORT.md](SUPPORT.md). Bugs belong in issues. Security reports follow [SECURITY.md](SECURITY.md), never a public thread.
+Bugs belong in issues. Security reports follow [SECURITY.md](SECURITY.md), never a public thread.
 
 ---
 

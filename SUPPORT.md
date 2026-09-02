@@ -9,8 +9,8 @@ There is no Discord. There is no support email. This desk is the repo.
 ## For a good Q&A answer fast, include
 
 - The walk URL if you have one (`/walk/v1.…`)
-- OS and browser (and whether you were in a nested preview or a top-level tab)
-- How you ran it (`npm run dev`, a fork, the live preview)
+- OS and browser (and whether you were in an iframe or a real tab)
+- How you ran it (`npm run dev`, a fork, the live booth)
 - What you clicked, in order
 - What you expected, what you got
 
@@ -18,7 +18,7 @@ Do not paste secrets. Walks are public certificates; they are safe to share.
 
 ## Save did not download
 
-Save is a native file link (`<a download>` with a PNG data URL). A nested preview can swallow it. Open the live booth in a top-level tab, then Save. Copy the walk still works in the frame.
+Save is a native file link (`<a download>` with a PNG data URL). An iframe can swallow it. Open the live booth in a real tab, then Save. Copy the walk still works in the frame.
 
 ## Share on social did nothing
 

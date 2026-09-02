@@ -56,7 +56,7 @@ Copy without Save still counts. The URL is the certificate.
 
 ## Honest host limits
 
-Inside a nested preview, the host may swallow `<a download>`. Funnel will show `tray` and maybe `copy`, not `save`. That is the host, not a lying button. Test Save in a top-level tab.
+Inside an iframe, the host may swallow `<a download>`. Funnel will show `tray` and maybe `copy`, not `save`. That is the host, not a lying button. Test Save in a real tab.
 
 ## What we will not add
 
