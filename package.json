@@ -2,7 +2,7 @@
   "name": "first-bucket-studios",
   "private": true,
   "license": "MIT",
-  "description": "Rip a basketball pack. Ten cards. Five names. Eighty-two nights. Send the card.",
+  "description": "Rip a basketball pack in the browser. Ten cards. Five names. 82 nights. The card is a PNG. The walk is a URL.",
   "homepage": "https://first-bucket-studios.vercel.app",
   "repository": {
     "type": "git",
