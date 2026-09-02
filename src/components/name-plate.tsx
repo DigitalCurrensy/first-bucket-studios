@@ -1,4 +1,4 @@
-import { initials } from "@/components/crest";
+import { initials } from "@/lib/plates";
 import { cn } from "@/lib/utils";
 
 const SIZES = {

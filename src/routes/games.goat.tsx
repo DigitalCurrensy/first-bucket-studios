@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { initials, cardSerial } from "@/components/crest";
+import { initials, cardSerial } from "@/lib/plates";
 import { DraftFilters, GameBar, StepKicker } from "@/components/game-bar";
 import { LithographLoader } from "@/components/lithograph-loader";
 import { MathSheet } from "@/components/math-sheet";

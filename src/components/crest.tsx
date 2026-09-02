@@ -1,26 +1,7 @@
 import type { ReactNode } from "react";
 import { marksFor, type CrestOp } from "@/lib/crest-marks";
 import { clubAbbr as clubCode, type Era } from "@/lib/nba";
-import {
-  initials,
-  plateFor,
-  plateForPlayer,
-  plateCrop,
-  cardSerial,
-  nameParts,
-  PLATES,
-} from "@/lib/plates";
 import { cn } from "@/lib/utils";
-
-export {
-  initials,
-  plateFor,
-  plateForPlayer,
-  plateCrop,
-  cardSerial,
-  nameParts,
-  PLATES,
-};
 
 function Mark({ children, className }: { children: ReactNode; className?: string }) {
   return (

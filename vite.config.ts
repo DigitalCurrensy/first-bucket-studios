@@ -10,6 +10,8 @@ import { nitro } from "nitro/vite";
 import { grokPwaPlugin } from "./scripts/grok-pwa-plugin.mjs";
 // @ts-expect-error JS plugin alongside the TS vite config
 import { appEnvPlugin } from "./scripts/app-env-plugin.mjs";
+// @ts-expect-error JS plugin alongside the TS vite config
+import { patchWorkspace } from "./scripts/fix-ssr-exportall.mjs";
 import { isMigrationFile } from "./scripts/migration-plan.mjs";
 
 /** The files `src/lib/db.ts` globs — same directory, same non-recursive scope. */
@@ -30,6 +32,20 @@ function hasGlobbedMigrations(root: string): boolean {
  * migrations — no schema to apply — skips it entirely rather than paying for a
  * PGLite instance it never queries.
  */
+function fixSsrExportAllPlugin(): Plugin {
+  return {
+    name: "fix-ssr-exportall-cycle",
+    apply: "build",
+    enforce: "post",
+    closeBundle() {
+      const patched = patchWorkspace();
+      if (patched.length > 0) {
+        console.log("[fix-ssr-exportall]", patched.join(", "));
+      }
+    },
+  };
+}
+
 function pgliteBootstrapPlugin(): Plugin {
   return {
     name: "app-builder:pglite-bootstrap",
@@ -179,5 +195,6 @@ export default defineConfig(({ command, isPreview }) => ({
         ]
       : []),
     viteReact(),
+    fixSsrExportAllPlugin(),
   ],
 }));

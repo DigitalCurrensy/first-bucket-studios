@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { Crest, cardSerial, initials, nameParts, plateCrop, plateForPlayer } from "@/components/crest";
+import { Crest } from "@/components/crest";
+import { cardSerial, initials, nameParts, plateCrop, plateForPlayer } from "@/lib/plates";
 import { CourtBack, HoopMark, PlateRosette } from "@/components/court-mark";
 import { emblemSrc } from "@/components/pack-emblem";
 import { clubName, houseInk } from "@/lib/house-ink";
