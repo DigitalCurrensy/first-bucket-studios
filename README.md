@@ -76,7 +76,7 @@ npm run test:vl     # stills + tape are night stock
 npm run test:demo   # live pack, studio already running
 ```
 
-The house pin must stay green. That is the lock test.
+The house certificate is the lock test. It must stay this walk. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
