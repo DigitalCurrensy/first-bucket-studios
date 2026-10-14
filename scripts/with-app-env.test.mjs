@@ -59,8 +59,12 @@ test("an explicit process-env override wins over the file", () => {
   assert.equal(merged.PATH, "/usr/bin");
 });
 
-test("the template ships auth off", () => {
-  assert.deepEqual(readAppEnv(projectRoot()), { VITE_AUTH_ENABLED: "false" });
+test("the checkout app-env contains only VITE_ string flags", () => {
+  // The file is gitignored. CI has none; a local file must still be flags only.
+  for (const [key, value] of Object.entries(readAppEnv(projectRoot()))) {
+    assert.equal(key.startsWith("VITE_"), true, key);
+    assert.equal(typeof value, "string", key);
+  }
 });
 
 test("vite loadEnv resolves the wrapped value", () => {
@@ -80,7 +84,7 @@ test("the wrapped command runs with the app env applied", async () => {
     "-e",
     PRINT_FLAG,
   ]);
-  assert.equal(stdout, "false");
+  assert.equal(stdout, readAppEnv(projectRoot()).VITE_AUTH_ENABLED ?? "undefined");
 });
 
 test("the wrapped command sees an explicit override, not the file value", async () => {
@@ -124,5 +128,5 @@ test("the CLI still runs when invoked through a symlinked path", async () => {
     "-e",
     PRINT_FLAG,
   ]);
-  assert.equal(stdout, "false");
+  assert.equal(stdout, readAppEnv(projectRoot()).VITE_AUTH_ENABLED ?? "undefined");
 });

@@ -21,6 +21,10 @@ import { renderInstallPage } from "./grok-pwa-plugin.mjs";
 
 const TEMPLATE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
+// injectGrokPwaHead defaults to process.cwd(). This repo ships site.json and a
+// custom card; cases that omit cwd are unit tests and must not read those files.
+process.chdir(mkdtempSync(join(tmpdir(), "grok-pwa-isolated-")));
+
 test("injects before </head>", () => {
   const out = injectGrokPwaHead("<html><head><title>x</title></head><body></body></html>");
   assert.match(out, /rel="manifest"/);

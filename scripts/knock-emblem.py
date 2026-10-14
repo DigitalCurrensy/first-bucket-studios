@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Knock magenta (or near-black) from emblem JPGs into tight transparent PNGs."""
+
 from __future__ import annotations
 
 import sys

@@ -12,7 +12,7 @@ import {
   compareAuthInvariant,
   probeDevAuthEnabled,
 } from "./check-auth-invariant.mjs";
-import { projectRoot } from "./with-app-env.mjs";
+import { projectRoot, readAppEnv } from "./with-app-env.mjs";
 
 /**
  * The JSON body `/__app-env` would serve. Do not start a real Vite server —
@@ -90,9 +90,13 @@ test("only a divergence warns the smoke verdict", () => {
   }
 });
 
-test("the build side resolves the template's shipped app-env", () => {
-  assert.equal(buildAuthEnabled(projectRoot(), {}), false);
+test("the build side resolves the checkout app-env and honors process overrides", () => {
+  // `.grok/app-env.json` is gitignored, so a fresh clone has no file and auth
+  // stays on. A local file, when present, is what the build resolves.
+  const shipped = readAppEnv(projectRoot()).VITE_AUTH_ENABLED;
+  assert.equal(buildAuthEnabled(projectRoot(), {}), authEnabledFromEnvValue(shipped));
   assert.equal(buildAuthEnabled(projectRoot(), { VITE_AUTH_ENABLED: "true" }), true);
+  assert.equal(buildAuthEnabled(projectRoot(), { VITE_AUTH_ENABLED: "false" }), false);
 });
 
 test("the CLI reports rather than silently passing when run via a symlink", async () => {
