@@ -15,13 +15,21 @@ interface GPUAdapter {
 interface GPUShaderModule {
   getCompilationInfo(): Promise<{ messages: Array<{ type: string; message: string }> }>;
 }
-interface GPUBindGroupLayout {}
-interface GPUBindGroup {}
+interface GPUBindGroupLayout {
+  label: string;
+}
+interface GPUBindGroup {
+  label: string;
+}
 interface GPUBuffer {
   destroy(): void;
 }
-interface GPUCommandBuffer {}
-interface GPUTextureView {}
+interface GPUCommandBuffer {
+  label: string;
+}
+interface GPUTextureView {
+  label: string;
+}
 
 interface GPURenderPipeline {
   getBindGroupLayout(index: number): GPUBindGroupLayout;
@@ -36,7 +44,9 @@ interface GPUTexture {
   destroy(): void;
 }
 
-interface GPUSampler {}
+interface GPUSampler {
+  label: string;
+}
 
 interface GPUComputePassEncoder {
   setPipeline(pipeline: GPUComputePipeline): void;
